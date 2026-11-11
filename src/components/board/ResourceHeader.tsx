@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Volume2, VolumeX, RotateCcw, Plus, Zap, Coins, Star, Gem, HelpCircle } from 'lucide-react';
+import { Plus, Zap, ShoppingCart, Volume2, VolumeX, RotateCcw, HelpCircle } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 import { sounds } from '../../utils/soundSynthesizer';
 
@@ -13,16 +13,13 @@ export const ResourceHeader: React.FC<ResourceHeaderProps> = ({ onOpenHelp, onOp
     energy,
     maxEnergy,
     coins,
-    stars,
     gems,
-    superchargeMultiplier,
-    setSupercharge,
     freeEnergyRefill,
     rechargeEnergyTick
   } = useGameStore();
 
   const [soundOn, setSoundOn] = useState(sounds.enabled);
-  const [secondsUntilRecharge, setSecondsUntilRecharge] = useState(60);
+  const [secondsUntilRecharge, setSecondsUntilRecharge] = useState(45);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -44,134 +41,106 @@ export const ResourceHeader: React.FC<ResourceHeaderProps> = ({ onOpenHelp, onOp
     setSoundOn(next);
   };
 
-  const energyPercent = Math.min(100, (energy / maxEnergy) * 100);
+  const timerText = `${Math.floor(secondsUntilRecharge / 60)
+    .toString()
+    .padStart(2, '0')}:${(secondsUntilRecharge % 60).toString().padStart(2, '0')}`;
 
   return (
-    <header className="bg-gradient-to-r from-[#4E342E] via-[#5D4037] to-[#4E342E] text-[#FFFDF9] shadow-lg border-b-4 border-[#8C6239] select-none">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex flex-wrap justify-between items-center gap-2.5">
+    <header className="bg-gradient-to-b from-[#1b5853] via-[#104e49] to-[#0c433e] text-white px-2 sm:px-4 py-2 select-none border-b border-[#1b6b63]/60 shadow-md">
+      <div className="max-w-[500px] mx-auto flex items-center justify-between gap-1 sm:gap-2">
         
-        {/* Brand & Title */}
-        <div className="flex items-center space-x-2.5">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-[#E76F51] flex items-center justify-center text-2xl shadow-md border-2 border-amber-200">
-            🧩
+        {/* Profile Avatar with Golden Level Badge */}
+        <div className="relative flex-shrink-0 cursor-pointer group" onClick={onOpenHelp} title="게임 도움말">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-tr from-amber-300 via-rose-300 to-sky-300 p-0.5 shadow-md overflow-hidden border-2 border-white">
+            <img
+              src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80"
+              alt="Avatar"
+              className="w-full h-full object-cover rounded-full"
+            />
           </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <h1 className="text-sm sm:text-base font-black tracking-tight text-[#FFFDF9]">
-                머지 비스트로 (Merge Bistro)
-              </h1>
-              <span className="text-[10px] bg-[#E76F51] text-white font-extrabold px-1.5 py-0.5 rounded-full shadow-2xs">
-                Cozy Cartoon
-              </span>
-            </div>
-            <p className="text-[10px] sm:text-[11px] text-[#EBE3D5] leading-none mt-0.5">
-              해변 레스토랑 복원 & 고대 유적 미스터리
-            </p>
+          {/* Level Star Badge */}
+          <div className="absolute -bottom-1 -left-1 bg-gradient-to-br from-amber-400 to-amber-600 text-white font-black text-[9px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-md">
+            49
           </div>
         </div>
 
-        {/* Resources Bar */}
-        <div className="flex items-center flex-wrap gap-2 text-xs font-bold">
-          
-          {/* Energy Gauge with progress fill */}
-          <div className="flex items-center bg-[#3E2723]/90 px-3 py-1.5 rounded-2xl border border-[#8C6239] shadow-inner relative overflow-hidden">
-            <div
-              className="absolute left-0 bottom-0 top-0 bg-amber-500/20 transition-all duration-300 pointer-events-none"
-              style={{ width: `${energyPercent}%` }}
-            />
-            <Zap className="w-4 h-4 text-amber-400 fill-amber-400 animate-pulse mr-1.5 z-10" />
-            <div className="flex flex-col z-10">
-              <div className="flex items-center space-x-1">
-                <span className="text-amber-300 font-black text-sm">{energy}</span>
-                <span className="text-slate-400 text-[10px]">/{maxEnergy}</span>
-              </div>
-              {energy < maxEnergy && (
-                <span className="text-[9px] text-[#EBE3D5]/80 -mt-0.5">
-                  +{secondsUntilRecharge}s
-                </span>
-              )}
-            </div>
-            {energy < 30 && (
-              <button
-                onClick={freeEnergyRefill}
-                title="무료 에너지 긴급 충전 (+50)"
-                className="ml-2.5 z-10 bg-amber-400 hover:bg-amber-300 text-[#4E342E] px-2 py-0.5 rounded-lg text-[10px] font-black transition-transform active:scale-90 flex items-center shadow"
-              >
-                <Plus className="w-3 h-3" />
-                <span className="hidden sm:inline">충전</span>
-              </button>
-            )}
-          </div>
-
-          {/* Coins */}
-          <div className="flex items-center bg-[#3E2723]/90 px-3 py-1.5 rounded-2xl border border-[#8C6239] shadow-inner">
-            <Coins className="w-4 h-4 text-yellow-300 mr-1.5" />
-            <span className="text-yellow-300 font-black text-sm tracking-wide">
-              {coins.toLocaleString()}
+        {/* Energy Pill with Blue Lightning and Countdown */}
+        <div className="flex flex-col items-center">
+          <div className="bg-[#002f52]/90 border-2 border-[#38bdf8]/80 rounded-full pl-2 pr-1 py-0.5 flex items-center gap-1.5 shadow-inner">
+            <Zap className="w-4 h-4 text-[#38bdf8] fill-[#38bdf8] animate-pulse" />
+            <span className="font-black text-xs sm:text-sm text-white tracking-tight">
+              {energy}
             </span>
-          </div>
-
-          {/* Stars */}
-          <div className="flex items-center bg-[#3E2723]/90 px-3 py-1.5 rounded-2xl border border-[#8C6239] shadow-inner">
-            <Star className="w-4 h-4 text-amber-400 fill-amber-400 mr-1.5" />
-            <span className="text-amber-400 font-black text-sm tracking-wide">
-              {stars.toLocaleString()}
-            </span>
-          </div>
-
-          {/* Gems */}
-          <div className="flex items-center bg-[#3E2723]/90 px-2.5 py-1.5 rounded-2xl border border-[#8C6239] shadow-inner">
-            <Gem className="w-3.5 h-3.5 text-cyan-300 mr-1" />
-            <span className="text-cyan-300 font-black text-xs">
-              {gems}
-            </span>
-          </div>
-
-          {/* Supercharge Switcher */}
-          <div className="flex items-center bg-[#2E1C18] p-1 rounded-2xl border border-[#6D4C41] gap-1">
-            <span className="text-[10px] text-[#EBE3D5] px-1 font-bold hidden md:inline">
-              스포너 배수:
-            </span>
-            {([1, 2, 4] as const).map(m => (
-              <button
-                key={m}
-                onClick={() => setSupercharge(m)}
-                className={`px-2 py-0.5 rounded-xl text-xs font-black transition-all ${
-                  superchargeMultiplier === m
-                    ? 'bg-gradient-to-r from-amber-500 to-[#E76F51] text-white shadow scale-105'
-                    : 'text-[#EBE3D5] hover:text-white hover:bg-[#4E342E]'
-                }`}
-              >
-                {m}x
-              </button>
-            ))}
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center gap-1">
             <button
-              onClick={handleToggleSound}
-              title={soundOn ? '사운드 끄기' : '사운드 켜기'}
-              className="p-1.5 rounded-xl bg-[#5D4037] hover:bg-[#6D4C41] text-[#EBE3D5] transition-colors"
+              onClick={freeEnergyRefill}
+              title="에너지 무료 충전 (+50)"
+              className="w-5 h-5 rounded-full bg-gradient-to-tr from-emerald-500 to-green-400 text-white flex items-center justify-center hover:scale-110 active:scale-90 transition-transform shadow-sm"
             >
-              {soundOn ? <Volume2 className="w-4 h-4 text-[#2A9D8F]" /> : <VolumeX className="w-4 h-4 text-rose-400" />}
-            </button>
-            <button
-              onClick={onOpenHelp}
-              title="게임 규칙 및 가이드"
-              className="p-1.5 rounded-xl bg-[#5D4037] hover:bg-[#6D4C41] text-[#EBE3D5] transition-colors"
-            >
-              <HelpCircle className="w-4 h-4" />
-            </button>
-            <button
-              onClick={onOpenResetConfirm}
-              title="게임 데이터 리셋"
-              className="p-1.5 rounded-xl bg-[#5D4037] hover:bg-rose-900 text-[#EBE3D5] transition-colors"
-            >
-              <RotateCcw className="w-4 h-4 text-slate-300 hover:text-rose-200" />
+              <Plus className="w-3.5 h-3.5 stroke-[3]" />
             </button>
           </div>
+          <span className="text-[9px] font-bold text-sky-200/90 tracking-tighter mt-0.5">
+            {energy < maxEnergy ? timerText : 'FULL'}
+          </span>
+        </div>
 
+        {/* Coin Pill */}
+        <div className="bg-[#6b4700]/90 border-2 border-amber-400 rounded-full pl-2 pr-1 py-0.5 flex items-center gap-1.5 shadow-inner">
+          <div className="w-4 h-4 rounded-full bg-amber-400 flex items-center justify-center text-[10px] text-amber-950 font-black shadow-xs">
+            🪙
+          </div>
+          <span className="font-black text-xs sm:text-sm text-amber-100 tracking-tight">
+            {coins.toLocaleString()}
+          </span>
+          <button
+            onClick={() => useGameStore.getState().addCoins(100)}
+            title="코인 보너스 (+100)"
+            className="w-5 h-5 rounded-full bg-gradient-to-tr from-emerald-500 to-green-400 text-white flex items-center justify-center hover:scale-110 active:scale-90 transition-transform shadow-sm"
+          >
+            <Plus className="w-3.5 h-3.5 stroke-[3]" />
+          </button>
+        </div>
+
+        {/* Gem Pill */}
+        <div className="bg-[#4a0834]/90 border-2 border-pink-400 rounded-full pl-2 pr-1 py-0.5 flex items-center gap-1.5 shadow-inner">
+          <span className="text-xs">💎</span>
+          <span className="font-black text-xs sm:text-sm text-pink-100 tracking-tight">
+            {gems.toLocaleString()}
+          </span>
+          <button
+            onClick={() => useGameStore.getState().addGems(10)}
+            title="보석 보너스 (+10)"
+            className="w-5 h-5 rounded-full bg-gradient-to-tr from-emerald-500 to-green-400 text-white flex items-center justify-center hover:scale-110 active:scale-90 transition-transform shadow-sm"
+          >
+            <Plus className="w-3.5 h-3.5 stroke-[3]" />
+          </button>
+        </div>
+
+        {/* Shop Cart & Sound Menu */}
+        <div className="flex items-center gap-1">
+          <button
+            onClick={onOpenHelp}
+            title="상점 & 이벤트"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-amber-400 via-amber-500 to-orange-500 border-2 border-amber-200 text-white flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-transform"
+          >
+            <ShoppingCart className="w-4 h-4 text-white drop-shadow" />
+          </button>
+
+          <button
+            onClick={handleToggleSound}
+            title={soundOn ? '효과음 끄기' : '효과음 켜기'}
+            className="w-7 h-7 rounded-lg bg-black/30 hover:bg-black/50 text-white/80 flex items-center justify-center text-xs"
+          >
+            {soundOn ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5 text-rose-300" />}
+          </button>
+
+          <button
+            onClick={onOpenResetConfirm}
+            title="게임 초기화"
+            className="w-7 h-7 rounded-lg bg-black/30 hover:bg-black/50 text-white/80 flex items-center justify-center text-xs"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+          </button>
         </div>
 
       </div>

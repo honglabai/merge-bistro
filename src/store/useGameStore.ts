@@ -52,6 +52,8 @@ interface GameState {
   moveSelectedToInventory: () => void;
   retrieveFromInventory: (pocketIdx: number) => void;
   freeEnergyRefill: () => void;
+  addCoins: (amount: number) => void;
+  addGems: (amount: number) => void;
   showToast: (msg: string) => void;
   resetGame: () => void;
 }
@@ -614,6 +616,26 @@ export const useGameStore = create<GameState>((set, get) => ({
     state.showToast('⚡ 무료 에너지 +50 충전 완료!');
     set({
       energy: Math.min(state.maxEnergy, state.energy + 50)
+    });
+    saveState(get());
+  },
+
+  addCoins: (amount: number) => {
+    const state = get();
+    sounds.playTapSound();
+    state.showToast(`+${amount}🪙 코인 획득!`);
+    set({
+      coins: state.coins + amount
+    });
+    saveState(get());
+  },
+
+  addGems: (amount: number) => {
+    const state = get();
+    sounds.playTapSound();
+    state.showToast(`+${amount}💎 보석 획득!`);
+    set({
+      gems: state.gems + amount
     });
     saveState(get());
   },

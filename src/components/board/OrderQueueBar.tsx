@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, Sparkles, UserCheck, ArrowRight } from 'lucide-react';
+import { Sparkles, Check, Clock } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 import { getItemDef, ITEM_CHAINS } from '../../data/itemsData';
 import { ItemGraphic } from '../ui/ItemGraphic';
@@ -8,27 +8,46 @@ import { ItemGraphic } from '../ui/ItemGraphic';
 export const OrderQueueBar: React.FC = () => {
   const { orders, board, fulfillOrder } = useGameStore();
 
+  const cardBorderColors = [
+    'border-amber-400 bg-amber-50/95',
+    'border-emerald-400 bg-emerald-50/95',
+    'border-sky-400 bg-sky-50/95',
+    'border-blue-500 bg-blue-50/95',
+    'border-rose-400 bg-rose-50/95'
+  ];
+
+  const cardTimers = ['21h 16m', '10d 21h', '1d 21h', '1d 21h', '6d 21h'];
+
   return (
-    <div className="bg-[#FAF7F2]/95 backdrop-blur-sm rounded-3xl p-3 sm:p-4 border-2 border-[#D4A373]/50 shadow-md">
-      <div className="flex justify-between items-center mb-2.5">
-        <div className="flex items-center gap-2">
-          <UserCheck className="w-4 h-4 text-[#E76F51]" />
-          <h2 className="text-xs sm:text-sm font-extrabold text-[#4E342E]">
-            비스트로 손님 주문서 (Customer Orders)
-          </h2>
-          <span className="text-[10px] bg-[#EBE3D5] text-[#4E342E] font-black px-2 py-0.5 rounded-full">
-            {orders.length}팀 대기 중
-          </span>
-        </div>
-        <span className="text-[11px] text-[#2A9D8F] font-bold flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-[#2A9D8F] animate-ping inline-block" />
-          보드 재료 실시간 감지 중
-        </span>
+    <div className="relative w-full max-w-[500px] mx-auto overflow-hidden rounded-2xl shadow-lg border-2 border-[#126b62] select-none">
+      
+      {/* Window Cafe Street Background with Curtains */}
+      <div className="relative w-full h-36 sm:h-40 bg-[#c5e6f5] overflow-hidden">
+        <img
+          src="/extracted/window_background.png"
+          alt="Window Backdrop"
+          className="w-full h-full object-cover object-center filter brightness-105"
+          onError={(e) => {
+            // Fallback gradient if missing
+            (e.target as HTMLElement).style.display = 'none';
+          }}
+        />
+
+        {/* Soft curtain vignette shadow */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/25 pointer-events-none" />
+
+        {/* Side Curtains Draping effect */}
+        <div className="absolute top-0 left-0 w-8 sm:w-10 h-full bg-gradient-to-r from-amber-50/90 via-amber-100/60 to-transparent pointer-events-none" />
+        <div className="absolute top-0 right-0 w-8 sm:w-10 h-full bg-gradient-to-l from-amber-50/90 via-amber-100/60 to-transparent pointer-events-none" />
+
+        {/* Window Sill Shelf on which cards rest */}
+        <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-[#0e5c54] to-[#16786e] border-t border-[#38b2a3]" />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+      {/* Floating Order Cards Row */}
+      <div className="absolute inset-0 flex items-end px-2 pb-2 overflow-x-auto no-scrollbar gap-2 z-10">
         <AnimatePresence mode="popLayout">
-          {orders.map(order => {
+          {orders.map((order, idx) => {
             const itemDef = getItemDef(order.targetChainId, order.targetLevel);
             const chainDef = ITEM_CHAINS[order.targetChainId];
 
@@ -41,97 +60,79 @@ export const OrderQueueBar: React.FC = () => {
                 !cell.item.isGenerator
             );
 
+            const borderTheme = cardBorderColors[idx % cardBorderColors.length];
+            const timer = cardTimers[idx % cardTimers.length];
+
             return (
               <motion.div
                 key={order.id}
                 layout
-                initial={{ opacity: 0, scale: 0.85, y: -10 }}
+                initial={{ opacity: 0, scale: 0.8, y: 15 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.85, y: 10 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                className={`p-3 rounded-2xl border-2 transition-all flex flex-col justify-between relative overflow-hidden shadow-sm ${
+                exit={{ opacity: 0, scale: 0.8, y: -15 }}
+                whileHover={{ scale: 1.04, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  if (hasItem) {
+                    fulfillOrder(order.id);
+                  }
+                }}
+                className={`relative w-20 sm:w-22 h-32 sm:h-34 flex-shrink-0 rounded-xl border-3 flex flex-col justify-between items-center p-1.5 shadow-xl cursor-pointer transition-all ${borderTheme} ${
                   hasItem
-                    ? 'bg-gradient-to-br from-emerald-50 via-teal-50 to-emerald-100/60 border-[#2A9D8F] ring-2 ring-[#2A9D8F]/50 shadow-md'
-                    : 'bg-[#FFFDF9] border-[#EBE3D5] hover:border-[#D4A373]'
+                    ? 'ring-4 ring-emerald-400 animate-pulse bg-gradient-to-b from-emerald-50 to-emerald-100'
+                    : 'hover:shadow-2xl'
                 }`}
               >
-                {/* Ready Badge */}
-                {hasItem && (
-                  <div className="absolute top-1.5 right-1.5 bg-[#2A9D8F] text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow flex items-center gap-1 animate-bounceSubtle">
-                    <Sparkles className="w-2.5 h-2.5" />
-                    납품 가능!
-                  </div>
-                )}
-
-                {/* Customer Info (Speech bubble style) */}
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-9 h-9 rounded-full bg-[#EBE3D5] border border-[#D4A373] flex items-center justify-center text-xl shadow-inner flex-shrink-0">
+                {/* Top Badge: Level or Item count */}
+                <div className="w-full flex justify-between items-center px-0.5">
+                  <span className="text-[9px] font-black bg-amber-400 text-amber-950 px-1 rounded-sm shadow-2xs">
+                    +{order.rewardStars}⭐
+                  </span>
+                  <div className="w-4 h-4 rounded-full bg-white/80 border border-slate-300 flex items-center justify-center text-[10px]">
                     {order.customerAvatar}
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-xs font-black text-[#4E342E] truncate">
-                      {order.customerName}
-                    </div>
-                    <div className="text-[10px] text-slate-500 truncate">
-                      {order.customerRole}
-                    </div>
-                  </div>
                 </div>
 
-                {/* Target Item Row */}
-                <div className="flex items-center justify-between bg-white/95 p-2 rounded-xl border border-[#EBE3D5] mb-2.5 shadow-2xs">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center p-0.5 flex-shrink-0">
-                      <ItemGraphic chainId={order.targetChainId} level={order.targetLevel} className="w-full h-full" />
+                {/* 3D Item Illustration */}
+                <div className="relative w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center my-auto">
+                  <ItemGraphic
+                    chainId={order.targetChainId}
+                    level={order.targetLevel}
+                    className="w-full h-full object-contain filter drop-shadow-md"
+                  />
+                  {hasItem && (
+                    <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg animate-bounceSubtle">
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
                     </div>
-                    <div className="min-w-0">
-                      <div className="text-xs font-black text-[#4E342E] truncate">
-                        {itemDef?.name || '요리'}
-                      </div>
-                      <div className="text-[10px] text-slate-500">
-                        {chainDef?.name} · <strong className="text-[#E76F51]">Lv.{order.targetLevel}</strong>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Rewards */}
-                  <div className="text-right flex-shrink-0 pl-1.5">
-                    <div className="text-[11px] font-black text-amber-600">
-                      +{order.rewardCoins}🪙
-                    </div>
-                    <div className="text-[10px] font-black text-[#E76F51]">
-                      +{order.rewardStars}⭐
-                    </div>
-                  </div>
+                  )}
                 </div>
 
-                {/* Deliver Button */}
-                <motion.button
-                  whileHover={hasItem ? { scale: 1.02 } : {}}
-                  whileTap={hasItem ? { scale: 0.96 } : {}}
-                  onClick={() => fulfillOrder(order.id)}
-                  disabled={!hasItem}
-                  className={`w-full py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 shadow ${
+                {/* Progress Pill / Reward Coins */}
+                <div className="w-full bg-black/60 rounded-full px-1 py-0.5 text-center flex items-center justify-center gap-0.5">
+                  <span className="text-[9px] font-black text-amber-300">
+                    +{order.rewardCoins}🪙
+                  </span>
+                </div>
+
+                {/* Bottom Timer Badge */}
+                <div
+                  className={`w-full text-center text-[8px] sm:text-[9px] font-black rounded-b-lg py-0.5 mt-0.5 text-white flex items-center justify-center gap-0.5 ${
                     hasItem
-                      ? 'bg-gradient-to-r from-[#2A9D8F] to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white cursor-pointer ring-1 ring-[#2A9D8F]/60'
-                      : 'bg-[#EBE3D5]/80 text-slate-400 cursor-not-allowed'
+                      ? 'bg-emerald-600'
+                      : idx === 0
+                      ? 'bg-amber-600'
+                      : 'bg-[#1b7367]'
                   }`}
                 >
-                  {hasItem ? (
-                    <>
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>요리 납품하기 (보상 수령)</span>
-                      <ArrowRight className="w-3 h-3" />
-                    </>
-                  ) : (
-                    <span>요리 조리 중...</span>
-                  )}
-                </motion.button>
+                  <Clock className="w-2.5 h-2.5" />
+                  <span>{hasItem ? '완료 탭!' : timer}</span>
+                </div>
               </motion.div>
             );
           })}
         </AnimatePresence>
       </div>
+
     </div>
   );
 };

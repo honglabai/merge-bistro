@@ -55,13 +55,27 @@ export const MergeBoard: React.FC = () => {
   };
 
   return (
-    <div className="bg-gradient-to-b from-[#8C6239] via-[#6D4C41] to-[#4E342E] p-2 sm:p-3.5 rounded-3xl shadow-2xl border-4 border-[#D4A373] select-none touch-none">
-      
-      {/* 7x9 = 63 Grid Board with carved tray styling */}
-      <div className="grid grid-cols-7 gap-1 sm:gap-1.5 aspect-[7/9] w-full max-w-[540px] mx-auto bg-[#3E2723]/95 p-1.5 sm:p-2.5 rounded-2xl shadow-inner border border-[#8C6239]/60">
+    <div className="w-full flex flex-col items-center select-none touch-none">
+      {/* 7x9 = 63 Checkerboard Grid Matching the Reference Screenshot */}
+      <div className="grid grid-cols-7 grid-rows-9 gap-[1px] aspect-[7/9] w-full max-w-[460px] mx-auto bg-[#6ea0c9]/50 p-[2px] rounded-2xl overflow-hidden shadow-2xl border-2 border-[#8db9db]/60">
         {board.map(cell => {
           const isSelected = selectedTileIndex === cell.index;
           const isGen = cell.item?.isGenerator;
+
+          const row = Math.floor(cell.index / 7);
+          const col = cell.index % 7;
+          const isLight = (row + col) % 2 === 0;
+
+          // Exact color matching from screenshot
+          // Light: #97c0e0, Dark: #7fb0d8, Cobweb/Locked: #5a8c2f (olive green)
+          const isOliveTile = cell.state === 'COBWEB' || cell.state === 'LOCKED';
+          const tileBgColor = isOliveTile
+            ? cell.state === 'LOCKED'
+              ? '#4a7526'
+              : '#5a8c2f'
+            : isLight
+            ? '#97c0e0'
+            : '#7fb0d8';
 
           const isDraggable = cell.state === 'OPEN' && !!cell.item && !isGen;
           const isDragCandidate =
@@ -85,39 +99,32 @@ export const MergeBoard: React.FC = () => {
               draggable={isDraggable}
               onDragStartCapture={e => handleDragStart(e, cell.index)}
               onDragEndCapture={handleDragEnd}
-              whileHover={{ scale: cell.item ? 1.04 : 1 }}
+              whileHover={{ scale: cell.item ? 1.05 : 1 }}
               whileTap={{ scale: cell.item ? 0.94 : 1 }}
               animate={
                 isSelected
-                  ? { scale: [1, 0.93, 1], transition: { repeat: Infinity, duration: 1.4 } }
+                  ? { scale: [1, 0.94, 1], transition: { repeat: Infinity, duration: 1.4 } }
                   : { scale: 1 }
               }
-              className={`relative rounded-xl flex flex-col items-center justify-center p-0.5 sm:p-1 cursor-pointer transition-shadow overflow-hidden ${
+              className={`relative aspect-square flex items-center justify-center cursor-pointer transition-shadow overflow-hidden ${
                 isSelected
-                  ? 'ring-4 ring-amber-400 z-20 shadow-xl bg-amber-50'
+                  ? 'ring-4 ring-amber-300 ring-offset-2 ring-offset-sky-200 z-20 shadow-2xl'
                   : isHoveredTarget && isDragCandidate
-                  ? 'ring-4 ring-emerald-400 bg-emerald-50 z-20 animate-pulse'
+                  ? 'ring-4 ring-emerald-400 bg-emerald-200/50 z-20 animate-pulse'
                   : isDragCandidate
                   ? 'ring-2 ring-amber-300 ring-dashed animate-pulse'
                   : ''
-              } ${
-                cell.state === 'LOCKED'
-                  ? 'bg-gradient-to-br from-[#4E342E] to-[#2E1C18] border border-[#6D4C41]/80 shadow-inner'
-                  : cell.state === 'COBWEB'
-                  ? 'bg-gradient-to-br from-[#EBE3D5] to-[#D6C8B5] border border-[#C2B29D] shadow-inner'
-                  : isGen
-                  ? 'bg-gradient-to-br from-amber-100 via-amber-200 to-amber-300 border-2 border-amber-400 shadow-md'
-                  : cell.item
-                  ? 'bg-gradient-to-b from-[#FFFDF9] to-[#FAF7F2] border border-[#EBE3D5] shadow-sm'
-                  : 'bg-[#FAF7F2]/40 border border-[#FAF7F2]/20 hover:bg-[#FAF7F2]/60'
               }`}
-              style={{ touchAction: 'none' }}
+              style={{
+                backgroundColor: tileBgColor,
+                touchAction: 'none'
+              }}
             >
               {/* Tile States */}
               {cell.state === 'LOCKED' && (
-                <div className="flex flex-col items-center justify-center text-[#8C6239] opacity-80">
-                  <Lock className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="text-[8px] sm:text-[9px] font-bold mt-0.5 tracking-tighter">
+                <div className="flex flex-col items-center justify-center text-white/90 drop-shadow">
+                  <Lock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                  <span className="text-[8px] font-black tracking-tighter mt-0.5 text-white">
                     상자
                   </span>
                 </div>
@@ -125,23 +132,20 @@ export const MergeBoard: React.FC = () => {
 
               {cell.state === 'COBWEB' && (
                 <div className="w-full h-full flex flex-col items-center justify-center relative p-0.5">
-                  <span className="absolute text-slate-400/40 text-xl sm:text-2xl select-none pointer-events-none z-10">
+                  <span className="absolute text-white/40 text-xl sm:text-2xl select-none pointer-events-none z-10 drop-shadow-sm">
                     🕸️
                   </span>
                   {cell.item ? (
-                    <div className="w-full h-full opacity-65 flex flex-col items-center justify-center z-0 relative">
+                    <div className="w-[88%] h-[88%] flex items-center justify-center z-0 relative opacity-85">
                       <ItemGraphic
                         chainId={cell.item.chainId}
                         level={cell.item.level}
                         isGenerator={cell.item.isGenerator}
-                        className="w-full h-full p-0.5 filter grayscale contrast-125"
+                        className="w-full h-full filter brightness-95"
                       />
-                      <span className="absolute top-0.5 right-0.5 text-[7px] sm:text-[8px] font-black text-slate-700 bg-white/80 px-1 rounded shadow-2xs">
-                        Lv.{cell.item.level}
-                      </span>
                     </div>
                   ) : (
-                    <span className="text-[8px] text-slate-400 z-10 font-bold">거미줄</span>
+                    <span className="text-[8px] text-white/80 z-10 font-bold">거미줄</span>
                   )}
                 </div>
               )}
@@ -150,40 +154,37 @@ export const MergeBoard: React.FC = () => {
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={cell.item.id}
-                    initial={{ scale: 0.8, opacity: 0 }}
+                    initial={{ scale: 0.75, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.8, opacity: 0 }}
-                    transition={{ type: 'spring', stiffness: 450, damping: 25 }}
-                    className="relative w-full h-full flex items-center justify-center p-0.5 sm:p-1 pointer-events-none"
+                    exit={{ scale: 0.75, opacity: 0 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 28 }}
+                    className="relative w-full h-full flex items-center justify-center p-0.5 pointer-events-none"
                   >
-                    {/* Generator Spawner Badge */}
-                    {isGen ? (
-                      <div className="absolute top-0.5 left-0.5 z-10 bg-amber-400 text-amber-950 px-1 py-0.2 rounded text-[7px] sm:text-[8px] font-black shadow-sm flex items-center gap-0.5 border border-amber-200">
-                        <Zap className="w-2 h-2 fill-amber-950 text-amber-950 animate-pulse" />
-                        <span>스포너</span>
-                      </div>
-                    ) : (
-                      <div className="absolute top-0.5 right-0.5 z-10 bg-black/60 backdrop-blur-xs text-white text-[7px] sm:text-[8px] font-black px-1 rounded shadow-sm border border-white/20">
-                        Lv.{cell.item.level}
+                    {/* Authentic Spawner Glowing Pink/Magenta Lightning Badge at Bottom-Right */}
+                    {isGen && (
+                      <div
+                        title="스포너 (탭하여 재료 생성)"
+                        className="absolute bottom-1 right-1 z-10 w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full bg-gradient-to-tr from-fuchsia-600 via-pink-500 to-rose-400 border-2 border-white shadow-lg flex items-center justify-center animate-pulse drop-shadow-[0_2px_4px_rgba(236,72,153,0.6)]"
+                      >
+                        <Zap className="w-3 h-3 text-white fill-white" />
                       </div>
                     )}
 
-                    {/* Graphic Box Filling the Entire Tile (No text) */}
-                    <div className={`w-full h-full flex items-center justify-center ${isSelected ? 'animate-bounceSubtle' : isGen ? 'hover:scale-105' : ''}`}>
+                    {/* Big Chunky 3D Graphic Filling ~88% of Tile with Ambient Drop Shadow */}
+                    <div
+                      className={`w-[88%] h-[88%] flex items-center justify-center ${
+                        isSelected ? 'animate-bounceSubtle' : isGen ? 'hover:scale-105' : ''
+                      }`}
+                    >
                       <ItemGraphic
                         chainId={cell.item.chainId}
                         level={cell.item.level}
                         isGenerator={isGen}
-                        className="w-full h-full p-0.5"
+                        className="w-full h-full"
                       />
                     </div>
                   </motion.div>
                 </AnimatePresence>
-              )}
-
-              {/* Empty Open Slot */}
-              {cell.state === 'OPEN' && !cell.item && (
-                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#D4A373]/40" />
               )}
             </motion.div>
           );
@@ -191,12 +192,12 @@ export const MergeBoard: React.FC = () => {
       </div>
 
       {/* Guide Banner */}
-      <div className="mt-2.5 text-center text-[10px] sm:text-xs text-[#EBE3D5] font-medium flex items-center justify-center gap-1.5 flex-wrap">
+      <div className="mt-2 text-center text-[10px] sm:text-xs text-emerald-100 font-bold flex items-center justify-center gap-1.5 flex-wrap">
         <Sparkles className="w-3.5 h-3.5 text-amber-300" />
         <span>
-          <strong className="text-amber-300">스포너 탭</strong> 재료 스폰 ·{' '}
-          <strong className="text-amber-300">동일 레벨 머지</strong> 상위 요리 제작 ·{' '}
-          <strong className="text-amber-300">합성 시</strong> 인접 거미줄/상자 연쇄 해금!
+          <strong className="text-pink-300">⚡ 스포너 탭</strong> 재료 소환 ·{' '}
+          <strong className="text-amber-300">동일 아이템 드래그 머지</strong> 합성 진화 ·{' '}
+          <strong className="text-emerald-300">합성 시</strong> 인접 거미줄 자동 해금!
         </span>
       </div>
     </div>

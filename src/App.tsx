@@ -4,8 +4,7 @@ import { useGameStore } from './store/useGameStore';
 import { ResourceHeader } from './components/board/ResourceHeader';
 import { OrderQueueBar } from './components/board/OrderQueueBar';
 import { MergeBoard } from './components/board/MergeBoard';
-import { BackpackStorage } from './components/board/BackpackStorage';
-import { ItemInspectorBar } from './components/board/ItemInspectorBar';
+import { BottomActionBar } from './components/board/BottomActionBar';
 import { TownRestorationView } from './components/meta/TownRestorationView';
 import { CookstagramView } from './components/meta/CookstagramView';
 import { MathSimulatorView } from './components/meta/MathSimulatorView';
@@ -126,20 +125,24 @@ export const App: React.FC = () => {
       {/* Main Tab Content */}
       <main className="max-w-7xl mx-auto px-2 sm:px-6 py-4 sm:py-6 flex-grow w-full">
         {currentTab === 'game' && (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
-            {/* Active Orders Queue */}
-            <OrderQueueBar />
+            {/* Center Merge Game Container - Authentic Mobile Casual Game Aesthetic */}
+            <div className="lg:col-span-7 flex flex-col items-center max-w-[500px] mx-auto w-full space-y-2.5 p-2.5 sm:p-3.5 rounded-3xl shadow-2xl border-4 border-[#006f5c]"
+              style={{
+                background:
+                  'repeating-linear-gradient(90deg, #008770 0px, #008770 38px, #007863 39px, #00937b 40px)'
+              }}
+            >
+              {/* Active Orders Shelf with Window Cafe Backdrop */}
+              <OrderQueueBar />
 
-            {/* Core Board & Side Panel Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-              
-              {/* Left / Center Merge Board Tray (7 cols) */}
-              <div className="lg:col-span-7 space-y-3">
-                <MergeBoard />
-                <BackpackStorage />
-                <ItemInspectorBar />
-              </div>
+              {/* 7x9 Seamless Checkerboard Grid */}
+              <MergeBoard />
+
+              {/* Bottom 3-Section Navigation Bar (Backpack | Inspector Pill | Map) */}
+              <BottomActionBar onOpenMap={() => setCurrentTab('restoration')} />
+            </div>
 
               {/* Right Side Panel: Bistro Restoration Hero & Village Journal (5 cols) */}
               <div className="lg:col-span-5 space-y-4">
@@ -254,8 +257,6 @@ export const App: React.FC = () => {
               </div>
 
             </div>
-
-          </div>
         )}
 
         {currentTab === 'restoration' && <TownRestorationView />}
