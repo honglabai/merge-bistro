@@ -1,0 +1,24 @@
+{
+  "name": "머지 비스트로: 유적의 비밀 (Merge Bistro)",
+  "short_name": "머지 비스트로",
+  "description": "폭풍우로 무너진 바닷마을 레스토랑을 복원하는 63타일 머지-2 퍼즐 & 스토리 타이쿤 게임",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAF7F2",
+  "theme_color": "#8C6239",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

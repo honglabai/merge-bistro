@@ -6,6 +6,7 @@ import { INITIAL_ORDERS, ORDER_POOL, RESTORATION_NODES } from '../data/ordersAnd
 import { COOKSTAGRAM_POSTS } from '../data/storyAndCookstagramData';
 import { ITEM_CHAINS, getItemDef } from '../data/itemsData';
 import { sounds } from '../utils/soundSynthesizer';
+import { emitMergeParticles } from '../components/ui/ParticleCanvas';
 
 const STORAGE_KEY = 'merge_bistro_gamestate_v1';
 
@@ -20,6 +21,7 @@ interface GameState {
   followers: number;
   superchargeMultiplier: 1 | 2 | 4;
   selectedTileIndex: number | null;
+  dragOverIndex: number | null;
   orders: CustomerOrder[];
   restorations: RestorationNode[];
   posts: CookstagramPost[];
@@ -34,9 +36,10 @@ interface GameState {
   init: () => void;
   rechargeEnergyTick: () => void;
   selectTile: (index: number | null) => void;
+  setDragOverIndex: (index: number | null) => void;
   handleTileClick: (index: number) => void;
   tapGenerator: (index: number) => void;
-  mergeOrMoveTile: (fromIndex: number, toIndex: number) => void;
+  mergeOrMoveTile: (fromIndex: number, toIndex: number, clientPos?: { x: number; y: number }) => void;
   unlockAdjacentTiles: (row: number, col: number) => void;
   fulfillOrder: (orderId: string) => void;
   openRestorationPicker: (node: RestorationNode) => void;
@@ -64,6 +67,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   followers: 85,
   superchargeMultiplier: 1,
   selectedTileIndex: null,
+  dragOverIndex: null,
   orders: INITIAL_ORDERS,
   restorations: RESTORATION_NODES,
   posts: COOKSTAGRAM_POSTS,
@@ -75,13 +79,26 @@ export const useGameStore = create<GameState>((set, get) => ({
   pendingRestorationNode: null,
 
   init: () => {
+    let recoveredOfflineEnergy = 0;
+
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
+        const storedLastRecharge = typeof parsed.lastEnergyRecharge === 'number' ? parsed.lastEnergyRecharge : Date.now();
+        const storedEnergy = typeof parsed.energy === 'number' ? parsed.energy : 100;
+        const maxE = 100;
+
+        // Calculate offline elapsed energy
+        const elapsedSec = Math.floor((Date.now() - storedLastRecharge) / 1000);
+        if (elapsedSec >= 60 && storedEnergy < maxE) {
+          const recoverable = Math.floor(elapsedSec / 60);
+          recoveredOfflineEnergy = Math.min(recoverable, maxE - storedEnergy);
+        }
+
         set({
           board: parsed.board || createInitialBoard(),
-          energy: typeof parsed.energy === 'number' ? parsed.energy : 100,
+          energy: Math.min(maxE, storedEnergy + recoveredOfflineEnergy),
           coins: typeof parsed.coins === 'number' ? parsed.coins : 150,
           stars: typeof parsed.stars === 'number' ? parsed.stars : 5,
           gems: typeof parsed.gems === 'number' ? parsed.gems : 30,
@@ -90,15 +107,29 @@ export const useGameStore = create<GameState>((set, get) => ({
           restorations: parsed.restorations || RESTORATION_NODES,
           posts: parsed.posts || COOKSTAGRAM_POSTS,
           inventoryPocket: parsed.inventoryPocket || [null, null, null, null],
-          lastEnergyRecharge: parsed.lastEnergyRecharge || Date.now()
+          lastEnergyRecharge: Date.now()
         });
       }
     } catch {
       // Fallback
     }
 
-    // Energy recharge catch-up
-    get().rechargeEnergyTick();
+    if (recoveredOfflineEnergy > 0) {
+      setTimeout(() => {
+        get().showToast(`☕ 비스트로에 돌아오신 것을 환영합니다! 부재중 에너지 +${recoveredOfflineEnergy}⚡ 자동 충전!`);
+      }, 800);
+    }
+
+    // Set up auto save listeners
+    if (typeof window !== 'undefined') {
+      window.addEventListener('beforeunload', () => {
+        saveState(get());
+      });
+      // 5-second periodic auto-sync
+      setInterval(() => {
+        saveState(get());
+      }, 5000);
+    }
   },
 
   rechargeEnergyTick: () => {
@@ -126,6 +157,10 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({ selectedTileIndex: index });
   },
 
+  setDragOverIndex: (index: number | null) => {
+    set({ dragOverIndex: index });
+  },
+
   handleTileClick: (index: number) => {
     const state = get();
     const cell = state.board[index];
@@ -141,16 +176,13 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     // 2. Selection & Merging
     if (state.selectedTileIndex === null) {
-      // Pick item if cell has item
       if (cell.item && cell.state === 'OPEN') {
         set({ selectedTileIndex: index });
       }
     } else {
       if (state.selectedTileIndex === index) {
-        // Deselect
         set({ selectedTileIndex: null });
       } else {
-        // Perform merge or move
         state.mergeOrMoveTile(state.selectedTileIndex, index);
       }
     }
@@ -168,7 +200,6 @@ export const useGameStore = create<GameState>((set, get) => ({
       return;
     }
 
-    // Find first available OPEN empty cell
     const emptyCell = state.board.find(c => c.state === 'OPEN' && !c.item);
     if (!emptyCell) {
       sounds.playErrorSound();
@@ -179,12 +210,10 @@ export const useGameStore = create<GameState>((set, get) => ({
     const newBoard = [...state.board];
     const targetCell = newBoard[emptyCell.index];
 
-    // Spawn level based on supercharge
     let spawnLevel = 1;
     if (state.superchargeMultiplier === 2) spawnLevel = 2;
     if (state.superchargeMultiplier === 4) spawnLevel = 3;
 
-    // Small bonus chance based on perks: e.g. +10% higher level
     if (Math.random() < 0.1 && spawnLevel < 4) {
       spawnLevel += 1;
     }
@@ -196,7 +225,16 @@ export const useGameStore = create<GameState>((set, get) => ({
       isGenerator: false
     };
 
-    sounds.playSpawnSound();
+    sounds.playPop();
+
+    // Burst sparkle at target
+    if (typeof document !== 'undefined') {
+      const el = document.getElementById(`tile-${emptyCell.index}`);
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        emitMergeParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#FBBF24');
+      }
+    }
 
     const newEnergy = state.energy - cost;
     set({
@@ -210,13 +248,13 @@ export const useGameStore = create<GameState>((set, get) => ({
     saveState(get());
   },
 
-  mergeOrMoveTile: (fromIndex: number, toIndex: number) => {
+  mergeOrMoveTile: (fromIndex: number, toIndex: number, clientPos?: { x: number; y: number }) => {
     const state = get();
     const fromCell = state.board[fromIndex];
     const toCell = state.board[toIndex];
 
     if (!fromCell || !toCell || !fromCell.item) {
-      set({ selectedTileIndex: null });
+      set({ selectedTileIndex: null, dragOverIndex: null });
       return;
     }
 
@@ -225,7 +263,6 @@ export const useGameStore = create<GameState>((set, get) => ({
     const dest = newBoard[toIndex];
 
     // Case A: Merge check
-    // Both items must have same chainId, same level, and neither is generator
     const canMerge =
       dest.item &&
       src.item &&
@@ -242,7 +279,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       if (dest.item.level >= maxLvl) {
         sounds.playErrorSound();
         state.showToast('🌟 이미 해당 체인의 최고 레벨 아이템입니다!');
-        set({ selectedTileIndex: null });
+        set({ selectedTileIndex: null, dragOverIndex: null });
         return;
       }
 
@@ -254,21 +291,27 @@ export const useGameStore = create<GameState>((set, get) => ({
         isGenerator: false
       };
 
-      // If dest was cobweb, it gets unlocked!
       if (dest.state === 'COBWEB') {
         dest.state = 'OPEN';
         sounds.playUnlockSound();
       }
 
-      // Empty source cell
       src.item = null;
-
-      // Unlock adjacent locked crates around the merge position
       state.unlockAdjacentTiles(dest.row, dest.col);
 
-      sounds.playMergeSound(nextLevel);
+      sounds.playMerge(nextLevel);
 
-      // Play confetti on big merges (Lv >= 4)
+      // Particle burst
+      if (clientPos) {
+        emitMergeParticles(clientPos.x, clientPos.y);
+      } else if (typeof document !== 'undefined') {
+        const el = document.getElementById(`tile-${dest.index}`);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          emitMergeParticles(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        }
+      }
+
       if (nextLevel >= 4) {
         confetti({
           particleCount: 25 + nextLevel * 4,
@@ -278,9 +321,9 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
 
       const mergedDef = getItemDef(dest.item.chainId, nextLevel);
-      state.showToast(`🎉 합성 성공! [Lv.${nextLevel} ${mergedDef?.name || '아이템'}] 달성!`);
+      state.showToast(`🎉 합성 성공! [Lv.${nextLevel} ${mergedDef?.name || '아이템'}] 탄생!`);
 
-      set({ board: newBoard, selectedTileIndex: null });
+      set({ board: newBoard, selectedTileIndex: null, dragOverIndex: null });
       saveState(get());
       return;
     }
@@ -289,13 +332,15 @@ export const useGameStore = create<GameState>((set, get) => ({
     if (dest.state === 'OPEN' && !dest.item) {
       dest.item = src.item;
       src.item = null;
-      set({ board: newBoard, selectedTileIndex: null });
+      sounds.playTapSound();
+      set({ board: newBoard, selectedTileIndex: null, dragOverIndex: null });
       saveState(get());
       return;
     }
 
-    // Case C: Cannot merge or move
-    set({ selectedTileIndex: null });
+    // Case C: Invalid drop
+    sounds.playErrorSound();
+    set({ selectedTileIndex: null, dragOverIndex: null });
   },
 
   unlockAdjacentTiles: (row: number, col: number) => {
@@ -315,7 +360,6 @@ export const useGameStore = create<GameState>((set, get) => ({
         const idx = n.r * 7 + n.c;
         const cell = newBoard[idx];
         if (cell && cell.state === 'LOCKED') {
-          // Promote LOCKED crate to COBWEB
           cell.state = 'COBWEB';
           unlockedAny = true;
         }
@@ -334,7 +378,6 @@ export const useGameStore = create<GameState>((set, get) => ({
     const order = state.orders.find(o => o.id === orderId);
     if (!order) return;
 
-    // Check matching item in OPEN cell
     const matchingCell = state.board.find(
       c => c.state === 'OPEN' && c.item && c.item.chainId === order.targetChainId && c.item.level === order.targetLevel && !c.item.isGenerator
     );
@@ -345,22 +388,18 @@ export const useGameStore = create<GameState>((set, get) => ({
       return;
     }
 
-    // Remove item
     const newBoard = state.board.map(c => (c.index === matchingCell.index ? { ...c, item: null } : c));
-
-    // Rewards
     const newCoins = state.coins + order.rewardCoins;
     const newStars = state.stars + order.rewardStars;
     const newFollowers = state.followers + Math.floor(order.rewardStars * 6);
 
-    sounds.playServeSound();
+    sounds.playOrderComplete();
     confetti({
       particleCount: 60,
       spread: 70,
       origin: { y: 0.5 }
     });
 
-    // Pick new order from pool
     const randomPoolOrder = ORDER_POOL[Math.floor(Math.random() * ORDER_POOL.length)];
     const newOrders = state.orders.map(o => {
       if (o.id === orderId) {
@@ -467,7 +506,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     const newPosts = state.posts.map(p => (p.id === postId ? { ...p, rewardClaimed: true } : p));
 
-    sounds.playServeSound();
+    sounds.playOrderComplete();
     state.showToast(`🎁 쿡스타그램 선물 [${post.reward.label}]을(를) 수령했습니다!`);
 
     set({
@@ -570,7 +609,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   freeEnergyRefill: () => {
     const state = get();
-    sounds.playServeSound();
+    sounds.playOrderComplete();
     confetti({ particleCount: 30, spread: 40 });
     state.showToast('⚡ 무료 에너지 +50 충전 완료!');
     set({
@@ -599,6 +638,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       followers: 85,
       superchargeMultiplier: 1,
       selectedTileIndex: null,
+      dragOverIndex: null,
       orders: INITIAL_ORDERS,
       restorations: RESTORATION_NODES,
       posts: COOKSTAGRAM_POSTS,

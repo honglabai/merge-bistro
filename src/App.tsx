@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Gamepad2, Hammer, Camera, Calculator, Terminal, BookOpen } from 'lucide-react';
+import { Gamepad2, Hammer, Camera, Calculator, Terminal, BookOpen, Sparkles, ChefHat } from 'lucide-react';
 import { useGameStore } from './store/useGameStore';
 import { ResourceHeader } from './components/board/ResourceHeader';
 import { OrderQueueBar } from './components/board/OrderQueueBar';
@@ -15,11 +15,13 @@ import { StylePickerModal } from './components/modals/StylePickerModal';
 import { ResetConfirmModal } from './components/modals/ResetConfirmModal';
 import { HelpGuideModal } from './components/modals/HelpGuideModal';
 import { Toast } from './components/ui/Toast';
+import { ParticleCanvas } from './components/ui/ParticleCanvas';
 
 export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<'game' | 'restoration' | 'cookstagram' | 'math' | 'antigravity'>('game');
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isResetOpen, setIsResetOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   const init = useGameStore(s => s.init);
   const restorations = useGameStore(s => s.restorations);
@@ -27,14 +29,22 @@ export const App: React.FC = () => {
   const openRestorationPicker = useGameStore(s => s.openRestorationPicker);
 
   useEffect(() => {
+    setIsMounted(true);
     init();
   }, [init]);
 
   const nextRestorationNode = restorations.find(r => !r.isRestored);
 
+  if (!isMounted) {
+    return null; // SSR hydration safety guard
+  }
+
   return (
-    <div className="bg-cream-100 text-slate-800 font-sans min-h-screen flex flex-col antialiased selection:bg-amber-200">
+    <div className="bg-[#FAF7F2] text-[#4E342E] font-sans min-h-[100dvh] flex flex-col antialiased selection:bg-amber-200">
       
+      {/* 60fps Micro Particle Canvas Overlay */}
+      <ParticleCanvas />
+
       {/* Top Resource & Settings Header */}
       <ResourceHeader
         onOpenHelp={() => setIsHelpOpen(true)}
@@ -42,16 +52,16 @@ export const App: React.FC = () => {
       />
 
       {/* Navigation Tabs Bar */}
-      <nav className="bg-cream-200 border-b border-cream-300 sticky top-0 z-30 shadow-sm backdrop-blur-md bg-cream-200/90">
+      <nav className="bg-[#FAF7F2]/95 border-b-2 border-[#EBE3D5] sticky top-0 z-30 shadow-sm backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-2 sm:px-6">
-          <div className="flex space-x-1 sm:space-x-2 overflow-x-auto py-2 text-xs sm:text-sm font-extrabold no-scrollbar">
+          <div className="flex space-x-1 sm:space-x-2 overflow-x-auto py-2 text-xs sm:text-sm font-black no-scrollbar">
             
             <button
               onClick={() => setCurrentTab('game')}
-              className={`px-3.5 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
+              className={`px-3.5 py-2 rounded-2xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
                 currentTab === 'game'
-                  ? 'bg-sage-600 text-white shadow-sm ring-1 ring-sage-700'
-                  : 'text-slate-700 hover:bg-cream-300'
+                  ? 'bg-[#2A9D8F] text-white shadow-md ring-1 ring-[#2A9D8F]'
+                  : 'text-[#4E342E] hover:bg-[#EBE3D5]'
               }`}
             >
               <Gamepad2 className="w-4 h-4" />
@@ -60,10 +70,10 @@ export const App: React.FC = () => {
 
             <button
               onClick={() => setCurrentTab('restoration')}
-              className={`px-3.5 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
+              className={`px-3.5 py-2 rounded-2xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
                 currentTab === 'restoration'
-                  ? 'bg-sage-600 text-white shadow-sm ring-1 ring-sage-700'
-                  : 'text-slate-700 hover:bg-cream-300'
+                  ? 'bg-[#2A9D8F] text-white shadow-md ring-1 ring-[#2A9D8F]'
+                  : 'text-[#4E342E] hover:bg-[#EBE3D5]'
               }`}
             >
               <Hammer className="w-4 h-4" />
@@ -75,10 +85,10 @@ export const App: React.FC = () => {
 
             <button
               onClick={() => setCurrentTab('cookstagram')}
-              className={`px-3.5 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
+              className={`px-3.5 py-2 rounded-2xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
                 currentTab === 'cookstagram'
-                  ? 'bg-sage-600 text-white shadow-sm ring-1 ring-sage-700'
-                  : 'text-slate-700 hover:bg-cream-300'
+                  ? 'bg-[#2A9D8F] text-white shadow-md ring-1 ring-[#2A9D8F]'
+                  : 'text-[#4E342E] hover:bg-[#EBE3D5]'
               }`}
             >
               <Camera className="w-4 h-4" />
@@ -87,10 +97,10 @@ export const App: React.FC = () => {
 
             <button
               onClick={() => setCurrentTab('math')}
-              className={`px-3.5 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
+              className={`px-3.5 py-2 rounded-2xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
                 currentTab === 'math'
-                  ? 'bg-sage-600 text-white shadow-sm ring-1 ring-sage-700'
-                  : 'text-slate-700 hover:bg-cream-300'
+                  ? 'bg-[#2A9D8F] text-white shadow-md ring-1 ring-[#2A9D8F]'
+                  : 'text-[#4E342E] hover:bg-[#EBE3D5]'
               }`}
             >
               <Calculator className="w-4 h-4" />
@@ -99,10 +109,10 @@ export const App: React.FC = () => {
 
             <button
               onClick={() => setCurrentTab('antigravity')}
-              className={`px-3.5 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
+              className={`px-3.5 py-2 rounded-2xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
                 currentTab === 'antigravity'
-                  ? 'bg-terracotta-500 text-white shadow-sm ring-1 ring-terracotta-600'
-                  : 'text-slate-700 hover:bg-cream-300'
+                  ? 'bg-[#E76F51] text-white shadow-md ring-1 ring-[#E76F51]'
+                  : 'text-[#4E342E] hover:bg-[#EBE3D5]'
               }`}
             >
               <Terminal className="w-4 h-4" />
@@ -124,95 +134,117 @@ export const App: React.FC = () => {
             {/* Core Board & Side Panel Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
               
-              {/* Left / Center 63-Tile Merge Board (7 cols) */}
+              {/* Left / Center Merge Board Tray (7 cols) */}
               <div className="lg:col-span-7 space-y-3">
                 <MergeBoard />
                 <BackpackStorage />
                 <ItemInspectorBar />
               </div>
 
-              {/* Right Side Panel: Quick Restoration & Story Logs (5 cols) */}
+              {/* Right Side Panel: Bistro Restoration Hero & Village Journal (5 cols) */}
               <div className="lg:col-span-5 space-y-4">
                 
-                {/* Next Restoration Quest Card */}
-                {nextRestorationNode ? (
-                  <div className="bg-white p-4 rounded-2xl border border-cream-300 shadow-sm space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-black text-terracotta-600 bg-terracotta-50 px-2.5 py-0.5 rounded-full border border-terracotta-200">
-                        현재 복원 목표: Chapter {nextRestorationNode.chapter}
-                      </span>
-                      <span className="text-xs font-black text-amber-600">
-                        필요: {nextRestorationNode.costStars}⭐ (보유: {stars}⭐)
-                      </span>
-                    </div>
-
-                    <h3 className="text-sm font-extrabold text-slate-900">
-                      {nextRestorationNode.title}
-                    </h3>
-                    <p className="text-xs text-slate-600 leading-relaxed">
-                      {nextRestorationNode.description}
-                    </p>
-
-                    <div className="flex items-center justify-between pt-1">
-                      <button
-                        onClick={() => setCurrentTab('restoration')}
-                        className="text-xs text-slate-500 hover:text-slate-800 font-semibold underline underline-offset-2"
-                      >
-                        전체 복원 목록 보기 →
-                      </button>
-
-                      <button
-                        onClick={() => openRestorationPicker(nextRestorationNode)}
-                        disabled={stars < nextRestorationNode.costStars}
-                        className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 shadow ${
-                          stars >= nextRestorationNode.costStars
-                            ? 'bg-gradient-to-r from-amber-500 to-terracotta-500 hover:from-amber-600 hover:to-terracotta-600 text-white animate-pulse active:scale-95'
-                            : 'bg-cream-200 text-slate-400 cursor-not-allowed'
-                        }`}
-                      >
-                        <Hammer className="w-3.5 h-3.5" />
-                        <span>지금 복원하기</span>
-                      </button>
+                {/* Bistro Hero Card */}
+                <div className="bg-white rounded-3xl border-2 border-[#D4A373]/50 shadow-md overflow-hidden relative">
+                  <div className="relative w-full aspect-[16/9] overflow-hidden bg-[#FAF7F2]">
+                    <img
+                      src="/bistro-hero.png"
+                      alt="Merge Bistro"
+                      className="w-full h-full object-cover object-center transform hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-3.5">
+                      <div className="text-white">
+                        <span className="text-[10px] bg-[#E76F51] text-white font-black px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1 w-max mb-1">
+                          <ChefHat className="w-3 h-3" />
+                          폭풍우를 이겨낸 따뜻한 안식처
+                        </span>
+                        <h2 className="text-base font-black drop-shadow">
+                          머지 비스트로 (Merge Bistro)
+                        </h2>
+                      </div>
                     </div>
                   </div>
-                ) : (
-                  <div className="bg-gradient-to-br from-amber-50 to-emerald-50 p-5 rounded-2xl border border-amber-300 shadow-sm text-center">
-                    <span className="text-3xl">🎉</span>
-                    <h3 className="text-sm font-black text-slate-900 mt-1">
-                      모든 시설 및 고대 유적 복원 완료!
-                    </h3>
-                    <p className="text-xs text-slate-600 mt-1">
-                      실종된 사장님이 무사히 돌아왔습니다! 비스트로의 전설적 성공을 축하합니다!
-                    </p>
-                  </div>
-                )}
+
+                  {/* Next Restoration Quest Card */}
+                  {nextRestorationNode ? (
+                    <div className="p-4 space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-[#E76F51] bg-[#FAF7F2] px-2.5 py-0.5 rounded-full border border-[#E76F51]/30">
+                          현재 복원 목표: Chapter {nextRestorationNode.chapter}
+                        </span>
+                        <span className="text-xs font-black text-amber-600">
+                          필요: {nextRestorationNode.costStars}⭐ (보유: {stars}⭐)
+                        </span>
+                      </div>
+
+                      <h3 className="text-sm font-black text-[#4E342E]">
+                        {nextRestorationNode.title}
+                      </h3>
+                      <p className="text-xs text-slate-600 leading-relaxed">
+                        {nextRestorationNode.description}
+                      </p>
+
+                      <div className="flex items-center justify-between pt-1">
+                        <button
+                          onClick={() => setCurrentTab('restoration')}
+                          className="text-xs text-slate-500 hover:text-slate-800 font-bold underline underline-offset-2"
+                        >
+                          전체 복원 목록 보기 →
+                        </button>
+
+                        <button
+                          onClick={() => openRestorationPicker(nextRestorationNode)}
+                          disabled={stars < nextRestorationNode.costStars}
+                          className={`px-4 py-2 rounded-2xl text-xs font-black transition-all flex items-center gap-1.5 shadow ${
+                            stars >= nextRestorationNode.costStars
+                              ? 'bg-gradient-to-r from-amber-500 to-[#E76F51] hover:from-amber-600 hover:to-orange-700 text-white animate-pulse active:scale-95'
+                              : 'bg-[#EBE3D5] text-slate-400 cursor-not-allowed'
+                          }`}
+                        >
+                          <Hammer className="w-3.5 h-3.5" />
+                          <span>지금 복원하기</span>
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-5 bg-gradient-to-br from-amber-50 to-emerald-50 text-center">
+                      <Sparkles className="w-8 h-8 text-amber-500 mx-auto mb-1 animate-bounceSubtle" />
+                      <h3 className="text-sm font-black text-[#4E342E]">
+                        모든 시설 및 고대 유적 복원 완료!
+                      </h3>
+                      <p className="text-xs text-slate-600 mt-1">
+                        실종된 사장님이 무사히 돌아왔습니다! 비스트로의 완전한 성공을 축하합니다!
+                      </p>
+                    </div>
+                  )}
+                </div>
 
                 {/* Village Story Journal */}
-                <div className="bg-white p-4 rounded-2xl border border-cream-300 shadow-sm space-y-3">
-                  <div className="flex items-center justify-between border-b border-cream-200 pb-2">
+                <div className="bg-white p-4 rounded-3xl border-2 border-[#D4A373]/50 shadow-md space-y-3">
+                  <div className="flex items-center justify-between border-b border-[#EBE3D5] pb-2">
                     <div className="flex items-center gap-2">
-                      <BookOpen className="w-4 h-4 text-wood-600" />
-                      <h3 className="text-xs font-extrabold text-slate-800">
+                      <BookOpen className="w-4 h-4 text-[#8C6239]" />
+                      <h3 className="text-xs font-black text-[#4E342E]">
                         바닷마을 & 유적 스토리 일지
                       </h3>
                     </div>
-                    <span className="text-[10px] text-slate-400">
-                      실종 사건 추적 중
+                    <span className="text-[10px] text-slate-400 font-semibold">
+                      실종 사건 단서 추적 중
                     </span>
                   </div>
 
-                  <div className="bg-cream-50 p-3 rounded-xl border border-cream-200 text-xs text-slate-700 space-y-2 max-h-56 overflow-y-auto leading-relaxed">
-                    <div className="p-2.5 bg-white rounded-lg border border-cream-300 shadow-2xs">
-                      <span className="font-extrabold text-slate-900">부엉이 촌장:</span>{' '}
+                  <div className="bg-[#FAF7F2] p-3 rounded-2xl border border-[#EBE3D5] text-xs text-[#4E342E] space-y-2 max-h-56 overflow-y-auto leading-relaxed">
+                    <div className="p-2.5 bg-white rounded-xl border border-[#EBE3D5] shadow-2xs">
+                      <span className="font-black text-[#4E342E]">부엉이 촌장:</span>{' '}
                       "폭풍우로 레스토랑이 무너지고 사장님마저 일주일째 행방불명이라니... 자네가 이 식당을 구해주게!"
                     </div>
-                    <div className="p-2.5 bg-white rounded-lg border border-cream-300 shadow-2xs">
-                      <span className="font-extrabold text-slate-900">바리스타 밀로:</span>{' '}
+                    <div className="p-2.5 bg-white rounded-xl border border-[#EBE3D5] shadow-2xs">
+                      <span className="font-black text-[#4E342E]">바리스타 밀로:</span>{' '}
                       "사장님은 유적의 고대 향신료 레시피를 연구하러 가셨어요냥. 식당을 복구하면 단서를 찾을 수 있어요냥!"
                     </div>
                     {restorations.filter(r => r.isRestored).map(r => (
-                      <div key={r.id} className="p-2.5 bg-amber-50/80 rounded-lg border border-amber-200 text-amber-950">
-                        <span className="font-black text-terracotta-700">[{r.title} 완료]</span>{' '}
+                      <div key={r.id} className="p-2.5 bg-amber-50/90 rounded-xl border border-amber-200 text-amber-950">
+                        <span className="font-black text-[#E76F51]">[{r.title} 완료]</span>{' '}
                         {r.dialogue[0]?.text || '성공적으로 구역을 복구했습니다.'}
                       </div>
                     ))}
@@ -240,13 +272,13 @@ export const App: React.FC = () => {
       <Toast />
 
       {/* Footer */}
-      <footer className="mt-auto bg-wood-900 text-cream-300/80 text-[11px] py-4 border-t border-wood-700 text-center">
+      <footer className="mt-auto bg-[#3E2723] text-[#EBE3D5]/80 text-[11px] py-4 border-t-2 border-[#8C6239] text-center">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
           <span>
-            Project: Storm & Bistro · 머지 타운 퍼즐 & 스토리 개발 연구 및 구글 안티그래비티 2.0
+            Project: Merge Bistro · 머지 비스트로 고도화 상용 퀄리티 에디션
           </span>
-          <span className="text-cream-400">
-            Vite + React 19 + TypeScript + Tailwind CSS + Web Audio API
+          <span className="text-[#D4A373]">
+            React 19 + Framer Motion + Tailwind CSS + Web Audio API + PWA
           </span>
         </div>
       </footer>

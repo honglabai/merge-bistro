@@ -1,11 +1,29 @@
 class SoundSynthesizer {
   private ctx: AudioContext | null = null;
   public enabled = true;
+  private hasUnlocked = false;
 
   constructor() {
     const saved = localStorage.getItem('merge_bistro_sound_enabled');
     if (saved !== null) {
       this.enabled = saved === 'true';
+    }
+
+    if (typeof window !== 'undefined') {
+      const unlockAudio = () => {
+        if (!this.hasUnlocked) {
+          this.initCtx();
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+          }
+          this.hasUnlocked = true;
+        }
+        window.removeEventListener('pointerdown', unlockAudio);
+        window.removeEventListener('keydown', unlockAudio);
+      };
+
+      window.addEventListener('pointerdown', unlockAudio, { passive: true });
+      window.addEventListener('keydown', unlockAudio, { passive: true });
     }
   }
 
@@ -13,15 +31,17 @@ class SoundSynthesizer {
     this.enabled = !this.enabled;
     localStorage.setItem('merge_bistro_sound_enabled', String(this.enabled));
     if (this.enabled) {
-      this.playTapSound();
+      this.playPop();
     }
     return this.enabled;
   }
 
   private initCtx(): AudioContext | null {
     if (!this.enabled) return null;
-    if (!this.ctx) {
-      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (!this.ctx && typeof window !== 'undefined') {
+      const AudioContextClass =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (AudioContextClass) {
         this.ctx = new AudioContextClass();
       }
@@ -32,35 +52,10 @@ class SoundSynthesizer {
     return this.ctx;
   }
 
-  public playMergeSound(level: number) {
-    const ctx = this.initCtx();
-    if (!ctx) return;
-
-    const baseFreq = 220; // A3
-    // Ascend up a pleasant pentatonic scale
-    const scale = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24];
-    const semitones = scale[Math.min(level - 1, scale.length - 1)];
-    const freq = baseFreq * Math.pow(2, semitones / 12);
-
-    const now = ctx.currentTime;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(freq, now);
-    osc.frequency.exponentialRampToValueAtTime(freq * 1.5, now + 0.15);
-
-    gain.gain.setValueAtTime(0.2, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.start(now);
-    osc.stop(now + 0.23);
-  }
-
-  public playSpawnSound() {
+  /**
+   * playPop: Spawning an item / tapping a generator (crisp sine chirp)
+   */
+  public playPop() {
     const ctx = this.initCtx();
     if (!ctx) return;
 
@@ -69,8 +64,8 @@ class SoundSynthesizer {
     const gain = ctx.createGain();
 
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(350, now);
-    osc.frequency.exponentialRampToValueAtTime(580, now + 0.08);
+    osc.frequency.setValueAtTime(360, now);
+    osc.frequency.exponentialRampToValueAtTime(620, now + 0.08);
 
     gain.gain.setValueAtTime(0.18, now);
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
@@ -82,7 +77,86 @@ class SoundSynthesizer {
     osc.stop(now + 0.13);
   }
 
-  public playServeSound() {
+  public playSpawnSound() {
+    this.playPop();
+  }
+
+  /**
+   * playMerge(level): Ascending pentatonic/harmonic scale chime per level
+   */
+  public playMerge(level: number) {
+    const ctx = this.initCtx();
+    if (!ctx) return;
+
+    const baseFreq = 220; // A3
+    const scale = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24];
+    const semitones = scale[Math.min(Math.max(0, level - 1), scale.length - 1)];
+    const freq = baseFreq * Math.pow(2, semitones / 12);
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const subOsc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, now);
+    osc.frequency.exponentialRampToValueAtTime(freq * 1.35, now + 0.16);
+
+    // Harmonic sparkle
+    subOsc.type = 'sine';
+    subOsc.frequency.setValueAtTime(freq * 2, now);
+    subOsc.frequency.exponentialRampToValueAtTime(freq * 2.5, now + 0.16);
+
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
+
+    osc.connect(gain);
+    subOsc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    subOsc.start(now);
+    osc.stop(now + 0.25);
+    subOsc.stop(now + 0.25);
+  }
+
+  public playMergeSound(level: number) {
+    this.playMerge(level);
+  }
+
+  /**
+   * playError(): Dull low buzz when drop fails or cannot merge
+   */
+  public playError() {
+    const ctx = this.initCtx();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(160, now);
+    osc.frequency.setValueAtTime(120, now + 0.08);
+
+    gain.gain.setValueAtTime(0.12, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.17);
+  }
+
+  public playErrorSound() {
+    this.playError();
+  }
+
+  /**
+   * playOrderComplete(): Triumphant arpeggio chord on fulfilling customer order
+   */
+  public playOrderComplete() {
     const ctx = this.initCtx();
     if (!ctx) return;
 
@@ -94,17 +168,21 @@ class SoundSynthesizer {
       const gain = ctx.createGain();
 
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+      osc.frequency.setValueAtTime(freq, now + idx * 0.065);
 
-      gain.gain.setValueAtTime(0.15, now + idx * 0.07);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.3);
+      gain.gain.setValueAtTime(0.16, now + idx * 0.065);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.065 + 0.3);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
 
-      osc.start(now + idx * 0.07);
-      osc.stop(now + idx * 0.07 + 0.32);
+      osc.start(now + idx * 0.065);
+      osc.stop(now + idx * 0.065 + 0.32);
     });
+  }
+
+  public playServeSound() {
+    this.playOrderComplete();
   }
 
   public playRestorationFanfare() {
@@ -119,16 +197,16 @@ class SoundSynthesizer {
       const gain = ctx.createGain();
 
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(freq, now + idx * 0.09);
+      osc.frequency.setValueAtTime(freq, now + idx * 0.08);
 
-      gain.gain.setValueAtTime(0.22, now + idx * 0.09);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.09 + 0.45);
+      gain.gain.setValueAtTime(0.2, now + idx * 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.45);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
 
-      osc.start(now + idx * 0.09);
-      osc.stop(now + idx * 0.09 + 0.48);
+      osc.start(now + idx * 0.08);
+      osc.stop(now + idx * 0.08 + 0.48);
     });
   }
 
@@ -141,10 +219,10 @@ class SoundSynthesizer {
     const gain = ctx.createGain();
 
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(400, now);
-    osc.frequency.exponentialRampToValueAtTime(150, now + 0.04);
+    osc.frequency.setValueAtTime(420, now);
+    osc.frequency.exponentialRampToValueAtTime(180, now + 0.04);
 
-    gain.gain.setValueAtTime(0.1, now);
+    gain.gain.setValueAtTime(0.09, now);
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
 
     osc.connect(gain);
@@ -163,39 +241,17 @@ class SoundSynthesizer {
     const gain = ctx.createGain();
 
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(600, now);
-    osc.frequency.exponentialRampToValueAtTime(900, now + 0.18);
+    osc.frequency.setValueAtTime(620, now);
+    osc.frequency.exponentialRampToValueAtTime(940, now + 0.16);
 
-    gain.gain.setValueAtTime(0.15, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.start(now);
-    osc.stop(now + 0.23);
-  }
-
-  public playErrorSound() {
-    const ctx = this.initCtx();
-    if (!ctx) return;
-
-    const now = ctx.currentTime;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(180, now);
-    osc.frequency.setValueAtTime(140, now + 0.08);
-
-    gain.gain.setValueAtTime(0.12, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+    gain.gain.setValueAtTime(0.14, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
 
     osc.connect(gain);
     gain.connect(ctx.destination);
 
     osc.start(now);
-    osc.stop(now + 0.17);
+    osc.stop(now + 0.21);
   }
 }
 

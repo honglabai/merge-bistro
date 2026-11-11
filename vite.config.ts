@@ -14,6 +14,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'zustand'],
+          motion: ['framer-motion'],
           chart: ['chart.js'],
           icons: ['lucide-react', 'canvas-confetti'],
         },
