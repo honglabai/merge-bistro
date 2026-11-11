@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <filter id="glow-garden_gen" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+    
+  </defs>
+  <g filter="url(#glow-garden_gen)">
+    
+  <path d="M32 78 C26 48 34 38 42 34 L58 34 C66 38 74 48 68 78 Z" fill="#8D6E63" stroke="#4E342E" stroke-width="2.5"/>
+  <!-- Tied neck with green ribbon -->
+  <rect x="38" y="32" width="24" height="5" rx="2" fill="#4CAF50"/>
+  <!-- Green Leaf Emblem -->
+  <path d="M50 48 C44 54 44 64 50 66 C56 64 56 54 50 48 Z" fill="#81C784" stroke="#2E7D32" stroke-width="1.5"/>
+
+  </g>
+</svg>

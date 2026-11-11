@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, Sparkles, UserCheck, ArrowRight } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 import { getItemDef, ITEM_CHAINS } from '../../data/itemsData';
+import { ItemGraphic } from '../ui/ItemGraphic';
 
 export const OrderQueueBar: React.FC = () => {
   const { orders, board, fulfillOrder } = useGameStore();
@@ -80,8 +81,8 @@ export const OrderQueueBar: React.FC = () => {
                 {/* Target Item Row */}
                 <div className="flex items-center justify-between bg-white/95 p-2 rounded-xl border border-[#EBE3D5] mb-2.5 shadow-2xs">
                   <div className="flex items-center gap-2 min-w-0">
-                    <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-xl flex-shrink-0">
-                      {itemDef?.icon || '📦'}
+                    <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center p-0.5 flex-shrink-0">
+                      <ItemGraphic chainId={order.targetChainId} level={order.targetLevel} className="w-full h-full" />
                     </div>
                     <div className="min-w-0">
                       <div className="text-xs font-black text-[#4E342E] truncate">

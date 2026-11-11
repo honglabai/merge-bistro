@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <filter id="glow-bakery_6" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+    
+  <linearGradient id="bagelTop" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#FFB74D"/>
+    <stop offset="100%" stop-color="#E65100"/>
+  </linearGradient>
+
+  </defs>
+  <g filter="url(#glow-bakery_6)">
+    
+  <ellipse cx="50" cy="74" rx="26" ry="6" fill="#000" opacity="0.2"/>
+  <!-- Bagel base -->
+  <ellipse cx="50" cy="54" rx="26" ry="18" fill="#F57C00" stroke="#5D4037" stroke-width="2.5"/>
+  <!-- Cream cheese layer -->
+  <ellipse cx="50" cy="50" rx="27" ry="15" fill="#FFFDE7"/>
+  <!-- Salmon slices -->
+  <path d="M30 48 Q40 40 54 48 Q46 54 30 48 Z" fill="#FF7043" stroke="#D84315" stroke-width="1"/>
+  <path d="M46 52 Q60 44 70 52 Q58 58 46 52 Z" fill="#FF8A65" stroke="#D84315" stroke-width="1"/>
+  <!-- Top bagel ring with hole -->
+  <path d="M26 42 C26 26 74 26 74 42 C74 54 26 54 26 42 Z" fill="url(#bagelTop)" stroke="#4E342E" stroke-width="2"/>
+  <ellipse cx="50" cy="40" rx="8" ry="5" fill="#FFFDE7" stroke="#4E342E" stroke-width="2"/>
+  <!-- Sesame seeds -->
+  <circle cx="36" cy="34" r="1.2" fill="#FFF"/>
+  <circle cx="44" cy="32" r="1.2" fill="#FFF"/>
+  <circle cx="58" cy="33" r="1.2" fill="#FFF"/>
+  <circle cx="64" cy="37" r="1.2" fill="#FFF"/>
+
+  </g>
+</svg>

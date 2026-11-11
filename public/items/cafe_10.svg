@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <filter id="glow-cafe_10" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+    
+  </defs>
+  <g filter="url(#glow-cafe_10)">
+    
+  <path d="M32 34 L36 74 C36 78 64 78 64 74 L68 34 Z" fill="#1B0000" stroke="#CFD8DC" stroke-width="2"/>
+  <!-- Thick cloud cream peak -->
+  <path d="M30 34 C30 20 40 16 50 16 C60 16 70 20 70 34 Z" fill="#FFF" stroke="#ECEFF1" stroke-width="1.5"/>
+  <circle cx="50" cy="18" r="3" fill="#FFF"/>
+  <!-- Cocoa dusting -->
+  <circle cx="44" cy="24" r="1" fill="#4E342E"/>
+  <circle cx="52" cy="22" r="1" fill="#4E342E"/>
+  <circle cx="58" cy="26" r="1" fill="#4E342E"/>
+  <!-- Golden sparkles -->
+  <path d="M50 6 L52 10 L56 12 L52 14 L50 18 L48 14 L44 12 L48 10 Z" fill="#FFD700"/>
+
+  </g>
+</svg>

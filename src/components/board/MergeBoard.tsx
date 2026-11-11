@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, Lock, Sparkles } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
-import { getItemDef } from '../../data/itemsData';
+import { ItemGraphic } from '../ui/ItemGraphic';
 
 export const MergeBoard: React.FC = () => {
   const {
@@ -55,13 +55,12 @@ export const MergeBoard: React.FC = () => {
   };
 
   return (
-    <div className="bg-gradient-to-b from-[#8C6239] via-[#6D4C41] to-[#4E342E] p-2.5 sm:p-4 rounded-3xl shadow-2xl border-4 border-[#D4A373] select-none touch-none">
+    <div className="bg-gradient-to-b from-[#8C6239] via-[#6D4C41] to-[#4E342E] p-2 sm:p-3.5 rounded-3xl shadow-2xl border-4 border-[#D4A373] select-none touch-none">
       
       {/* 7x9 = 63 Grid Board with carved tray styling */}
       <div className="grid grid-cols-7 gap-1 sm:gap-1.5 aspect-[7/9] w-full max-w-[540px] mx-auto bg-[#3E2723]/95 p-1.5 sm:p-2.5 rounded-2xl shadow-inner border border-[#8C6239]/60">
         {board.map(cell => {
           const isSelected = selectedTileIndex === cell.index;
-          const itemDef = cell.item ? getItemDef(cell.item.chainId, cell.item.level) : null;
           const isGen = cell.item?.isGenerator;
 
           const isDraggable = cell.state === 'OPEN' && !!cell.item && !isGen;
@@ -117,7 +116,7 @@ export const MergeBoard: React.FC = () => {
               {/* Tile States */}
               {cell.state === 'LOCKED' && (
                 <div className="flex flex-col items-center justify-center text-[#8C6239] opacity-80">
-                  <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <Lock className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span className="text-[8px] sm:text-[9px] font-bold mt-0.5 tracking-tighter">
                     상자
                   </span>
@@ -125,21 +124,24 @@ export const MergeBoard: React.FC = () => {
               )}
 
               {cell.state === 'COBWEB' && (
-                <div className="w-full h-full flex flex-col items-center justify-center relative">
-                  <span className="absolute text-slate-400/40 text-lg sm:text-2xl select-none pointer-events-none">
+                <div className="w-full h-full flex flex-col items-center justify-center relative p-0.5">
+                  <span className="absolute text-slate-400/40 text-xl sm:text-2xl select-none pointer-events-none z-10">
                     🕸️
                   </span>
                   {cell.item ? (
-                    <div className="opacity-75 flex flex-col items-center z-10">
-                      <span className="text-sm sm:text-xl filter grayscale contrast-125">
-                        {itemDef?.icon || '📦'}
-                      </span>
-                      <span className="text-[8px] sm:text-[9px] font-black text-slate-600 bg-white/70 px-1 rounded -mt-0.5">
+                    <div className="w-full h-full opacity-65 flex flex-col items-center justify-center z-0 relative">
+                      <ItemGraphic
+                        chainId={cell.item.chainId}
+                        level={cell.item.level}
+                        isGenerator={cell.item.isGenerator}
+                        className="w-full h-full p-0.5 filter grayscale contrast-125"
+                      />
+                      <span className="absolute top-0.5 right-0.5 text-[7px] sm:text-[8px] font-black text-slate-700 bg-white/80 px-1 rounded shadow-2xs">
                         Lv.{cell.item.level}
                       </span>
                     </div>
                   ) : (
-                    <span className="text-[8px] text-slate-400 z-10 font-medium">거미줄</span>
+                    <span className="text-[8px] text-slate-400 z-10 font-bold">거미줄</span>
                   )}
                 </div>
               )}
@@ -152,37 +154,29 @@ export const MergeBoard: React.FC = () => {
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.8, opacity: 0 }}
                     transition={{ type: 'spring', stiffness: 450, damping: 25 }}
-                    className="flex flex-col items-center justify-between w-full h-full py-0.5 pointer-events-none"
+                    className="relative w-full h-full flex items-center justify-center p-0.5 sm:p-1 pointer-events-none"
                   >
-                    {/* Generator Header Tag */}
+                    {/* Generator Spawner Badge */}
                     {isGen ? (
-                      <div className="w-full flex items-center justify-between px-0.5 text-amber-800 text-[8px] font-black">
-                        <Zap className="w-2.5 h-2.5 fill-amber-500 text-amber-600 animate-pulse" />
-                        <span className="bg-amber-400/90 text-amber-950 px-1 rounded-sm text-[7px] sm:text-[8px] shadow-2xs font-extrabold">
-                          스포너
-                        </span>
+                      <div className="absolute top-0.5 left-0.5 z-10 bg-amber-400 text-amber-950 px-1 py-0.2 rounded text-[7px] sm:text-[8px] font-black shadow-sm flex items-center gap-0.5 border border-amber-200">
+                        <Zap className="w-2 h-2 fill-amber-950 text-amber-950 animate-pulse" />
+                        <span>스포너</span>
                       </div>
                     ) : (
-                      <div className="w-full flex justify-end px-0.5">
-                        <span className="text-[7px] sm:text-[9px] font-black text-[#B85C38] bg-[#FAF7F2] border border-[#B85C38]/30 px-1 rounded shadow-2xs">
-                          Lv.{cell.item.level}
-                        </span>
+                      <div className="absolute top-0.5 right-0.5 z-10 bg-black/60 backdrop-blur-xs text-white text-[7px] sm:text-[8px] font-black px-1 rounded shadow-sm border border-white/20">
+                        Lv.{cell.item.level}
                       </div>
                     )}
 
-                    {/* Icon */}
-                    <div
-                      className={`text-lg sm:text-2xl transition-transform ${
-                        isSelected ? 'animate-bounceSubtle' : isGen ? 'hover:scale-110' : ''
-                      }`}
-                    >
-                      {itemDef?.icon || '📦'}
+                    {/* Graphic Box Filling the Entire Tile (No text) */}
+                    <div className={`w-full h-full flex items-center justify-center ${isSelected ? 'animate-bounceSubtle' : isGen ? 'hover:scale-105' : ''}`}>
+                      <ItemGraphic
+                        chainId={cell.item.chainId}
+                        level={cell.item.level}
+                        isGenerator={isGen}
+                        className="w-full h-full p-0.5"
+                      />
                     </div>
-
-                    {/* Item Name */}
-                    <span className="text-[8px] sm:text-[9px] font-bold text-slate-800 truncate max-w-full px-0.5 text-center leading-tight">
-                      {itemDef?.name || '아이템'}
-                    </span>
                   </motion.div>
                 </AnimatePresence>
               )}

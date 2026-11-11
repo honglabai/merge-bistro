@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <filter id="glow-bakery_9" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+    
+  <linearGradient id="chocGrad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#4E342E"/>
+    <stop offset="100%" stop-color="#2D1A14"/>
+  </linearGradient>
+
+  </defs>
+  <g filter="url(#glow-bakery_9)">
+    
+  <ellipse cx="50" cy="78" rx="26" ry="6" fill="#000" opacity="0.25"/>
+  <!-- Dark chocolate lava cake muffin -->
+  <path d="M26 66 L30 40 C32 34 68 34 70 40 L74 66 C74 74 26 74 26 66 Z" fill="url(#chocGrad)" stroke="#271914" stroke-width="2.5"/>
+  <ellipse cx="50" cy="40" rx="20" ry="7" fill="#4E342E"/>
+  <!-- Molten chocolate lava flowing out -->
+  <path d="M42 42 C40 54 36 68 34 74 Q50 78 54 72 C50 64 48 50 48 42 Z" fill="#211510"/>
+  <!-- Powdered sugar dust -->
+  <circle cx="38" cy="38" r="1.2" fill="#FFF" opacity="0.8"/>
+  <circle cx="48" cy="36" r="1.2" fill="#FFF" opacity="0.8"/>
+  <circle cx="58" cy="39" r="1.2" fill="#FFF" opacity="0.8"/>
+  <!-- Red cherry on top -->
+  <circle cx="50" cy="30" r="7" fill="#D32F2F" stroke="#B71C1C" stroke-width="1.5"/>
+  <circle cx="48" cy="28" r="2" fill="#FFF"/>
+  <path d="M50 24 Q56 16 62 18" stroke="#388E3C" stroke-width="2" fill="none"/>
+
+  </g>
+</svg>

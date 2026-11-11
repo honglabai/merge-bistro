@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <filter id="glow-seafood_gen" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+    
+  </defs>
+  <g filter="url(#glow-seafood_gen)">
+    
+  <path d="M24 44 C26 72 74 72 76 44 Z" fill="#8D6E63" stroke="#4E342E" stroke-width="2.5"/>
+  <!-- Woven basket texture lines -->
+  <path d="M26 50 Q50 60 74 50 M28 58 Q50 68 72 58 M32 66 Q50 74 68 66" stroke="#5D4037" stroke-width="1.5" fill="none"/>
+  <!-- Basket handle -->
+  <path d="M24 44 C24 18 76 18 76 44" fill="none" stroke="#4E342E" stroke-width="3"/>
+  <!-- Clam & Shrimp sticking out -->
+  <ellipse cx="44" cy="40" rx="8" ry="6" fill="#90CAF9"/>
+  <path d="M52 38 Q62 28 66 36" stroke="#FF7043" stroke-width="4" stroke-linecap="round" fill="none"/>
+
+  </g>
+</svg>

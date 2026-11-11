@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <filter id="glow-bakery_2" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+    
+  <linearGradient id="doughGrad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#FFF9C4"/>
+    <stop offset="70%" stop-color="#FFE082"/>
+    <stop offset="100%" stop-color="#FFCA28"/>
+  </linearGradient>
+
+  </defs>
+  <g filter="url(#glow-bakery_2)">
+    
+  <ellipse cx="50" cy="74" rx="26" ry="6" fill="#3E2723" opacity="0.25"/>
+  <path d="M26 62 C22 45 36 34 50 34 C66 34 78 45 74 62 C72 74 28 74 26 62 Z" fill="url(#doughGrad)" stroke="#D7CCC8" stroke-width="2"/>
+  <ellipse cx="44" cy="46" rx="8" ry="4" fill="#FFF" opacity="0.6"/>
+  <ellipse cx="60" cy="54" rx="4" ry="2" fill="#FFF" opacity="0.5"/>
+  <!-- Flour dusting -->
+  <circle cx="40" cy="55" r="1.5" fill="#FFF"/>
+  <circle cx="56" cy="45" r="1.5" fill="#FFF"/>
+  <circle cx="52" cy="60" r="1.5" fill="#FFF"/>
+
+  </g>
+</svg>
