@@ -162,7 +162,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         ];
 
         let replCount = 0;
-        const rawOrders = Array.isArray(parsed.orders) ? parsed.orders : INITIAL_ORDERS;
+        const rawOrders = Array.isArray(parsed.orders) && parsed.orders.length > 0 ? parsed.orders : INITIAL_ORDERS;
         const sanitizedOrders = rawOrders.map((ord: CustomerOrder) => {
           if (ord.targetChainId === 'ruins') {
             const repl = BISTRO_REPLACEMENTS[replCount % BISTRO_REPLACEMENTS.length];
@@ -175,6 +175,15 @@ export const useGameStore = create<GameState>((set, get) => ({
           }
           return ord;
         });
+
+        // Ensure exactly 5 active orders are visible as requested
+        while (sanitizedOrders.length < 5) {
+          const poolOrd = ORDER_POOL[sanitizedOrders.length % ORDER_POOL.length];
+          sanitizedOrders.push({
+            ...poolOrd,
+            id: `ord-init-${Date.now()}-${sanitizedOrders.length}`
+          });
+        }
 
         set({
           board: sanitizedBoard,
