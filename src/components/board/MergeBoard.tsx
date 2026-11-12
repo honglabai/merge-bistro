@@ -34,8 +34,10 @@ export const MergeBoard: React.FC = () => {
 
       // Fit 7 columns and 9 rows perfectly inside available container
       // to ensure each tile is a 100% mathematically exact square!
-      const sizeByWidth = cw / 7;
-      const sizeByHeight = ch / 9;
+      const availableWidth = Math.max(0, cw - 6);
+      const availableHeight = Math.max(0, ch - 6);
+      const sizeByWidth = availableWidth / 7;
+      const sizeByHeight = availableHeight / 9;
       const tileSize = Math.floor(Math.min(sizeByWidth, sizeByHeight));
 
       if (tileSize > 0) {
@@ -103,7 +105,7 @@ export const MergeBoard: React.FC = () => {
     >
       {/* 7x9 = 63 Exact Mathematical 1:1 Square Checkerboard Grid */}
       <div
-        className="rounded-2xl overflow-hidden shadow-2xl mx-auto flex-shrink-0"
+        className="rounded-2xl overflow-hidden shadow-2xl mx-auto flex-shrink-0 border-2 border-[#166d62]/80 ring-1 ring-black/15"
         style={{
           display: 'grid',
           gridTemplateColumns: `repeat(7, ${boardSize.tileSize}px)`,

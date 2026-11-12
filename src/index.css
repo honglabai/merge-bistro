@@ -13,11 +13,16 @@
   }
 }
 
-body {
+html, body {
   margin: 0;
   padding: 0;
+  height: 100%;
+  width: 100%;
+  overscroll-behavior: none;
+  -webkit-touch-callout: none;
+  touch-action: pan-x pan-y;
+  background-color: #1f1510;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #FAF7F2;
   user-select: none;
 }

@@ -46,7 +46,7 @@ export const ResourceHeader: React.FC<ResourceHeaderProps> = ({ onOpenHelp, onOp
     .padStart(2, '0')}:${(secondsUntilRecharge % 60).toString().padStart(2, '0')}`;
 
   return (
-    <header className="bg-gradient-to-b from-[#1b5853] via-[#104e49] to-[#0c433e] text-white px-2 sm:px-4 py-2 select-none border-b border-[#1b6b63]/60 shadow-md">
+    <header className="bg-gradient-to-b from-[#1b5853] via-[#104e49] to-[#0c433e] text-white px-1.5 sm:px-3 pt-[max(8px,env(safe-area-inset-top,8px))] pb-2 select-none border-b border-[#1b6b63]/60 shadow-md">
       <div className="max-w-[500px] mx-auto flex items-center justify-between gap-1 sm:gap-2">
         
         {/* Profile Avatar with Golden Level Badge */}

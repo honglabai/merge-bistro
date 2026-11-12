@@ -102,13 +102,13 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
       )}
 
       {/* Main 3-Section Bottom Bar matching reference screenshot */}
-      <div className="flex items-center justify-between gap-2 px-1">
+      <div className="flex items-center justify-between gap-1.5 px-1">
         
         {/* Left: Round Backpack Button (Board) or Home Button (Other screens) */}
         <button
           onClick={handleLeftButtonClick}
           title={currentTab === 'game' ? '홈 메뉴 및 보관함 열기' : '1. 머지 보드로 복귀'}
-          className="relative w-14 h-14 sm:w-16 sm:h-16 p-0 bg-transparent border-0 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0 cursor-pointer drop-shadow-lg"
+          className="relative w-[56px] h-[56px] sm:w-16 sm:h-16 p-0 bg-transparent border-0 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0 cursor-pointer drop-shadow-lg"
         >
           {currentTab === 'game' ? (
             <>
@@ -217,7 +217,7 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
         <button
           onClick={handleRightButtonClick}
           title={currentTab === 'restoration' ? '머지 보드로 복귀' : '2. 식당 & 유적 복원 맵으로 이동'}
-          className="relative w-14 h-14 sm:w-16 sm:h-16 p-0 bg-transparent border-0 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0 cursor-pointer drop-shadow-lg"
+          className="relative w-[56px] h-[56px] sm:w-16 sm:h-16 p-0 bg-transparent border-0 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0 cursor-pointer drop-shadow-lg"
         >
           {currentTab === 'restoration' ? (
             <div className="w-full h-full rounded-full bg-gradient-to-b from-amber-500 to-orange-600 border-2 border-white shadow-xl flex flex-col items-center justify-center text-white">

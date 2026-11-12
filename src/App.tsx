@@ -39,10 +39,11 @@ export const App: React.FC = () => {
       {/* 60fps Micro Particle Canvas Overlay */}
       <ParticleCanvas />
 
-      {/* Main App Container - Perfect Native Mobile Proportions matching Reference Screenshot */}
+      {/* Main App Container - Perfect Samsung Galaxy S26 19.5:9 Screen Ratio */}
       <div
-        className="w-full max-w-[480px] h-[100dvh] flex flex-col justify-between relative shadow-2xl overflow-hidden select-none touch-none"
+        className="w-full h-[100dvh] flex flex-col justify-between relative shadow-2xl overflow-hidden select-none touch-none"
         style={{
+          maxWidth: 'min(100vw, calc(100dvh * (9 / 19.5)), 460px)',
           background:
             'repeating-linear-gradient(90deg, #008770 0px, #008770 38px, #007863 39px, #00937b 40px)'
         }}
@@ -57,20 +58,20 @@ export const App: React.FC = () => {
 
         {/* 1번: 머지 보드 & 주문 메인 화면 */}
         {currentTab === 'game' && (
-          <div className="flex-1 min-h-0 flex flex-col justify-between items-center w-full px-0 overflow-hidden space-y-0.5">
+          <div className="flex-1 min-h-0 flex flex-col justify-between items-center w-full px-0 overflow-hidden">
             
-            {/* Upper Stage: Active Orders Shelf with Cat & Bakery Hero Window */}
+            {/* Upper Stage: Active Orders Shelf with Cat & Bakery Hero Window (~21% of 19.5:9 viewport) */}
             <div className="w-full flex-shrink-0 px-0.5 pt-0">
               <OrderQueueBar />
             </div>
 
-            {/* Middle Stage: 7x9 Seamless Edge-to-Edge Checkerboard Merge Grid */}
-            <div className="w-full flex-1 min-h-0 flex items-center justify-center px-0 py-0">
+            {/* Middle Stage: 7x9 Seamless Edge-to-Edge Checkerboard Merge Grid (~58% of 19.5:9 viewport) */}
+            <div className="w-full flex-1 min-h-0 flex items-center justify-center px-0.5 py-0 overflow-hidden">
               <MergeBoard />
             </div>
 
             {/* Bottom Stage: 3-Section Navigation Bar (Left Bag/Menu | Center Pill | Right Map Pin) */}
-            <div className="w-full flex-shrink-0 px-1 pb-1">
+            <div className="w-full flex-shrink-0 px-1 pb-[max(0.35rem,env(safe-area-inset-bottom,0.6rem))]">
               <BottomActionBar
                 currentTab={currentTab}
                 onOpenHomeMenu={() => setIsHomeMenuOpen(true)}
@@ -87,7 +88,7 @@ export const App: React.FC = () => {
             <div className="flex-1 min-h-0 overflow-y-auto px-3 py-3 no-scrollbar">
               <TownRestorationView onBackToBoard={() => setCurrentTab('game')} />
             </div>
-            <div className="flex-shrink-0 p-1.5 border-t border-[#D4A373]/40 bg-[#008770]">
+            <div className="flex-shrink-0 p-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom,0.75rem))] border-t border-[#D4A373]/40 bg-[#008770]">
               <BottomActionBar
                 currentTab={currentTab}
                 onOpenHomeMenu={() => setIsHomeMenuOpen(true)}
@@ -104,7 +105,7 @@ export const App: React.FC = () => {
             <div className="flex-1 min-h-0 overflow-y-auto px-3 py-3 no-scrollbar">
               <CookstagramView onBackToBoard={() => setCurrentTab('game')} />
             </div>
-            <div className="flex-shrink-0 p-1.5 border-t border-[#D4A373]/40 bg-[#008770]">
+            <div className="flex-shrink-0 p-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom,0.75rem))] border-t border-[#D4A373]/40 bg-[#008770]">
               <BottomActionBar
                 currentTab={currentTab}
                 onOpenHomeMenu={() => setIsHomeMenuOpen(true)}
@@ -121,7 +122,7 @@ export const App: React.FC = () => {
             <div className="flex-1 min-h-0 overflow-y-auto px-3 py-3 no-scrollbar">
               <MathSimulatorView onBackToBoard={() => setCurrentTab('game')} />
             </div>
-            <div className="flex-shrink-0 p-1.5 border-t border-[#D4A373]/40 bg-[#008770]">
+            <div className="flex-shrink-0 p-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom,0.75rem))] border-t border-[#D4A373]/40 bg-[#008770]">
               <BottomActionBar
                 currentTab={currentTab}
                 onOpenHomeMenu={() => setIsHomeMenuOpen(true)}
