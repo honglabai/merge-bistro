@@ -261,6 +261,9 @@ export const useGameStore = create<GameState>((set, get) => ({
     if (state.selectedTileIndex === null) {
       if (cell.item && cell.state === 'OPEN') {
         set({ selectedTileIndex: index });
+      } else if (cell.state === 'COBWEB') {
+        sounds.playErrorSound();
+        state.showToast('🕸️ 거미줄에 묶인 아이템입니다! 같은 레벨의 아이템과 합성하거나 바로 옆에서 아이템을 합성하여 해금하세요.');
       }
     } else {
       if (state.selectedTileIndex === index) {
@@ -374,13 +377,40 @@ export const useGameStore = create<GameState>((set, get) => ({
         isGenerator: false
       };
 
-      if (dest.state === 'COBWEB') {
+      let unlockedCount = 0;
+      if (dest.state === 'COBWEB' || dest.state === 'LOCKED') {
         dest.state = 'OPEN';
-        sounds.playUnlockSound();
+        unlockedCount++;
       }
 
       src.item = null;
-      state.unlockAdjacentTiles(dest.row, dest.col);
+
+      // Directly unlock all 4 adjacent cobwebs or locked tiles in newBoard!
+      const destRow = dest.row !== undefined ? dest.row : Math.floor(dest.index / 7);
+      const destCol = dest.col !== undefined ? dest.col : (dest.index % 7);
+
+      const neighbors = [
+        { r: destRow - 1, c: destCol },
+        { r: destRow + 1, c: destCol },
+        { r: destRow, c: destCol - 1 },
+        { r: destRow, c: destCol + 1 }
+      ];
+
+      neighbors.forEach(n => {
+        const neighbor = newBoard.find(c => {
+          const r = c.row !== undefined ? c.row : Math.floor(c.index / 7);
+          const col = c.col !== undefined ? c.col : (c.index % 7);
+          return r === n.r && col === n.c;
+        });
+        if (neighbor && (neighbor.state === 'COBWEB' || neighbor.state === 'LOCKED')) {
+          neighbor.state = 'OPEN';
+          unlockedCount++;
+        }
+      });
+
+      if (unlockedCount > 0) {
+        sounds.playUnlockSound();
+      }
 
       sounds.playMerge(nextLevel);
 
@@ -404,7 +434,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
 
       const mergedDef = getItemDef(dest.item.chainId, nextLevel);
-      state.showToast(`🎉 합성 성공! [Lv.${nextLevel} ${mergedDef?.name || '아이템'}] 탄생!`);
+      if (unlockedCount > 0) {
+        state.showToast(`🎉 합성 성공! [Lv.${nextLevel} ${mergedDef?.name || '아이템'}] & 🕸️ 거미줄 ${unlockedCount}곳 해금!`);
+      } else {
+        state.showToast(`🎉 합성 성공! [Lv.${nextLevel} ${mergedDef?.name || '아이템'}] 탄생!`);
+      }
 
       set({ board: newBoard, selectedTileIndex: null, dragOverIndex: null });
       saveState(get());
@@ -439,7 +473,11 @@ export const useGameStore = create<GameState>((set, get) => ({
     ];
 
     neighbors.forEach(n => {
-      const cell = newBoard.find(c => c.row === n.r && c.col === n.c);
+      const cell = newBoard.find(c => {
+        const r = c.row !== undefined ? c.row : Math.floor(c.index / 7);
+        const col = c.col !== undefined ? c.col : (c.index % 7);
+        return r === n.r && col === n.c;
+      });
       if (cell && (cell.state === 'COBWEB' || cell.state === 'LOCKED')) {
         cell.state = 'OPEN';
         unlockedAny = true;

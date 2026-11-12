@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, Lock, Sparkles } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
@@ -15,6 +15,48 @@ export const MergeBoard: React.FC = () => {
   } = useGameStore();
 
   const [draggingIdx, setDraggingIdx] = useState<number | null>(null);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [boardSize, setBoardSize] = useState<{ width: number; height: number; tileSize: number }>({
+    width: 350,
+    height: 450,
+    tileSize: 50
+  });
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const measure = () => {
+      const cw = el.clientWidth;
+      const ch = el.clientHeight;
+      if (cw <= 0 || ch <= 0) return;
+
+      // Fit 7 columns and 9 rows perfectly inside available container
+      // to ensure each tile is a 100% mathematically exact square!
+      const sizeByWidth = cw / 7;
+      const sizeByHeight = ch / 9;
+      const tileSize = Math.floor(Math.min(sizeByWidth, sizeByHeight));
+
+      if (tileSize > 0) {
+        setBoardSize({
+          width: tileSize * 7,
+          height: tileSize * 9,
+          tileSize
+        });
+      }
+    };
+
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    window.addEventListener('resize', measure);
+
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, []);
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
     setDraggingIdx(index);
@@ -55,15 +97,19 @@ export const MergeBoard: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center select-none touch-none px-0 sm:px-1">
-      {/* 7x9 = 63 Seamless Edge-to-Edge Checkerboard Grid */}
+    <div
+      ref={containerRef}
+      className="w-full h-full flex items-center justify-center select-none touch-none px-0 sm:px-1 overflow-hidden"
+    >
+      {/* 7x9 = 63 Exact Mathematical 1:1 Square Checkerboard Grid */}
       <div
-        className="w-full max-h-full rounded-2xl overflow-hidden shadow-2xl"
+        className="rounded-2xl overflow-hidden shadow-2xl mx-auto flex-shrink-0"
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
-          gridTemplateRows: 'repeat(9, minmax(0, 1fr))',
-          aspectRatio: '7 / 9',
+          gridTemplateColumns: `repeat(7, ${boardSize.tileSize}px)`,
+          gridTemplateRows: `repeat(9, ${boardSize.tileSize}px)`,
+          width: `${boardSize.width}px`,
+          height: `${boardSize.height}px`,
           gap: 0
         }}
       >
@@ -116,7 +162,7 @@ export const MergeBoard: React.FC = () => {
                   ? { scale: [1, 0.95, 1], transition: { repeat: Infinity, duration: 1.4 } }
                   : { scale: 1 }
               }
-              className={`relative aspect-square flex items-center justify-center cursor-pointer transition-shadow overflow-hidden ${
+              className={`relative flex items-center justify-center cursor-pointer transition-shadow overflow-hidden ${
                 isSelected
                   ? 'ring-4 ring-amber-300 ring-inset z-20 shadow-2xl'
                   : isHoveredTarget && isDragCandidate
@@ -127,6 +173,8 @@ export const MergeBoard: React.FC = () => {
               }`}
               style={{
                 backgroundColor: tileBgColor,
+                width: `${boardSize.tileSize}px`,
+                height: `${boardSize.tileSize}px`,
                 touchAction: 'none'
               }}
             >
@@ -199,16 +247,6 @@ export const MergeBoard: React.FC = () => {
             </motion.div>
           );
         })}
-      </div>
-
-      {/* Guide Banner */}
-      <div className="mt-1.5 text-center text-[10px] sm:text-xs text-emerald-100 font-bold flex items-center justify-center gap-1.5 flex-wrap">
-        <Sparkles className="w-3 h-3 text-amber-300" />
-        <span>
-          <strong className="text-pink-300">⚡ 스포너 탭</strong> 재료 소환 ·{' '}
-          <strong className="text-amber-300">동일 아이템 드래그</strong> 합성 진화 ·{' '}
-          <strong className="text-emerald-300">합성 시</strong> 인접 거미줄 해금!
-        </span>
       </div>
     </div>
   );

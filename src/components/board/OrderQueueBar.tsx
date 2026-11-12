@@ -84,21 +84,21 @@ export const OrderQueueBar: React.FC = () => {
                 initial={{ opacity: 0, scale: 0.8, y: 15 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.8, y: -15 }}
-                whileHover={{ scale: 1.05, y: -2 }}
+                whileHover={{ scale: 1.04, y: -2 }}
                 whileTap={{ scale: 0.94 }}
                 onClick={() => {
                   if (hasItem) {
                     fulfillOrder(order.id);
                   }
                 }}
-                className={`relative w-[68px] sm:w-[74px] h-[94px] sm:h-[100px] flex-shrink-0 rounded-xl border-2 flex flex-col justify-between items-center p-1 shadow-xl cursor-pointer transition-all backdrop-blur-xs ${borderTheme} ${
+                className={`relative w-[68px] sm:w-[74px] h-[88px] sm:h-[92px] flex-shrink-0 rounded-xl border-2 flex flex-col justify-between items-center p-1 pb-0.5 shadow-xl cursor-pointer transition-all backdrop-blur-xs ${borderTheme} ${
                   hasItem
                     ? 'ring-4 ring-emerald-400 animate-pulse bg-emerald-50/95'
                     : 'hover:shadow-2xl'
                 }`}
               >
                 {/* Top Header: Star reward and Customer Avatar */}
-                <div className="w-full flex justify-between items-center px-0.5">
+                <div className="w-full flex justify-between items-center px-0.5 flex-shrink-0">
                   <span className="text-[8px] font-black bg-amber-400 text-amber-950 px-1 rounded-xs shadow-2xs leading-tight">
                     +{order.rewardStars}⭐
                   </span>
@@ -107,8 +107,8 @@ export const OrderQueueBar: React.FC = () => {
                   </div>
                 </div>
 
-                {/* 3D Item Illustration (Compact & Clear) */}
-                <div className="relative w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center my-auto">
+                {/* 3D Item Illustration (Maximized & Snug directly above button) */}
+                <div className="relative w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center flex-1 min-h-0 my-0">
                   <ItemGraphic
                     chainId={order.targetChainId}
                     level={order.targetLevel}
@@ -121,23 +121,35 @@ export const OrderQueueBar: React.FC = () => {
                   )}
                 </div>
 
-                {/* Progress Pill / Reward Coins */}
-                <div className="w-full bg-black/65 rounded-full px-0.5 py-0.2 text-center flex items-center justify-center">
-                  <span className="text-[8px] font-black text-amber-300 tracking-tight">
-                    +{order.rewardCoins}🪙
-                  </span>
-                </div>
+                {/* Tight Integrated Bottom Action Bar (Coins + Button with zero wasted margin) */}
+                <div className="w-full flex flex-col gap-0 flex-shrink-0">
+                  {/* Reward Coins */}
+                  <div className="w-full bg-black/70 rounded-t-sm py-0.5 text-center flex items-center justify-center leading-none">
+                    <span className="text-[8px] font-black text-amber-300 tracking-tight">
+                      +{order.rewardCoins}🪙
+                    </span>
+                  </div>
 
-                {/* Bottom Timer Badge */}
-                <div
-                  className={`w-full text-center text-[7px] sm:text-[8px] font-black rounded-b-md py-0.2 text-white flex items-center justify-center gap-0.5 ${
-                    hasItem
-                      ? 'bg-emerald-600'
-                      : 'bg-[#1b7367]'
-                  }`}
-                >
-                  <Clock className="w-2 h-2" />
-                  <span>{hasItem ? '납품' : timer}</span>
+                  {/* Bottom Action / Timer Button */}
+                  <div
+                    className={`w-full text-center text-[7.5px] sm:text-[8px] font-black rounded-b-md py-0.5 text-white flex items-center justify-center gap-0.5 leading-none ${
+                      hasItem
+                        ? 'bg-emerald-600'
+                        : 'bg-[#1b7367]'
+                    }`}
+                  >
+                    {hasItem ? (
+                      <>
+                        <Check className="w-2.5 h-2.5 stroke-[3]" />
+                        <span>납품</span>
+                      </>
+                    ) : (
+                      <>
+                        <Clock className="w-2 h-2" />
+                        <span>{timer}</span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </motion.div>
             );
