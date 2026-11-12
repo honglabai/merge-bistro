@@ -57,15 +57,15 @@ export const App: React.FC = () => {
 
         {/* 1번: 머지 보드 & 주문 메인 화면 */}
         {currentTab === 'game' && (
-          <div className="flex-1 min-h-0 flex flex-col justify-between items-center w-full px-0 overflow-hidden">
+          <div className="flex-1 min-h-0 flex flex-col justify-between items-center w-full px-0 overflow-hidden space-y-0.5">
             
             {/* Upper Stage: Active Orders Shelf with Cat & Bakery Hero Window */}
-            <div className="w-full flex-shrink-0 px-1 pt-1">
+            <div className="w-full flex-shrink-0 px-0.5 pt-0">
               <OrderQueueBar />
             </div>
 
-            {/* Middle Stage: 6x8 Seamless Edge-to-Edge Checkerboard Merge Grid */}
-            <div className="w-full flex-1 min-h-0 flex items-center justify-center px-0">
+            {/* Middle Stage: 7x9 Seamless Edge-to-Edge Checkerboard Merge Grid */}
+            <div className="w-full flex-1 min-h-0 flex items-center justify-center px-0 py-0">
               <MergeBoard />
             </div>
 

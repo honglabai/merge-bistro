@@ -56,15 +56,24 @@ export const MergeBoard: React.FC = () => {
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center select-none touch-none px-0 sm:px-1">
-      {/* 6x8 = 48 Seamless Edge-to-Edge Checkerboard Grid */}
-      <div className="grid grid-cols-6 grid-rows-8 gap-0 aspect-[6/8] w-full max-h-full rounded-2xl overflow-hidden shadow-2xl">
+      {/* 7x9 = 63 Seamless Edge-to-Edge Checkerboard Grid */}
+      <div
+        className="w-full max-h-full rounded-2xl overflow-hidden shadow-2xl"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
+          gridTemplateRows: 'repeat(9, minmax(0, 1fr))',
+          aspectRatio: '7 / 9',
+          gap: 0
+        }}
+      >
         {board.map(cell => {
           const isSelected = selectedTileIndex === cell.index;
           const isGen = cell.item?.isGenerator;
 
-          // 6 columns grid calculation
-          const row = Math.floor(cell.index / 6);
-          const col = cell.index % 6;
+          // 7 columns grid calculation
+          const row = Math.floor(cell.index / 7);
+          const col = cell.index % 7;
           const isLight = (row + col) % 2 === 0;
 
           // Exact seamless checkerboard colors

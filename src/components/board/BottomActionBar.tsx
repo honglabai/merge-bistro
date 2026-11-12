@@ -108,31 +108,24 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
         <button
           onClick={handleLeftButtonClick}
           title={currentTab === 'game' ? '홈 메뉴 및 보관함 열기' : '1. 머지 보드로 복귀'}
-          className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-full p-1 shadow-xl border-2 border-white hover:scale-105 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0 ${
-            currentTab !== 'game'
-              ? 'bg-gradient-to-b from-[#2A9D8F] to-[#176259] ring-2 ring-emerald-300'
-              : 'bg-gradient-to-b from-[#29b6f6] to-[#0288d1]'
-          }`}
+          className="relative w-14 h-14 sm:w-16 sm:h-16 p-0 bg-transparent border-0 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0 cursor-pointer drop-shadow-lg"
         >
           {currentTab === 'game' ? (
             <>
               <img
-                src="/extracted/btn_backpack.png"
+                src="/extracted/btn_backpack_clean.png"
                 alt="Backpack"
-                className="w-full h-full object-contain filter drop-shadow"
-                onError={(e) => {
-                  (e.target as HTMLElement).style.display = 'none';
-                }}
+                className="w-full h-full object-contain filter drop-shadow-md"
               />
               {/* Badge */}
               {occupiedBackpackCount > 0 && (
-                <div className="absolute -top-1 -right-1 bg-amber-400 text-amber-950 font-black text-[9px] w-5 h-5 rounded-full flex items-center justify-center border border-white shadow">
+                <div className="absolute -top-1 -right-1 bg-amber-400 text-amber-950 font-black text-[9px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow">
                   {occupiedBackpackCount}
                 </div>
               )}
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center text-white">
+            <div className="w-full h-full rounded-full bg-gradient-to-b from-[#2A9D8F] to-[#176259] border-2 border-white shadow-xl flex flex-col items-center justify-center text-white">
               <Gamepad2 className="w-6 h-6 drop-shadow" />
               <span className="text-[9px] font-black -mt-0.5 tracking-tighter">보드</span>
             </div>
@@ -224,26 +217,19 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
         <button
           onClick={handleRightButtonClick}
           title={currentTab === 'restoration' ? '머지 보드로 복귀' : '2. 식당 & 유적 복원 맵으로 이동'}
-          className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-full p-1 shadow-xl border-2 border-white hover:scale-105 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0 ${
-            currentTab === 'restoration'
-              ? 'bg-gradient-to-b from-amber-500 to-orange-600 ring-2 ring-amber-300'
-              : 'bg-gradient-to-b from-[#29b6f6] to-[#0288d1]'
-          }`}
+          className="relative w-14 h-14 sm:w-16 sm:h-16 p-0 bg-transparent border-0 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0 cursor-pointer drop-shadow-lg"
         >
           {currentTab === 'restoration' ? (
-            <div className="flex flex-col items-center justify-center text-white">
+            <div className="w-full h-full rounded-full bg-gradient-to-b from-amber-500 to-orange-600 border-2 border-white shadow-xl flex flex-col items-center justify-center text-white">
               <Gamepad2 className="w-6 h-6 drop-shadow" />
               <span className="text-[9px] font-black -mt-0.5 tracking-tighter">보드</span>
             </div>
           ) : (
             <>
               <img
-                src="/extracted/btn_map.png"
+                src="/extracted/btn_map_clean.png"
                 alt="Map"
-                className="w-full h-full object-contain filter drop-shadow"
-                onError={(e) => {
-                  (e.target as HTMLElement).style.display = 'none';
-                }}
+                className="w-full h-full object-contain filter drop-shadow-md"
               />
               {/* Notification ping badge if restoration is ready */}
               {canRestore && (

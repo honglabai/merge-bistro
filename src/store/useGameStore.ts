@@ -98,7 +98,7 @@ export const useGameStore = create<GameState>((set, get) => ({
           recoveredOfflineEnergy = Math.min(recoverable, maxE - storedEnergy);
         }
 
-        const isValidBoard = Array.isArray(parsed.board) && parsed.board.length === 48;
+        const isValidBoard = Array.isArray(parsed.board) && parsed.board.length === 63;
         const rawBoard = isValidBoard ? parsed.board : createInitialBoard();
         const sanitizedBoard = rawBoard.map((cell: BoardCell) => {
           if (cell.item && cell.item.chainId === 'ruins') {
