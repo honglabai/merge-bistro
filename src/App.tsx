@@ -39,11 +39,10 @@ export const App: React.FC = () => {
       {/* 60fps Micro Particle Canvas Overlay */}
       <ParticleCanvas />
 
-      {/* Main App Container - Perfect Samsung Galaxy S26 19.5:9 Screen Ratio */}
+      {/* Universal Mobile Container - Balanced & Uniform Across All Phone Screen Sizes */}
       <div
-        className="w-full h-[100dvh] flex flex-col justify-between relative shadow-2xl overflow-hidden select-none touch-none"
+        className="w-full max-w-[480px] h-[100dvh] flex flex-col justify-between relative shadow-2xl overflow-hidden select-none touch-none mx-auto"
         style={{
-          maxWidth: 'min(100vw, calc(100dvh * (9 / 19.5)), 460px)',
           background:
             'repeating-linear-gradient(90deg, #008770 0px, #008770 38px, #007863 39px, #00937b 40px)'
         }}
