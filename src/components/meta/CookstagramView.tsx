@@ -35,16 +35,15 @@ export const CookstagramView: React.FC<CookstagramViewProps> = ({ onBackToBoard 
       
       {/* Return to Board Header Bar */}
       {onBackToBoard && (
-        <div className="flex items-center justify-between bg-white px-3 py-2 rounded-xl border border-[#d6cbbe] shadow-2xs">
+        <div className="flex items-center justify-between bg-white px-3 py-2 rounded-2xl border-2 border-rose-200 shadow-xs">
           <button
             onClick={onBackToBoard}
-            className="px-3 py-1.5 rounded-lg bg-[#2A9D8F] hover:bg-[#238779] text-white text-xs font-semibold shadow-xs flex items-center gap-1.5 active:scale-95 transition-colors"
+            className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#2A9D8F] to-[#1c6b61] text-white text-xs font-black shadow-sm flex items-center gap-1.5 active:scale-95 transition-transform"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
+            <ArrowLeft className="w-4 h-4" />
             <span>1. 머지 보드로 복귀</span>
           </button>
-          <span className="text-xs font-semibold text-rose-800 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200/80 flex items-center gap-1 tabular-nums">
-            <Users className="w-3 h-3 text-rose-600" />
+          <span className="text-xs font-black text-rose-700 bg-rose-50 px-3 py-1 rounded-full border border-rose-200">
             팔로워: {followers.toLocaleString()}명
           </span>
         </div>

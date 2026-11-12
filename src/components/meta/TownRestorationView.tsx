@@ -17,17 +17,16 @@ export const TownRestorationView: React.FC<TownRestorationViewProps> = ({ onBack
       
       {/* Return to Board Header Bar */}
       {onBackToBoard && (
-        <div className="flex items-center justify-between bg-white px-3 py-2 rounded-xl border border-[#d6cbbe] shadow-2xs">
+        <div className="flex items-center justify-between bg-white px-3 py-2 rounded-2xl border-2 border-[#D4A373]/60 shadow-xs">
           <button
             onClick={onBackToBoard}
-            className="px-3 py-1.5 rounded-lg bg-[#2A9D8F] hover:bg-[#238779] text-white text-xs font-semibold shadow-xs flex items-center gap-1.5 active:scale-95 transition-colors"
+            className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#2A9D8F] to-[#1c6b61] text-white text-xs font-black shadow-sm flex items-center gap-1.5 active:scale-95 transition-transform"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
+            <ArrowLeft className="w-4 h-4" />
             <span>1. 머지 보드로 복귀</span>
           </button>
-          <span className="text-xs font-semibold text-amber-900 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200/80 flex items-center gap-1 tabular-nums">
-            <Star className="w-3 h-3 text-amber-500 fill-amber-400" />
-            보유 별: {stars}
+          <span className="text-xs font-black text-amber-800 bg-amber-100 px-3 py-1 rounded-full border border-amber-300">
+            보유 별: {stars}⭐
           </span>
         </div>
       )}
@@ -142,14 +141,14 @@ export const TownRestorationView: React.FC<TownRestorationViewProps> = ({ onBack
                     <button
                       onClick={() => openRestorationPicker(node)}
                       disabled={!canRestore}
-                      className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-2xs ${
+                      className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 shadow ${
                         canRestore
-                          ? 'bg-amber-600 hover:bg-amber-500 text-white active:scale-95'
-                          : 'bg-stone-200 text-stone-400 cursor-not-allowed'
+                          ? 'bg-gradient-to-r from-amber-500 to-terracotta-500 hover:from-amber-600 hover:to-terracotta-600 text-white active:scale-95 animate-pulse'
+                          : 'bg-cream-200 text-slate-400 cursor-not-allowed'
                       }`}
                     >
                       <Hammer className="w-3.5 h-3.5" />
-                      <span>{canRestore ? '복원하기 (스타일 선택)' : `별 부족 (${stars}/${node.costStars})`}</span>
+                      <span>{canRestore ? '복원하기 (스타일 선택)' : `별 부족 (${stars}/${node.costStars}⭐)`}</span>
                     </button>
                   </div>
                 )}
