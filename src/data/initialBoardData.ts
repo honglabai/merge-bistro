@@ -1,21 +1,21 @@
 import { BoardCell, TileState } from '../types/gameSchema';
 
+export const BOARD_COLS = 6;
+export const BOARD_ROWS = 8;
+export const TOTAL_TILES = BOARD_COLS * BOARD_ROWS; // 48
+
 export function createInitialBoard(): BoardCell[] {
   const cells: BoardCell[] = [];
 
-  for (let i = 0; i < 63; i++) {
-    const row = Math.floor(i / 7);
-    const col = i % 7;
+  for (let i = 0; i < TOTAL_TILES; i++) {
+    const row = Math.floor(i / BOARD_COLS);
+    const col = i % BOARD_COLS;
 
-    const isCenter = row >= 3 && row <= 5 && col >= 2 && col <= 4;
-    const isBorder = row === 0 || row === 8 || col === 0 || col === 6;
+    // Center area (rows 2..5, cols 1..4) is OPEN
+    const isCenterOpen = row >= 2 && row <= 5 && col >= 1 && col <= 4;
 
-    let state: TileState = 'COBWEB';
-    if (isBorder) {
-      state = 'LOCKED';
-    } else if (isCenter) {
-      state = 'OPEN';
-    }
+    // Perimeter tiles are COBWEB with trapped rewards (No locked 'box' walls)
+    const state: TileState = isCenterOpen ? 'OPEN' : 'COBWEB';
 
     cells.push({
       index: i,
@@ -35,8 +35,8 @@ export function createInitialBoard(): BoardCell[] {
     isGenerator = false,
     generatorLevel = 4
   ) => {
-    const idx = r * 7 + c;
-    if (idx >= 0 && idx < 63) {
+    const idx = r * BOARD_COLS + c;
+    if (idx >= 0 && idx < TOTAL_TILES) {
       cells[idx].item = {
         id: `init-${r}-${c}-${chainId}-${level}`,
         chainId,
@@ -47,40 +47,35 @@ export function createInitialBoard(): BoardCell[] {
     }
   };
 
-  // Center Generators (Open)
-  place(4, 3, 'bakery', 4, true, 4); // 밀가루 포대 (중앙)
-  place(4, 4, 'cafe', 4, true, 4);   // 커피 머신 (우측)
-  place(4, 2, 'garden', 4, true, 4); // 씨앗 주머니 (좌측)
+  // Center Open Generators (4 chains)
+  place(3, 2, 'bakery', 4, true, 4); // 화덕 베이커리 스포너
+  place(3, 3, 'cafe', 4, true, 4);   // 바리스타 커피 스포너
+  place(4, 2, 'garden', 4, true, 4); // 정원 텃밭 스포너
+  place(4, 3, 'seafood', 4, true, 4); // 항구 해산물 스포너
 
-  // Starting Free Items (Ready to merge in Open 3x3)
-  place(3, 3, 'bakery', 1); // 밀가루
-  place(3, 4, 'bakery', 1); // 밀가루 (합성하면 반죽 Lv.2)
-  place(5, 3, 'cafe', 1);   // 원두
-  place(5, 4, 'cafe', 1);   // 원두 (합성하면 에스프레소 Lv.2)
-  place(3, 2, 'garden', 1); // 새싹
-  place(5, 2, 'garden', 1); // 새싹
+  // Starting Free Items in Open Tiles (Ready to merge!)
+  place(2, 2, 'bakery', 1); // 밀가루
+  place(2, 3, 'bakery', 1); // 밀가루 (합성 시 반죽 Lv.2)
+  place(5, 2, 'cafe', 1);   // 원두
+  place(5, 3, 'cafe', 1);   // 원두 (합성 시 에스프레소 Lv.2)
+  place(3, 1, 'garden', 1); // 새싹
+  place(4, 1, 'garden', 1); // 새싹 (합성 시 바질 Lv.2)
+  place(3, 4, 'seafood', 1); // 비단조개
+  place(4, 4, 'seafood', 1); // 비단조개 (합성 시 대하꼬치 Lv.2)
 
-  // Cobweb trapped items for rewarding unlocks
-  place(2, 3, 'bakery', 2); // 반죽 (Lv.2)
-  place(2, 4, 'cafe', 2);   // 에스프레소 (Lv.2)
-  place(2, 2, 'garden', 2); // 바질 (Lv.2)
-
-  place(3, 1, 'bakery', 2); // 반죽 (Lv.2)
-  place(4, 1, 'seafood', 1); // 비단조개 (Lv.1)
-  place(5, 1, 'ruins', 1);  // 돋보기 (Lv.1)
-
-  place(3, 5, 'seafood', 1); // 비단조개 (Lv.1)
-  place(4, 5, 'garden', 2); // 바질 (Lv.2)
-  place(5, 5, 'cafe', 2);   // 에스프레소 (Lv.2)
-
-  place(6, 3, 'bakery', 3); // 식빵 (Lv.3)
-  place(6, 4, 'cafe', 3);   // 아메리카노 (Lv.3)
-  place(6, 2, 'ruins', 2);  // 미세 솔 (Lv.2)
-
-  place(1, 3, 'bakery', 4); // 바게트 (Lv.4)
-  place(1, 4, 'cafe', 4);   // 바닐라 라떼 (Lv.4)
-  place(7, 3, 'seafood', 2); // 대하 꼬치 (Lv.2)
-  place(7, 4, 'garden', 3); // 로즈마리 (Lv.3)
+  // Outer Cobweb Trapped Items (Unlocked when neighboring items are merged)
+  place(1, 2, 'bakery', 2); // 반죽 (Lv.2)
+  place(1, 3, 'cafe', 2);   // 에스프레소 (Lv.2)
+  place(2, 1, 'garden', 2); // 바질 (Lv.2)
+  place(2, 4, 'seafood', 2); // 대하 꼬치 (Lv.2)
+  place(5, 1, 'ruins', 1);  // 가죽 스트랩 (Lv.1)
+  place(5, 4, 'ruins', 2);  // 필름 스트립 (Lv.2)
+  place(6, 2, 'bakery', 3); // 식빵 (Lv.3)
+  place(6, 3, 'cafe', 3);   // 아메리카노 (Lv.3)
+  place(0, 2, 'bakery', 4); // 바게트 (Lv.4)
+  place(0, 3, 'cafe', 4);   // 라떼 (Lv.4)
+  place(7, 2, 'seafood', 3); // 블루 피쉬 (Lv.3)
+  place(7, 3, 'garden', 3); // 허브 화분 (Lv.3)
 
   return cells;
 }

@@ -56,18 +56,19 @@ export const MergeBoard: React.FC = () => {
 
   return (
     <div className="w-full flex flex-col items-center select-none touch-none">
-      {/* 7x9 = 63 Checkerboard Grid Matching the Reference Screenshot */}
-      <div className="grid grid-cols-7 grid-rows-9 gap-[1px] aspect-[7/9] w-full max-w-[460px] mx-auto bg-[#6ea0c9]/50 p-[2px] rounded-2xl overflow-hidden shadow-2xl border-2 border-[#8db9db]/60">
+      {/* 6x8 = 48 Seamless Edge-to-Edge Checkerboard Grid */}
+      <div className="grid grid-cols-6 grid-rows-8 gap-0 aspect-[6/8] w-full rounded-2xl overflow-hidden shadow-2xl">
         {board.map(cell => {
           const isSelected = selectedTileIndex === cell.index;
           const isGen = cell.item?.isGenerator;
 
-          const row = Math.floor(cell.index / 7);
-          const col = cell.index % 7;
+          // 6 columns grid calculation
+          const row = Math.floor(cell.index / 6);
+          const col = cell.index % 6;
           const isLight = (row + col) % 2 === 0;
 
-          // Exact color matching from screenshot
-          // Light: #97c0e0, Dark: #7fb0d8, Cobweb/Locked: #5a8c2f (olive green)
+          // Exact seamless checkerboard colors
+          // Light: #97c0e0, Dark: #7fb0d8, Cobweb: #5a8c2f (olive green)
           const isOliveTile = cell.state === 'COBWEB' || cell.state === 'LOCKED';
           const tileBgColor = isOliveTile
             ? cell.state === 'LOCKED'
@@ -99,20 +100,20 @@ export const MergeBoard: React.FC = () => {
               draggable={isDraggable}
               onDragStartCapture={e => handleDragStart(e, cell.index)}
               onDragEndCapture={handleDragEnd}
-              whileHover={{ scale: cell.item ? 1.05 : 1 }}
+              whileHover={{ scale: cell.item ? 1.04 : 1 }}
               whileTap={{ scale: cell.item ? 0.94 : 1 }}
               animate={
                 isSelected
-                  ? { scale: [1, 0.94, 1], transition: { repeat: Infinity, duration: 1.4 } }
+                  ? { scale: [1, 0.95, 1], transition: { repeat: Infinity, duration: 1.4 } }
                   : { scale: 1 }
               }
               className={`relative aspect-square flex items-center justify-center cursor-pointer transition-shadow overflow-hidden ${
                 isSelected
-                  ? 'ring-4 ring-amber-300 ring-offset-2 ring-offset-sky-200 z-20 shadow-2xl'
+                  ? 'ring-4 ring-amber-300 ring-inset z-20 shadow-2xl'
                   : isHoveredTarget && isDragCandidate
-                  ? 'ring-4 ring-emerald-400 bg-emerald-200/50 z-20 animate-pulse'
+                  ? 'ring-4 ring-emerald-400 ring-inset bg-emerald-200/50 z-20 animate-pulse'
                   : isDragCandidate
-                  ? 'ring-2 ring-amber-300 ring-dashed animate-pulse'
+                  ? 'ring-2 ring-amber-300 ring-inset ring-dashed animate-pulse'
                   : ''
               }`}
               style={{
@@ -131,12 +132,12 @@ export const MergeBoard: React.FC = () => {
               )}
 
               {cell.state === 'COBWEB' && (
-                <div className="w-full h-full flex flex-col items-center justify-center relative p-0.5">
-                  <span className="absolute text-white/40 text-xl sm:text-2xl select-none pointer-events-none z-10 drop-shadow-sm">
+                <div className="w-full h-full flex flex-col items-center justify-center relative p-0">
+                  <span className="absolute text-white/40 text-2xl sm:text-3xl select-none pointer-events-none z-10 drop-shadow-sm">
                     🕸️
                   </span>
                   {cell.item ? (
-                    <div className="w-[88%] h-[88%] flex items-center justify-center z-0 relative opacity-85">
+                    <div className="w-[96%] h-[96%] flex items-center justify-center z-0 relative opacity-85">
                       <ItemGraphic
                         chainId={cell.item.chainId}
                         level={cell.item.level}
@@ -158,21 +159,21 @@ export const MergeBoard: React.FC = () => {
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.75, opacity: 0 }}
                     transition={{ type: 'spring', stiffness: 500, damping: 28 }}
-                    className="relative w-full h-full flex items-center justify-center p-0.5 pointer-events-none"
+                    className="relative w-full h-full flex items-center justify-center p-0 pointer-events-none"
                   >
-                    {/* Authentic Spawner Glowing Pink/Magenta Lightning Badge at Bottom-Right */}
+                    {/* Glowing Magenta Lightning Badge at Bottom-Right */}
                     {isGen && (
                       <div
                         title="스포너 (탭하여 재료 생성)"
-                        className="absolute bottom-1 right-1 z-10 w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full bg-gradient-to-tr from-fuchsia-600 via-pink-500 to-rose-400 border-2 border-white shadow-lg flex items-center justify-center animate-pulse drop-shadow-[0_2px_4px_rgba(236,72,153,0.6)]"
+                        className="absolute bottom-1 right-1 z-10 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-tr from-fuchsia-600 via-pink-500 to-rose-400 border-2 border-white shadow-lg flex items-center justify-center animate-pulse drop-shadow-[0_2px_4px_rgba(236,72,153,0.6)]"
                       >
-                        <Zap className="w-3 h-3 text-white fill-white" />
+                        <Zap className="w-3.5 h-3.5 text-white fill-white" />
                       </div>
                     )}
 
-                    {/* Big Chunky 3D Graphic Filling ~88% of Tile with Ambient Drop Shadow */}
+                    {/* Maximized 3D Graphic Filling ~96% of Tile for superior mobile usability */}
                     <div
-                      className={`w-[88%] h-[88%] flex items-center justify-center ${
+                      className={`w-[96%] h-[96%] flex items-center justify-center ${
                         isSelected ? 'animate-bounceSubtle' : isGen ? 'hover:scale-105' : ''
                       }`}
                     >
@@ -192,12 +193,12 @@ export const MergeBoard: React.FC = () => {
       </div>
 
       {/* Guide Banner */}
-      <div className="mt-2 text-center text-[10px] sm:text-xs text-emerald-100 font-bold flex items-center justify-center gap-1.5 flex-wrap">
-        <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+      <div className="mt-1.5 text-center text-[10px] sm:text-xs text-emerald-100 font-bold flex items-center justify-center gap-1.5 flex-wrap">
+        <Sparkles className="w-3 h-3 text-amber-300" />
         <span>
           <strong className="text-pink-300">⚡ 스포너 탭</strong> 재료 소환 ·{' '}
-          <strong className="text-amber-300">동일 아이템 드래그 머지</strong> 합성 진화 ·{' '}
-          <strong className="text-emerald-300">합성 시</strong> 인접 거미줄 자동 해금!
+          <strong className="text-amber-300">동일 아이템 드래그</strong> 합성 진화 ·{' '}
+          <strong className="text-emerald-300">합성 시</strong> 인접 거미줄 해금!
         </span>
       </div>
     </div>

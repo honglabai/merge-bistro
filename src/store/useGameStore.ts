@@ -98,8 +98,9 @@ export const useGameStore = create<GameState>((set, get) => ({
           recoveredOfflineEnergy = Math.min(recoverable, maxE - storedEnergy);
         }
 
+        const isValidBoard = Array.isArray(parsed.board) && parsed.board.length === 48;
         set({
-          board: parsed.board || createInitialBoard(),
+          board: isValidBoard ? parsed.board : createInitialBoard(),
           energy: Math.min(maxE, storedEnergy + recoveredOfflineEnergy),
           coins: typeof parsed.coins === 'number' ? parsed.coins : 150,
           stars: typeof parsed.stars === 'number' ? parsed.stars : 5,
@@ -358,13 +359,10 @@ export const useGameStore = create<GameState>((set, get) => ({
     ];
 
     neighbors.forEach(n => {
-      if (n.r >= 0 && n.r < 9 && n.c >= 0 && n.c < 7) {
-        const idx = n.r * 7 + n.c;
-        const cell = newBoard[idx];
-        if (cell && cell.state === 'LOCKED') {
-          cell.state = 'COBWEB';
-          unlockedAny = true;
-        }
+      const cell = newBoard.find(c => c.row === n.r && c.col === n.c);
+      if (cell && (cell.state === 'COBWEB' || cell.state === 'LOCKED')) {
+        cell.state = 'OPEN';
+        unlockedAny = true;
       }
     });
 

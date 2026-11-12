@@ -128,20 +128,27 @@ export const App: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
             {/* Center Merge Game Container - Authentic Mobile Casual Game Aesthetic */}
-            <div className="lg:col-span-7 flex flex-col items-center max-w-[500px] mx-auto w-full space-y-2.5 p-2.5 sm:p-3.5 rounded-3xl shadow-2xl border-4 border-[#006f5c]"
+            <div
+              className="lg:col-span-7 flex flex-col items-center max-w-[500px] mx-auto w-full space-y-1 p-0 sm:p-1.5 rounded-2xl sm:rounded-3xl shadow-2xl border-0 sm:border-2 border-[#006f5c] overflow-hidden"
               style={{
                 background:
                   'repeating-linear-gradient(90deg, #008770 0px, #008770 38px, #007863 39px, #00937b 40px)'
               }}
             >
               {/* Active Orders Shelf with Window Cafe Backdrop */}
-              <OrderQueueBar />
+              <div className="w-full px-0 sm:px-1 pt-1">
+                <OrderQueueBar />
+              </div>
 
-              {/* 7x9 Seamless Checkerboard Grid */}
-              <MergeBoard />
+              {/* 6x8 Seamless Edge-to-Edge Checkerboard Grid */}
+              <div className="w-full">
+                <MergeBoard />
+              </div>
 
               {/* Bottom 3-Section Navigation Bar (Backpack | Inspector Pill | Map) */}
-              <BottomActionBar onOpenMap={() => setCurrentTab('restoration')} />
+              <div className="w-full px-1 pb-1">
+                <BottomActionBar onOpenMap={() => setCurrentTab('restoration')} />
+              </div>
             </div>
 
               {/* Right Side Panel: Bistro Restoration Hero & Village Journal (5 cols) */}
