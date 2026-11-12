@@ -114,14 +114,63 @@ export const useGameStore = create<GameState>((set, get) => ({
           return cell;
         });
 
+        const BISTRO_REPLACEMENTS = [
+          {
+            customerId: 'bruno',
+            customerName: '파티시에 곰 브루노',
+            customerAvatar: '🐻',
+            customerRole: '명예 제빵 마스터',
+            customerQuote: '황금빛 결이 살아있는 골든 버터 크루아상이다곰!',
+            targetChainId: 'bakery' as const,
+            targetLevel: 5,
+            rewardCoins: 180,
+            rewardStars: 11
+          },
+          {
+            customerId: 'milo',
+            customerName: '바리스타 고양이 밀로',
+            customerAvatar: '🐱',
+            customerRole: '비스트로 수석 바리스타',
+            customerQuote: '부드러운 우유 거품과 에스프레소의 조화! 카페라떼를 주문받았냥!',
+            targetChainId: 'cafe' as const,
+            targetLevel: 4,
+            rewardCoins: 125,
+            rewardStars: 8
+          },
+          {
+            customerId: 'waddles',
+            customerName: '선장 펭귄 와들스',
+            customerAvatar: '🐧',
+            customerRole: '달콤 디저트 미식가',
+            customerQuote: '마스카포네 치즈의 깊은 풍미! 클래식 티라미수를 부탁하네!',
+            targetChainId: 'seafood' as const,
+            targetLevel: 5,
+            rewardCoins: 180,
+            rewardStars: 11
+          },
+          {
+            customerId: 'fiona',
+            customerName: '여우 고고학자 피오나',
+            customerAvatar: '🦊',
+            customerRole: '고대 유적 탐사원',
+            customerQuote: '고문서 연구 중 당 충전이 필요해요! 달콤한 초콜릿 에클레어를 부탁해요!',
+            targetChainId: 'seafood' as const,
+            targetLevel: 3,
+            rewardCoins: 100,
+            rewardStars: 7
+          }
+        ];
+
+        let replCount = 0;
         const rawOrders = Array.isArray(parsed.orders) ? parsed.orders : INITIAL_ORDERS;
         const sanitizedOrders = rawOrders.map((ord: CustomerOrder) => {
           if (ord.targetChainId === 'ruins') {
+            const repl = BISTRO_REPLACEMENTS[replCount % BISTRO_REPLACEMENTS.length];
+            replCount++;
             return {
               ...ord,
-              targetChainId: 'seafood' as const,
-              targetLevel: ord.targetLevel >= 5 ? 6 : 4,
-              customerQuote: '달콤한 디저트가 필요해요! 정성 가득한 수제 딸기 케이크를 부탁드려요!'
+              ...repl,
+              id: ord.id || `ord-migrated-${Date.now()}-${replCount}`
             };
           }
           return ord;
@@ -140,6 +189,9 @@ export const useGameStore = create<GameState>((set, get) => ({
           inventoryPocket: parsed.inventoryPocket || [null, null, null, null],
           lastEnergyRecharge: Date.now()
         });
+
+        // Immediately persist the sanitized state
+        saveState(get());
       }
     } catch {
       // Fallback
