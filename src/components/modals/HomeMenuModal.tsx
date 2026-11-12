@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Gamepad2, Hammer, Camera, Calculator, Volume2, VolumeX, RotateCcw, HelpCircle, Zap, Archive, ChevronRight, Sparkles } from 'lucide-react';
+import { X, Gamepad2, Hammer, Camera, Calculator, Volume2, VolumeX, RotateCcw, HelpCircle, Zap, Archive, ChevronRight, Star, Coins, Gem, Users } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 import { sounds } from '../../utils/soundSynthesizer';
 import { ItemGraphic } from '../ui/ItemGraphic';
@@ -47,55 +47,67 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-pop select-none">
-      <div className="bg-[#FAF7F2] w-full max-w-md rounded-3xl border-4 border-[#8C6239] shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs select-none">
+      <div className="bg-[#FAF7F2] w-full max-w-md rounded-2xl border border-[#b89f82] shadow-xl overflow-hidden flex flex-col max-h-[92vh]">
         
-        {/* Modal Top Header */}
-        <div className="bg-gradient-to-r from-[#3E2723] via-[#4E342E] to-[#3E2723] text-amber-100 p-4 flex items-center justify-between border-b-2 border-amber-600/40">
-          <div className="flex items-center gap-2.5">
+        {/* Modal Top Header: Dark Bistro Spruce / Wood */}
+        <div className="bg-[#0b483e] text-white p-4 flex items-center justify-between border-b border-[#1b6b60]">
+          <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-amber-300 via-rose-300 to-sky-300 p-0.5 shadow-md overflow-hidden border-2 border-white">
+              <div className="w-11 h-11 rounded-full bg-[#1b6b60] p-0.5 shadow-sm overflow-hidden border border-white/80">
                 <img
                   src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80"
                   alt="Avatar"
                   className="w-full h-full object-cover rounded-full"
                 />
               </div>
-              <div className="absolute -bottom-1 -right-1 bg-gradient-to-br from-amber-400 to-amber-600 text-white font-black text-[9px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow">
+              <div className="absolute -bottom-1 -right-1 bg-amber-500 text-amber-950 font-bold text-[9px] w-5 h-5 rounded-full flex items-center justify-center border border-white shadow-xs">
                 49
               </div>
             </div>
             <div>
-              <div className="text-sm font-black text-amber-200 flex items-center gap-1.5">
+              <div className="text-sm font-semibold text-white flex items-center gap-1.5">
                 <span>비스트로 총괄 본부</span>
-                <span className="text-[10px] bg-amber-500/30 text-amber-300 px-2 py-0.5 rounded-full border border-amber-400/30">
+                <span className="text-[10px] bg-white/15 text-emerald-100 px-2 py-0.5 rounded-full border border-white/20 font-medium">
                   Lv.49 매니저
                 </span>
               </div>
-              <div className="text-[11px] text-amber-100/70 font-semibold flex items-center gap-2 mt-0.5">
-                <span>⭐ {stars}</span>
-                <span>🪙 {coins.toLocaleString()}</span>
-                <span>💎 {gems}</span>
-                <span>👥 {followers}</span>
+              <div className="text-xs text-emerald-100/80 font-medium flex items-center gap-2.5 mt-0.5 tabular-nums">
+                <span className="flex items-center gap-1">
+                  <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                  {stars}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Coins className="w-3 h-3 text-amber-300" />
+                  {coins.toLocaleString()}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Gem className="w-3 h-3 text-rose-300" />
+                  {gems}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Users className="w-3 h-3 text-sky-300" />
+                  {followers}
+                </span>
               </div>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center active:scale-90 transition-transform"
+            className="w-8 h-8 rounded-full bg-black/20 hover:bg-black/35 text-white flex items-center justify-center active:scale-95 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Scrollable Content Body */}
         <div className="p-4 overflow-y-auto space-y-4 no-scrollbar">
           
-          {/* Main Navigation Section: 1번 머지 보드 & 2번 식당 복원 */}
+          {/* Main Navigation Section */}
           <div className="space-y-2">
-            <div className="text-xs font-black text-slate-500 uppercase tracking-wider px-1">
-              핵심 게임 모드 이동
+            <div className="text-xs font-semibold text-stone-500 uppercase tracking-wider px-1">
+              핵심 모드
             </div>
 
             {/* 1번: 머지 보드 & 주문 */}
@@ -104,31 +116,31 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
                 onSelectTab('game');
                 onClose();
               }}
-              className={`w-full p-3.5 rounded-2xl border-2 transition-all flex items-center justify-between shadow-sm active:scale-98 ${
+              className={`w-full p-3 rounded-xl border transition-colors flex items-center justify-between active:scale-98 ${
                 currentTab === 'game'
-                  ? 'bg-gradient-to-r from-[#2A9D8F]/15 to-[#2A9D8F]/5 border-[#2A9D8F] text-[#2A9D8F] ring-2 ring-[#2A9D8F]/20 font-black'
-                  : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-800 font-bold'
+                  ? 'bg-[#eef8f5] border-[#2A9D8F] text-[#16332d] shadow-2xs'
+                  : 'bg-white hover:bg-stone-50 border-[#e5ded3] text-stone-800'
               }`}
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2A9D8F] to-[#1c6b61] text-white flex items-center justify-center shadow-md">
-                  <Gamepad2 className="w-5 h-5" />
+                <div className="w-9 h-9 rounded-lg bg-[#2A9D8F] text-white flex items-center justify-center shadow-xs">
+                  <Gamepad2 className="w-4 h-4" />
                 </div>
                 <div className="text-left">
-                  <div className="text-sm font-black flex items-center gap-1.5">
-                    <span>1. 머지 보드 & 주문</span>
+                  <div className="text-xs font-semibold flex items-center gap-1.5">
+                    <span>1. 머지 보드 및 주문 서빙</span>
                     {currentTab === 'game' && (
-                      <span className="text-[10px] bg-[#2A9D8F] text-white px-1.5 py-0.2 rounded-full">
-                        현재 화면
+                      <span className="text-[9px] bg-[#2A9D8F] text-white px-1.5 py-0.2 rounded-full font-medium">
+                        진행 중
                       </span>
                     )}
                   </div>
-                  <div className="text-[11px] text-slate-500 font-medium">
-                    빵, 커피, 디저트를 합성하고 손님 주문 서빙
+                  <div className="text-[11px] text-stone-500 font-normal mt-0.5">
+                    베이커리, 커피, 디저트를 합성하고 손님 주문 납품
                   </div>
                 </div>
               </div>
-              <ChevronRight className="w-5 h-5 text-slate-400" />
+              <ChevronRight className="w-4 h-4 text-stone-400" />
             </button>
 
             {/* 2번: 식당 & 유적 복원 맵 */}
@@ -137,41 +149,38 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
                 onSelectTab('restoration');
                 onClose();
               }}
-              className={`w-full p-3.5 rounded-2xl border-2 transition-all flex items-center justify-between shadow-sm active:scale-98 ${
+              className={`w-full p-3 rounded-xl border transition-colors flex items-center justify-between active:scale-98 ${
                 currentTab === 'restoration'
-                  ? 'bg-gradient-to-r from-amber-500/15 to-orange-500/5 border-amber-500 text-amber-900 ring-2 ring-amber-400/20 font-black'
-                  : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-800 font-bold'
+                  ? 'bg-amber-50/80 border-amber-600 text-amber-950 shadow-2xs'
+                  : 'bg-white hover:bg-stone-50 border-[#e5ded3] text-stone-800'
               }`}
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center shadow-md relative">
-                  <Hammer className="w-5 h-5" />
-                  {nextRestorationNode && stars >= nextRestorationNode.costStars && (
-                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-rose-500 rounded-full border-2 border-white animate-ping" />
-                  )}
+                <div className="w-9 h-9 rounded-lg bg-amber-600 text-white flex items-center justify-center shadow-xs">
+                  <Hammer className="w-4 h-4" />
                 </div>
                 <div className="text-left">
-                  <div className="text-sm font-black flex items-center gap-1.5">
-                    <span>2. 식당 & 유적 복원 맵</span>
+                  <div className="text-xs font-semibold flex items-center gap-1.5">
+                    <span>2. 식당 및 유적 복원</span>
                     {nextRestorationNode && stars >= nextRestorationNode.costStars && (
-                      <span className="text-[10px] bg-rose-500 text-white font-black px-1.5 py-0.2 rounded-full animate-bounce">
-                        복원 가능!
+                      <span className="text-[9px] bg-amber-500 text-amber-950 font-bold px-1.5 py-0.2 rounded-full">
+                        복원 가능
                       </span>
                     )}
                   </div>
-                  <div className="text-[11px] text-slate-500 font-medium">
-                    별(⭐)을 사용하여 비스트로 시설 재건 및 스토리 해금
+                  <div className="text-[11px] text-stone-500 font-normal mt-0.5">
+                    별을 사용하여 비스트로 시설 재건 및 스토리 해금
                   </div>
                 </div>
               </div>
-              <ChevronRight className="w-5 h-5 text-slate-400" />
+              <ChevronRight className="w-4 h-4 text-stone-400" />
             </button>
           </div>
 
-          {/* Sub Features Section: 3번 쿡스타그램 & 4번 수리 경제 시뮬레이터 */}
+          {/* Sub Features Section */}
           <div className="space-y-2">
-            <div className="text-xs font-black text-slate-500 uppercase tracking-wider px-1">
-              비스트로 부가 기능
+            <div className="text-xs font-semibold text-stone-500 uppercase tracking-wider px-1">
+              추가 기능
             </div>
 
             {/* 3번: 쿡스타그램 */}
@@ -180,26 +189,26 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
                 onSelectTab('cookstagram');
                 onClose();
               }}
-              className={`w-full p-3 rounded-2xl border-2 transition-all flex items-center justify-between shadow-xs active:scale-98 ${
+              className={`w-full p-3 rounded-xl border transition-colors flex items-center justify-between active:scale-98 ${
                 currentTab === 'cookstagram'
-                  ? 'bg-gradient-to-r from-pink-500/15 to-rose-500/5 border-pink-500 text-pink-900 font-black'
-                  : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-800 font-bold'
+                  ? 'bg-rose-50/70 border-rose-500 text-rose-950 shadow-2xs'
+                  : 'bg-white hover:bg-stone-50 border-[#e5ded3] text-stone-800'
               }`}
             >
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 text-white flex items-center justify-center shadow-sm">
+                <div className="w-9 h-9 rounded-lg bg-[#b04a6e] text-white flex items-center justify-center shadow-xs">
                   <Camera className="w-4 h-4" />
                 </div>
                 <div className="text-left">
-                  <div className="text-xs font-black text-slate-800">
+                  <div className="text-xs font-semibold text-stone-800">
                     3. 쿡스타그램 & 크루 소식
                   </div>
-                  <div className="text-[10px] text-slate-500 font-medium">
-                    스토리 피드 감상, 좋아요 누르고 보석(💎) 보상 수령
+                  <div className="text-[11px] text-stone-500 font-normal mt-0.5">
+                    비스트로 일상 스토리 감상 및 보석 보상 수령
                   </div>
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-slate-400" />
+              <ChevronRight className="w-4 h-4 text-stone-400" />
             </button>
 
             {/* 4번: 수리 경제 시뮬레이터 */}
@@ -208,38 +217,38 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
                 onSelectTab('math');
                 onClose();
               }}
-              className={`w-full p-3 rounded-2xl border-2 transition-all flex items-center justify-between shadow-xs active:scale-98 ${
+              className={`w-full p-3 rounded-xl border transition-colors flex items-center justify-between active:scale-98 ${
                 currentTab === 'math'
-                  ? 'bg-gradient-to-r from-indigo-500/15 to-purple-500/5 border-indigo-500 text-indigo-900 font-black'
-                  : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-800 font-bold'
+                  ? 'bg-indigo-50/70 border-indigo-500 text-indigo-950 shadow-2xs'
+                  : 'bg-white hover:bg-stone-50 border-[#e5ded3] text-stone-800'
               }`}
             >
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center shadow-sm">
+                <div className="w-9 h-9 rounded-lg bg-[#435388] text-white flex items-center justify-center shadow-xs">
                   <Calculator className="w-4 h-4" />
                 </div>
                 <div className="text-left">
-                  <div className="text-xs font-black text-slate-800">
-                    4. 수리 경제 & 통계 시뮬레이터
+                  <div className="text-xs font-semibold text-stone-800">
+                    4. 수리 경제 & 통계 분석
                   </div>
-                  <div className="text-[10px] text-slate-500 font-medium">
-                    아이템 생성 확률, 에너지 가치, 코인/별 밸런스 분석
+                  <div className="text-[11px] text-stone-500 font-normal mt-0.5">
+                    생성 확률, 에너지 효율, 재화 밸런스 데이터
                   </div>
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-slate-400" />
+              <ChevronRight className="w-4 h-4 text-stone-400" />
             </button>
           </div>
 
           {/* Quick Chef Inventory Section */}
-          <div className="bg-white p-3.5 rounded-2xl border-2 border-slate-200 shadow-xs space-y-2">
+          <div className="bg-white p-3.5 rounded-xl border border-[#e5ded3] shadow-2xs space-y-2">
             <div className="flex justify-between items-center px-0.5">
-              <span className="text-xs font-black text-slate-700 flex items-center gap-1.5">
-                <Archive className="w-4 h-4 text-amber-600" />
+              <span className="text-xs font-semibold text-[#3b291a] flex items-center gap-1.5">
+                <Archive className="w-3.5 h-3.5 text-amber-700" />
                 셰프 보관함 ({occupiedBackpackCount}/4)
               </span>
-              <span className="text-[10px] text-slate-400 font-semibold">
-                클릭 시 보드로 복귀
+              <span className="text-[10px] text-stone-400 font-medium">
+                탭하여 보드로 이동
               </span>
             </div>
             <div className="grid grid-cols-4 gap-2">
@@ -252,10 +261,10 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
                       onClose();
                     }
                   }}
-                  className={`aspect-square rounded-xl border-2 flex items-center justify-center relative cursor-pointer shadow-xs transition-transform active:scale-90 ${
+                  className={`aspect-square rounded-lg border flex items-center justify-center relative cursor-pointer shadow-2xs transition-transform active:scale-95 ${
                     pocketItem
-                      ? 'bg-amber-50 border-amber-300 hover:scale-105'
-                      : 'bg-slate-50 border-dashed border-slate-200'
+                      ? 'bg-[#fcfaf7] border-[#d8cfc4] hover:border-[#b8ab9b]'
+                      : 'bg-[#f7f4ee] border-dashed border-[#d6cbbe]'
                   }`}
                   title={pocketItem ? '클릭 시 보드로 복귀' : '빈 슬롯'}
                 >
@@ -266,7 +275,7 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
                       className="w-8 h-8 object-contain"
                     />
                   ) : (
-                    <span className="text-slate-300 text-base font-bold">+</span>
+                    <span className="text-stone-300 text-sm font-light">+</span>
                   )}
                 </div>
               ))}
@@ -280,30 +289,30 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
               onClick={() => {
                 freeEnergyRefill();
               }}
-              className="p-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-black flex items-center justify-center gap-1.5 shadow-sm active:scale-95"
+              className="p-2.5 rounded-lg bg-[#1b7367] hover:bg-[#238779] text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-2xs active:scale-95 transition-colors"
             >
-              <Zap className="w-4 h-4" />
-              <span>무료 에너지 (+50⚡)</span>
+              <Zap className="w-3.5 h-3.5" />
+              <span>에너지 충전 (+50)</span>
             </button>
 
             {/* Sound Toggle */}
             <button
               onClick={handleToggleSound}
-              className={`p-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-sm border active:scale-95 transition-all ${
+              className={`p-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 shadow-2xs border active:scale-95 transition-colors ${
                 soundOn
-                  ? 'bg-white text-slate-700 border-slate-200'
-                  : 'bg-rose-50 text-rose-600 border-rose-200'
+                  ? 'bg-white hover:bg-stone-50 text-stone-700 border-[#e5ded3]'
+                  : 'bg-rose-50 text-rose-700 border-rose-200'
               }`}
             >
               {soundOn ? (
                 <>
-                  <Volume2 className="w-4 h-4 text-emerald-600" />
-                  <span>효과음 ON</span>
+                  <Volume2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>효과음 켜짐</span>
                 </>
               ) : (
                 <>
-                  <VolumeX className="w-4 h-4 text-rose-500" />
-                  <span>효과음 OFF</span>
+                  <VolumeX className="w-3.5 h-3.5 text-rose-500" />
+                  <span>효과음 꺼짐</span>
                 </>
               )}
             </button>
@@ -314,9 +323,9 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
                 onClose();
                 onOpenHelp();
               }}
-              className="p-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-black flex items-center justify-center gap-1.5 shadow-sm active:scale-95"
+              className="p-2.5 rounded-lg bg-white hover:bg-stone-50 text-stone-700 border border-[#e5ded3] text-xs font-semibold flex items-center justify-center gap-1.5 shadow-2xs active:scale-95 transition-colors"
             >
-              <HelpCircle className="w-4 h-4 text-slate-500" />
+              <HelpCircle className="w-3.5 h-3.5 text-stone-500" />
               <span>게임 가이드</span>
             </button>
 
@@ -326,9 +335,9 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
                 onClose();
                 onOpenResetConfirm();
               }}
-              className="p-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-black flex items-center justify-center gap-1.5 shadow-sm active:scale-95"
+              className="p-2.5 rounded-lg bg-stone-100 hover:bg-rose-50 text-stone-600 hover:text-rose-700 border border-[#e5ded3] hover:border-rose-200 text-xs font-semibold flex items-center justify-center gap-1.5 shadow-2xs active:scale-95 transition-colors"
             >
-              <RotateCcw className="w-4 h-4 text-rose-500" />
+              <RotateCcw className="w-3.5 h-3.5 text-stone-400" />
               <span>데이터 초기화</span>
             </button>
           </div>

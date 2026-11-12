@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, Archive, Sparkles, X, Gamepad2, Hammer, MapPin } from 'lucide-react';
+import { Archive, Sparkles, X, Gamepad2, Hammer, Coins, Trash2 } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 import { getItemDef, ITEM_CHAINS } from '../../data/itemsData';
 import { ItemGraphic } from '../ui/ItemGraphic';
@@ -60,16 +60,17 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
   return (
     <div className="w-full max-w-[500px] mx-auto select-none mt-1">
       
-      {/* Backpack Drawer Mini Popup if open */}
+      {/* Backpack Drawer Mini Popup */}
       {isBackpackDrawerOpen && currentTab === 'game' && (
-        <div className="mb-2 bg-[#d5e7ff] p-3 rounded-2xl border-2 border-[#8eb3d9] shadow-xl animate-bounceSubtle">
+        <div className="mb-2 bg-[#FAF7F2] p-3 rounded-2xl border border-[#d6cbbe] shadow-lg">
           <div className="flex justify-between items-center mb-2 px-1">
-            <span className="text-xs font-black text-slate-800 flex items-center gap-1">
-              🧳 셰프 보관함 ({occupiedBackpackCount}/4)
+            <span className="text-xs font-semibold text-[#3b291a] flex items-center gap-1.5">
+              <Archive className="w-3.5 h-3.5 text-amber-700" />
+              셰프 보관함 ({occupiedBackpackCount}/4)
             </span>
             <button
               onClick={() => setIsBackpackDrawerOpen(false)}
-              className="text-slate-500 hover:text-slate-800 text-xs p-1"
+              className="text-stone-400 hover:text-stone-700 text-xs p-1"
             >
               <X className="w-4 h-4" />
             </button>
@@ -79,10 +80,10 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
               <div
                 key={idx}
                 onClick={() => pocketItem && retrieveFromInventory(idx)}
-                className={`w-14 h-14 rounded-xl border-2 flex items-center justify-center relative cursor-pointer shadow-sm transition-transform active:scale-90 ${
+                className={`w-14 h-14 rounded-xl border flex items-center justify-center relative cursor-pointer shadow-2xs transition-transform active:scale-95 ${
                   pocketItem
-                    ? 'bg-white border-amber-300 hover:scale-105'
-                    : 'bg-white/50 border-dashed border-slate-300'
+                    ? 'bg-white border-[#d8cfc4] hover:border-[#b8ab9b]'
+                    : 'bg-[#f4efe8] border-dashed border-[#c5b8a6]'
                 }`}
                 title={pocketItem ? '클릭 시 보드로 복귀' : '빈 슬롯'}
               >
@@ -93,7 +94,7 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
                     className="w-11 h-11 object-contain"
                   />
                 ) : (
-                  <span className="text-slate-300 text-lg font-bold">+</span>
+                  <span className="text-stone-300 text-lg font-light">+</span>
                 )}
               </div>
             ))}
@@ -101,44 +102,44 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
         </div>
       )}
 
-      {/* Main 3-Section Bottom Bar matching reference screenshot */}
+      {/* Main 3-Section Bottom Bar matching Reference Screenshot */}
       <div className="flex items-center justify-between gap-2 px-1">
         
         {/* Left: Round Backpack Button (Board) or Home Button (Other screens) */}
         <button
           onClick={handleLeftButtonClick}
           title={currentTab === 'game' ? '홈 메뉴 및 보관함 열기' : '1. 머지 보드로 복귀'}
-          className="relative w-14 h-14 sm:w-16 sm:h-16 p-0 bg-transparent border-0 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0 cursor-pointer drop-shadow-lg"
+          className="relative w-14 h-14 sm:w-16 sm:h-16 p-0 bg-transparent border-0 hover:scale-102 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0 cursor-pointer drop-shadow-sm"
         >
           {currentTab === 'game' ? (
             <>
               <img
                 src="/extracted/btn_backpack_clean.png"
                 alt="Backpack"
-                className="w-full h-full object-contain filter drop-shadow-md"
+                className="w-full h-full object-contain filter drop-shadow-xs"
               />
               {/* Badge */}
               {occupiedBackpackCount > 0 && (
-                <div className="absolute -top-1 -right-1 bg-amber-400 text-amber-950 font-black text-[9px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow">
+                <div className="absolute -top-1 -right-1 bg-amber-500 text-amber-950 font-bold text-[9px] w-5 h-5 rounded-full flex items-center justify-center border border-white shadow-xs tabular-nums">
                   {occupiedBackpackCount}
                 </div>
               )}
             </>
           ) : (
-            <div className="w-full h-full rounded-full bg-gradient-to-b from-[#2A9D8F] to-[#176259] border-2 border-white shadow-xl flex flex-col items-center justify-center text-white">
-              <Gamepad2 className="w-6 h-6 drop-shadow" />
-              <span className="text-[9px] font-black -mt-0.5 tracking-tighter">보드</span>
+            <div className="w-full h-full rounded-full bg-[#1b6b60] border border-white/80 shadow-sm flex flex-col items-center justify-center text-white">
+              <Gamepad2 className="w-5 h-5" />
+              <span className="text-[9px] font-semibold -mt-0.5 tracking-tighter">보드</span>
             </div>
           )}
         </button>
 
-        {/* Center: Sleek Rounded Pill Inspector Bar (#d5e7ff) */}
-        <div className="flex-1 h-13 sm:h-14 bg-[#d5e7ff] rounded-full border-2 border-[#8eb3d9] shadow-md flex items-center justify-between px-3 overflow-hidden">
+        {/* Center: Soft Sage/Mint Capsule Inspector Bar */}
+        <div className="flex-1 h-13 sm:h-14 bg-[#eef8f5] rounded-full border border-[#a8d9cf] shadow-inner flex items-center justify-between px-3.5 overflow-hidden">
           {currentTab === 'game' ? (
             item && itemDef ? (
               <div className="w-full flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-9 h-9 flex-shrink-0 flex items-center justify-center">
+                  <div className="w-8 h-8 flex-shrink-0 flex items-center justify-center">
                     <ItemGraphic
                       chainId={item.chainId}
                       level={item.level}
@@ -147,10 +148,10 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
                     />
                   </div>
                   <div className="min-w-0 leading-tight">
-                    <div className="text-xs font-black text-slate-800 truncate">
+                    <div className="text-xs font-semibold text-[#16332d] truncate">
                       {itemDef.name}
                     </div>
-                    <div className="text-[10px] text-slate-500 font-bold truncate">
+                    <div className="text-[10px] text-[#406861] font-medium truncate">
                       {chainDef?.name} · Lv.{item.level}
                     </div>
                   </div>
@@ -163,52 +164,54 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
                       <button
                         onClick={moveSelectedToInventory}
                         title="보관함 이동"
-                        className="p-1.5 rounded-lg bg-white/90 hover:bg-white text-slate-700 shadow-xs border border-slate-300 active:scale-90"
+                        className="p-1.5 rounded-lg bg-white hover:bg-stone-50 text-[#2a4d46] shadow-2xs border border-[#b8ded6] active:scale-95 transition-colors"
                       >
-                        <Archive className="w-4 h-4 text-slate-600" />
+                        <Archive className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={sellSelectedItem}
                         title="판매"
-                        className="px-2 py-1 rounded-lg bg-amber-400 hover:bg-amber-300 text-amber-950 text-[11px] font-black shadow-xs flex items-center gap-0.5 active:scale-90"
+                        className="px-2.5 py-1 rounded-lg bg-[#b45309] hover:bg-[#92400e] text-white text-[11px] font-semibold shadow-xs flex items-center gap-1 active:scale-95 transition-colors tabular-nums"
                       >
                         <Trash2 className="w-3 h-3" />
-                        <span>+{sellPrice}🪙</span>
+                        <Coins className="w-2.5 h-2.5 text-amber-200" />
+                        <span>+{sellPrice}</span>
                       </button>
                     </>
                   )}
                   {isGen && (
-                    <span className="text-[10px] font-black text-pink-700 bg-pink-100 px-2 py-1 rounded-lg border border-pink-300 flex items-center gap-1">
-                      <Sparkles className="w-3 h-3 text-pink-500" />
+                    <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-md border border-emerald-300 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-emerald-600" />
                       생성기
                     </span>
                   )}
                 </div>
               </div>
             ) : (
-              <div className="w-full flex items-center justify-center gap-2 text-xs font-black text-slate-600/90 tracking-tight">
-                <span>💡 동일한 아이템 2개를 합쳐 상위 레벨을 만드세요</span>
+              <div className="w-full flex items-center justify-center gap-1.5 text-xs font-medium text-[#2d524b] tracking-tight">
+                <Sparkles className="w-3.5 h-3.5 text-[#2A9D8F] flex-shrink-0" />
+                <span>동일한 아이템 2개를 드래그하여 합성하세요</span>
               </div>
             )
           ) : currentTab === 'restoration' ? (
             <div className="w-full flex items-center justify-between px-1">
               <div className="flex items-center gap-1.5 min-w-0">
                 <Hammer className="w-4 h-4 text-amber-700 flex-shrink-0" />
-                <span className="text-xs font-black text-slate-800 truncate">
+                <span className="text-xs font-semibold text-[#16332d] truncate">
                   2. 식당 & 유적 복원 진행 중
                 </span>
               </div>
-              <span className="text-xs font-black text-amber-700 bg-amber-100/90 px-2 py-0.5 rounded-full border border-amber-300 flex-shrink-0">
-                보유: {stars}⭐
+              <span className="text-xs font-semibold text-amber-800 bg-amber-100/80 px-2 py-0.5 rounded-full border border-amber-300/80 flex-shrink-0 tabular-nums">
+                보유 별: {stars}
               </span>
             </div>
           ) : currentTab === 'cookstagram' ? (
-            <div className="w-full text-center text-xs font-black text-slate-800">
-              📸 3. 쿡스타그램 & 크루 소식
+            <div className="w-full text-center text-xs font-semibold text-[#16332d]">
+              3. 쿡스타그램 & 크루 소식
             </div>
           ) : (
-            <div className="w-full text-center text-xs font-black text-slate-800">
-              📊 4. 수리 경제 & 통계 시뮬레이터
+            <div className="w-full text-center text-xs font-semibold text-[#16332d]">
+              4. 수리 경제 & 통계 시뮬레이터
             </div>
           )}
         </div>
@@ -217,24 +220,24 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
         <button
           onClick={handleRightButtonClick}
           title={currentTab === 'restoration' ? '머지 보드로 복귀' : '2. 식당 & 유적 복원 맵으로 이동'}
-          className="relative w-14 h-14 sm:w-16 sm:h-16 p-0 bg-transparent border-0 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0 cursor-pointer drop-shadow-lg"
+          className="relative w-14 h-14 sm:w-16 sm:h-16 p-0 bg-transparent border-0 hover:scale-102 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0 cursor-pointer drop-shadow-sm"
         >
           {currentTab === 'restoration' ? (
-            <div className="w-full h-full rounded-full bg-gradient-to-b from-amber-500 to-orange-600 border-2 border-white shadow-xl flex flex-col items-center justify-center text-white">
-              <Gamepad2 className="w-6 h-6 drop-shadow" />
-              <span className="text-[9px] font-black -mt-0.5 tracking-tighter">보드</span>
+            <div className="w-full h-full rounded-full bg-amber-600 border border-white/80 shadow-sm flex flex-col items-center justify-center text-white">
+              <Gamepad2 className="w-5 h-5" />
+              <span className="text-[9px] font-semibold -mt-0.5 tracking-tighter">보드</span>
             </div>
           ) : (
             <>
               <img
                 src="/extracted/btn_map_clean.png"
                 alt="Map"
-                className="w-full h-full object-contain filter drop-shadow-md"
+                className="w-full h-full object-contain filter drop-shadow-xs"
               />
-              {/* Notification ping badge if restoration is ready */}
+              {/* Notification badge if restoration is ready */}
               {canRestore && (
-                <div className="absolute -top-1 -right-1 bg-rose-500 text-white font-black text-[9px] px-1.5 py-0.5 rounded-full flex items-center justify-center border-2 border-white shadow animate-bounce">
-                  ⭐UP!
+                <div className="absolute -top-1 -right-1 bg-amber-500 text-amber-950 font-bold text-[9px] px-1.5 py-0.2 rounded-full flex items-center justify-center border border-white shadow-xs">
+                  복원!
                 </div>
               )}
             </>

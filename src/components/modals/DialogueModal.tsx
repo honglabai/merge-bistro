@@ -19,45 +19,45 @@ export const DialogueModal: React.FC = () => {
   const isLast = dialogueIndex + 1 === currentDialogue.length;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-3 sm:p-6 animate-fade-in">
-      <div className="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border-4 border-wood-600 relative overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-3 sm:p-6 animate-fade-in select-none">
+      <div className="bg-[#FAF7F2] rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-xl border border-[#b89f82] relative overflow-hidden">
         
         {/* Close Button */}
         <button
           onClick={closeDialogue}
-          className="absolute top-4 right-4 p-1.5 rounded-full text-slate-400 hover:text-slate-700 bg-cream-100 hover:bg-cream-200 transition-colors"
+          className="absolute top-4 right-4 p-1.5 rounded-full text-stone-400 hover:text-stone-700 bg-black/5 hover:bg-black/10 transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
 
         {/* Character Portrait & Dialog Box */}
         <div className="flex items-start gap-4 mb-4">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200 border-2 border-amber-400 flex items-center justify-center text-4xl sm:text-5xl shadow-md flex-shrink-0 animate-bounceSubtle">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-amber-100 border border-amber-300/80 flex items-center justify-center text-3xl sm:text-4xl shadow-2xs flex-shrink-0">
             {current.avatar}
           </div>
           <div className="flex-1">
-            <span className="text-xs font-black text-terracotta-600 bg-terracotta-50 px-2 py-0.5 rounded-full border border-terracotta-200">
-              스토리 진행 대화 ({dialogueIndex + 1}/{currentDialogue.length})
+            <span className="text-[10px] font-semibold text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-full border border-amber-300/60">
+              스토리 진행 ({dialogueIndex + 1}/{currentDialogue.length})
             </span>
-            <h3 className="text-base sm:text-lg font-black text-slate-900 mt-1">
+            <h3 className="text-sm sm:text-base font-semibold text-stone-900 mt-1">
               {current.speaker}
             </h3>
           </div>
         </div>
 
         {/* Speech Bubble */}
-        <div className="bg-cream-50 p-4 rounded-2xl border border-cream-300 text-slate-800 text-sm sm:text-base leading-relaxed mb-4 shadow-inner min-h-[90px] flex items-center">
-          <p className="font-medium">{current.text}</p>
+        <div className="bg-white p-4 rounded-xl border border-[#e5ded3] text-stone-800 text-xs sm:text-sm leading-relaxed mb-4 shadow-2xs min-h-[80px] flex items-center">
+          <p className="font-normal text-stone-700">{current.text}</p>
         </div>
 
         {/* Next / Close Button */}
         <div className="flex justify-end">
           <button
             onClick={nextDialogue}
-            className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-terracotta-500 hover:from-amber-600 hover:to-terracotta-600 text-white font-black text-xs sm:text-sm shadow-md flex items-center gap-2 active:scale-95 transition-all"
+            className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs sm:text-sm shadow-xs flex items-center gap-1.5 active:scale-95 transition-colors"
           >
-            <span>{isLast ? '대화 종료 및 보상 확인' : '다음 이야기'}</span>
-            <ArrowRight className="w-4 h-4" />
+            <span>{isLast ? '대화 완료' : '다음'}</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
