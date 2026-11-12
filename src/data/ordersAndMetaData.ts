@@ -134,11 +134,11 @@ export const ORDER_POOL: Omit<CustomerOrder, 'id'>[] = [
     customerName: '여우 고고학자 피오나',
     customerAvatar: '🦊',
     customerRole: '고대 유적 탐사원',
-    customerQuote: '유적 동굴은 짙은 안개로 둘러싸여 있어요. 방향을 잡아줄 청동 나침반이 필요합니다!',
-    targetChainId: 'ruins',
-    targetLevel: 3,
-    rewardCoins: 140,
-    rewardStars: 9
+    customerQuote: '고문서 연구에는 달콤한 티라미수가 최고예요! 부드러운 치즈 향이 집중력을 높여줘요!',
+    targetChainId: 'seafood',
+    targetLevel: 5,
+    rewardCoins: 180,
+    rewardStars: 11
   },
   {
     customerId: 'toby',
@@ -167,11 +167,11 @@ export const ORDER_POOL: Omit<CustomerOrder, 'id'>[] = [
     customerName: '여우 고고학자 피오나',
     customerAvatar: '🦊',
     customerRole: '고대 유적 탐사원',
-    customerQuote: '유적 벽면에 새겨진 비밀 문양의 열쇠를 찾았어요! 별빛 문양 열쇠를 합성해주세요!',
-    targetChainId: 'ruins',
-    targetLevel: 5,
-    rewardCoins: 350,
-    rewardStars: 20
+    customerQuote: '탐사팀 모두가 지쳤을 때 달콤한 케이크만한 게 없죠. 시그니처 딸기 쇼트케이크를 부탁해요!',
+    targetChainId: 'seafood',
+    targetLevel: 6,
+    rewardCoins: 320,
+    rewardStars: 18
   }
 ];
 

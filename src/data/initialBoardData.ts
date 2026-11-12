@@ -69,7 +69,7 @@ export function createInitialBoard(): BoardCell[] {
   place(2, 1, 'seafood', 2); // 딸기 글레이즈 도넛 (제과 Lv.2)
   place(2, 4, 'garden', 2);  // 스위트 바질 잎 (과일 Lv.2)
   place(5, 1, 'seafood', 3); // 초콜릿 에클레어 (제과 Lv.3)
-  place(5, 4, 'ruins', 1);   // 우드 롤링핀 (도구 Lv.1)
+  place(5, 4, 'seafood', 2); // 딸기 글레이즈 도넛 (제과 Lv.2)
   place(6, 2, 'bakery', 3);  // 노릇노릇 식빵 (빵 Lv.3)
   place(6, 3, 'cafe', 3);    // 아이스 아메리카노 (커피 Lv.3)
   place(0, 2, 'bakery', 4);  // 바삭 바게트 (빵 Lv.4)

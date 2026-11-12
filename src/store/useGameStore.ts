@@ -99,14 +99,42 @@ export const useGameStore = create<GameState>((set, get) => ({
         }
 
         const isValidBoard = Array.isArray(parsed.board) && parsed.board.length === 48;
+        const rawBoard = isValidBoard ? parsed.board : createInitialBoard();
+        const sanitizedBoard = rawBoard.map((cell: BoardCell) => {
+          if (cell.item && cell.item.chainId === 'ruins') {
+            return {
+              ...cell,
+              item: {
+                ...cell.item,
+                chainId: 'seafood' as const,
+                level: Math.min(cell.item.level, 4)
+              }
+            };
+          }
+          return cell;
+        });
+
+        const rawOrders = Array.isArray(parsed.orders) ? parsed.orders : INITIAL_ORDERS;
+        const sanitizedOrders = rawOrders.map((ord: CustomerOrder) => {
+          if (ord.targetChainId === 'ruins') {
+            return {
+              ...ord,
+              targetChainId: 'seafood' as const,
+              targetLevel: ord.targetLevel >= 5 ? 6 : 4,
+              customerQuote: '달콤한 디저트가 필요해요! 정성 가득한 수제 딸기 케이크를 부탁드려요!'
+            };
+          }
+          return ord;
+        });
+
         set({
-          board: isValidBoard ? parsed.board : createInitialBoard(),
+          board: sanitizedBoard,
           energy: Math.min(maxE, storedEnergy + recoveredOfflineEnergy),
           coins: typeof parsed.coins === 'number' ? parsed.coins : 150,
           stars: typeof parsed.stars === 'number' ? parsed.stars : 5,
           gems: typeof parsed.gems === 'number' ? parsed.gems : 30,
           followers: typeof parsed.followers === 'number' ? parsed.followers : 85,
-          orders: parsed.orders || INITIAL_ORDERS,
+          orders: sanitizedOrders,
           restorations: parsed.restorations || RESTORATION_NODES,
           posts: parsed.posts || COOKSTAGRAM_POSTS,
           inventoryPocket: parsed.inventoryPocket || [null, null, null, null],
