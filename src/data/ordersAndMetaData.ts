@@ -48,18 +48,6 @@ export const INITIAL_ORDERS: CustomerOrder[] = [
     targetLevel: 2, // 스위트 바질 잎
     rewardCoins: 50,
     rewardStars: 4
-  },
-  {
-    id: 'ord-5',
-    customerId: 'bruno',
-    customerName: '파티시에 곰 브루노',
-    customerAvatar: '🐻',
-    customerRole: '명예 제빵 마스터',
-    customerQuote: '달콤한 디저트가 빠질 수 없지 곰! 쫀득한 무지개 마카롱을 부탁한다곰!',
-    targetChainId: 'seafood',
-    targetLevel: 1, // 무지개 마카롱
-    rewardCoins: 45,
-    rewardStars: 3
   }
 ];
 

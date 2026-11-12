@@ -101,44 +101,44 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
         </div>
       )}
 
-      {/* Main 3-Section Bottom Bar matching reference screenshot */}
+      {/* Main 3-Section Bottom Bar matching reference screenshot (Compact) */}
       <div className="flex items-center justify-between gap-1.5 px-1">
         
         {/* Left: Round Backpack Button (Board) or Home Button (Other screens) */}
         <button
           onClick={handleLeftButtonClick}
           title={currentTab === 'game' ? '홈 메뉴 및 보관함 열기' : '1. 머지 보드로 복귀'}
-          className="relative w-[56px] h-[56px] sm:w-16 sm:h-16 p-0 bg-transparent border-0 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0 cursor-pointer drop-shadow-lg"
+          className="relative w-11 h-11 sm:w-12 sm:h-12 p-0 bg-transparent border-0 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0 cursor-pointer drop-shadow-md"
         >
           {currentTab === 'game' ? (
             <>
               <img
                 src="/extracted/btn_backpack_clean.png"
                 alt="Backpack"
-                className="w-full h-full object-contain filter drop-shadow-md"
+                className="w-full h-full object-contain filter drop-shadow-sm"
               />
               {/* Badge */}
               {occupiedBackpackCount > 0 && (
-                <div className="absolute -top-1 -right-1 bg-amber-400 text-amber-950 font-black text-[9px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow">
+                <div className="absolute -top-1 -right-1 bg-amber-400 text-amber-950 font-black text-[8px] w-4 h-4 rounded-full flex items-center justify-center border border-white shadow">
                   {occupiedBackpackCount}
                 </div>
               )}
             </>
           ) : (
-            <div className="w-full h-full rounded-full bg-gradient-to-b from-[#2A9D8F] to-[#176259] border-2 border-white shadow-xl flex flex-col items-center justify-center text-white">
-              <Gamepad2 className="w-6 h-6 drop-shadow" />
-              <span className="text-[9px] font-black -mt-0.5 tracking-tighter">보드</span>
+            <div className="w-full h-full rounded-full bg-gradient-to-b from-[#2A9D8F] to-[#176259] border-2 border-white shadow-md flex flex-col items-center justify-center text-white">
+              <Gamepad2 className="w-5 h-5 drop-shadow" />
+              <span className="text-[8px] font-black -mt-0.5 tracking-tighter">보드</span>
             </div>
           )}
         </button>
 
         {/* Center: Sleek Rounded Pill Inspector Bar (#d5e7ff) */}
-        <div className="flex-1 h-13 sm:h-14 bg-[#d5e7ff] rounded-full border-2 border-[#8eb3d9] shadow-md flex items-center justify-between px-3 overflow-hidden">
+        <div className="flex-1 h-11 sm:h-12 bg-[#d5e7ff] rounded-full border-2 border-[#8eb3d9] shadow-sm flex items-center justify-between px-2.5 overflow-hidden">
           {currentTab === 'game' ? (
             item && itemDef ? (
-              <div className="w-full flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-9 h-9 flex-shrink-0 flex items-center justify-center">
+              <div className="w-full flex items-center justify-between gap-1.5">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 flex-shrink-0 flex items-center justify-center">
                     <ItemGraphic
                       chainId={item.chainId}
                       level={item.level}
@@ -147,58 +147,58 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
                     />
                   </div>
                   <div className="min-w-0 leading-tight">
-                    <div className="text-xs font-black text-slate-800 truncate">
+                    <div className="text-[11px] sm:text-xs font-black text-slate-800 truncate">
                       {itemDef.name}
                     </div>
-                    <div className="text-[10px] text-slate-500 font-bold truncate">
+                    <div className="text-[9px] sm:text-[10px] text-slate-500 font-bold truncate">
                       {chainDef?.name} · Lv.{item.level}
                     </div>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-1.5 flex-shrink-0">
+                <div className="flex items-center gap-1 flex-shrink-0">
                   {!isGen && (
                     <>
                       <button
                         onClick={moveSelectedToInventory}
                         title="보관함 이동"
-                        className="p-1.5 rounded-lg bg-white/90 hover:bg-white text-slate-700 shadow-xs border border-slate-300 active:scale-90"
+                        className="p-1 rounded-md bg-white/90 hover:bg-white text-slate-700 shadow-2xs border border-slate-300 active:scale-90"
                       >
-                        <Archive className="w-4 h-4 text-slate-600" />
+                        <Archive className="w-3.5 h-3.5 text-slate-600" />
                       </button>
                       <button
                         onClick={sellSelectedItem}
                         title="판매"
-                        className="px-2 py-1 rounded-lg bg-amber-400 hover:bg-amber-300 text-amber-950 text-[11px] font-black shadow-xs flex items-center gap-0.5 active:scale-90"
+                        className="px-1.5 py-0.5 rounded-md bg-amber-400 hover:bg-amber-300 text-amber-950 text-[10px] font-black shadow-2xs flex items-center gap-0.5 active:scale-90"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Trash2 className="w-2.5 h-2.5" />
                         <span>+{sellPrice}🪙</span>
                       </button>
                     </>
                   )}
                   {isGen && (
-                    <span className="text-[10px] font-black text-pink-700 bg-pink-100 px-2 py-1 rounded-lg border border-pink-300 flex items-center gap-1">
-                      <Sparkles className="w-3 h-3 text-pink-500" />
+                    <span className="text-[9px] font-black text-pink-700 bg-pink-100 px-1.5 py-0.5 rounded-md border border-pink-300 flex items-center gap-0.5">
+                      <Sparkles className="w-2.5 h-2.5 text-pink-500" />
                       생성기
                     </span>
                   )}
                 </div>
               </div>
             ) : (
-              <div className="w-full flex items-center justify-center gap-2 text-xs font-black text-slate-600/90 tracking-tight">
+              <div className="w-full flex items-center justify-center gap-1 text-[11px] font-black text-slate-600/90 tracking-tight">
                 <span>💡 동일한 아이템 2개를 합쳐 상위 레벨을 만드세요</span>
               </div>
             )
           ) : currentTab === 'restoration' ? (
             <div className="w-full flex items-center justify-between px-1">
               <div className="flex items-center gap-1.5 min-w-0">
-                <Hammer className="w-4 h-4 text-amber-700 flex-shrink-0" />
+                <Hammer className="w-3.5 h-3.5 text-amber-700 flex-shrink-0" />
                 <span className="text-xs font-black text-slate-800 truncate">
                   2. 식당 & 유적 복원 진행 중
                 </span>
               </div>
-              <span className="text-xs font-black text-amber-700 bg-amber-100/90 px-2 py-0.5 rounded-full border border-amber-300 flex-shrink-0">
+              <span className="text-[11px] font-black text-amber-700 bg-amber-100/90 px-1.5 py-0.5 rounded-full border border-amber-300 flex-shrink-0">
                 보유: {stars}⭐
               </span>
             </div>
@@ -217,23 +217,23 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
         <button
           onClick={handleRightButtonClick}
           title={currentTab === 'restoration' ? '머지 보드로 복귀' : '2. 식당 & 유적 복원 맵으로 이동'}
-          className="relative w-[56px] h-[56px] sm:w-16 sm:h-16 p-0 bg-transparent border-0 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0 cursor-pointer drop-shadow-lg"
+          className="relative w-11 h-11 sm:w-12 sm:h-12 p-0 bg-transparent border-0 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0 cursor-pointer drop-shadow-md"
         >
           {currentTab === 'restoration' ? (
-            <div className="w-full h-full rounded-full bg-gradient-to-b from-amber-500 to-orange-600 border-2 border-white shadow-xl flex flex-col items-center justify-center text-white">
-              <Gamepad2 className="w-6 h-6 drop-shadow" />
-              <span className="text-[9px] font-black -mt-0.5 tracking-tighter">보드</span>
+            <div className="w-full h-full rounded-full bg-gradient-to-b from-amber-500 to-orange-600 border-2 border-white shadow-md flex flex-col items-center justify-center text-white">
+              <Gamepad2 className="w-5 h-5 drop-shadow" />
+              <span className="text-[8px] font-black -mt-0.5 tracking-tighter">보드</span>
             </div>
           ) : (
             <>
               <img
                 src="/extracted/btn_map_clean.png"
                 alt="Map"
-                className="w-full h-full object-contain filter drop-shadow-md"
+                className="w-full h-full object-contain filter drop-shadow-sm"
               />
               {/* Notification ping badge if restoration is ready */}
               {canRestore && (
-                <div className="absolute -top-1 -right-1 bg-rose-500 text-white font-black text-[9px] px-1.5 py-0.5 rounded-full flex items-center justify-center border-2 border-white shadow animate-bounce">
+                <div className="absolute -top-1 -right-1 bg-rose-500 text-white font-black text-[8px] px-1 py-0.2 rounded-full flex items-center justify-center border border-white shadow animate-bounce">
                   ⭐UP!
                 </div>
               )}

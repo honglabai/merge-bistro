@@ -176,12 +176,13 @@ export const useGameStore = create<GameState>((set, get) => ({
           return ord;
         });
 
-        // Ensure exactly 5 active orders are visible as requested
-        while (sanitizedOrders.length < 5) {
-          const poolOrd = ORDER_POOL[sanitizedOrders.length % ORDER_POOL.length];
-          sanitizedOrders.push({
+        // Ensure exactly 4 active orders are maintained
+        const activeOrders = sanitizedOrders.slice(0, 4);
+        while (activeOrders.length < 4) {
+          const poolOrd = ORDER_POOL[activeOrders.length % ORDER_POOL.length];
+          activeOrders.push({
             ...poolOrd,
-            id: `ord-init-${Date.now()}-${sanitizedOrders.length}`
+            id: `ord-init-${Date.now()}-${activeOrders.length}`
           });
         }
 
@@ -192,7 +193,7 @@ export const useGameStore = create<GameState>((set, get) => ({
           stars: typeof parsed.stars === 'number' ? parsed.stars : 5,
           gems: typeof parsed.gems === 'number' ? parsed.gems : 30,
           followers: typeof parsed.followers === 'number' ? parsed.followers : 85,
-          orders: sanitizedOrders,
+          orders: activeOrders,
           restorations: parsed.restorations || RESTORATION_NODES,
           posts: parsed.posts || COOKSTAGRAM_POSTS,
           inventoryPocket: parsed.inventoryPocket || [null, null, null, null],
