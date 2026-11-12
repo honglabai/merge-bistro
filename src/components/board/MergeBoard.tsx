@@ -55,9 +55,9 @@ export const MergeBoard: React.FC = () => {
   };
 
   return (
-    <div className="w-full flex flex-col items-center select-none touch-none">
+    <div className="w-full h-full flex flex-col items-center justify-center select-none touch-none px-0 sm:px-1">
       {/* 6x8 = 48 Seamless Edge-to-Edge Checkerboard Grid */}
-      <div className="grid grid-cols-6 grid-rows-8 gap-0 aspect-[6/8] w-full rounded-2xl overflow-hidden shadow-2xl">
+      <div className="grid grid-cols-6 grid-rows-8 gap-0 aspect-[6/8] w-full max-h-full rounded-2xl overflow-hidden shadow-2xl">
         {board.map(cell => {
           const isSelected = selectedTileIndex === cell.index;
           const isGen = cell.item?.isGenerator;

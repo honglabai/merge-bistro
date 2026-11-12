@@ -1,9 +1,13 @@
 import React from 'react';
-import { Heart, Gift, Users, Award, Check } from 'lucide-react';
+import { Heart, Gift, Users, Award, Check, ArrowLeft } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 import { STAFF_CHARACTERS } from '../../data/storyAndCookstagramData';
 
-export const CookstagramView: React.FC = () => {
+interface CookstagramViewProps {
+  onBackToBoard?: () => void;
+}
+
+export const CookstagramView: React.FC<CookstagramViewProps> = ({ onBackToBoard }) => {
   const { posts, followers, claimPostReward, restorations } = useGameStore();
 
   const restoredChapters = restorations.filter(r => r.isRestored).map(r => r.chapter);
@@ -27,8 +31,24 @@ export const CookstagramView: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 max-w-3xl mx-auto pb-4">
       
+      {/* Return to Board Header Bar */}
+      {onBackToBoard && (
+        <div className="flex items-center justify-between bg-white px-3 py-2 rounded-2xl border-2 border-rose-200 shadow-xs">
+          <button
+            onClick={onBackToBoard}
+            className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#2A9D8F] to-[#1c6b61] text-white text-xs font-black shadow-sm flex items-center gap-1.5 active:scale-95 transition-transform"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>1. 머지 보드로 복귀</span>
+          </button>
+          <span className="text-xs font-black text-rose-700 bg-rose-50 px-3 py-1 rounded-full border border-rose-200">
+            팔로워: {followers.toLocaleString()}명
+          </span>
+        </div>
+      )}
+
       {/* Top Banner: Follower Count & Milestones */}
       <div className="bg-gradient-to-r from-pink-50 via-rose-50 to-amber-50 p-5 rounded-2xl border border-rose-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>

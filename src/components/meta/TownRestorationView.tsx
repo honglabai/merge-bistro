@@ -1,16 +1,36 @@
 import React from 'react';
-import { Hammer, CheckCircle, Sparkles, MapPin, Star } from 'lucide-react';
+import { Hammer, CheckCircle, Sparkles, MapPin, Star, ArrowLeft } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 
-export const TownRestorationView: React.FC = () => {
+interface TownRestorationViewProps {
+  onBackToBoard?: () => void;
+}
+
+export const TownRestorationView: React.FC<TownRestorationViewProps> = ({ onBackToBoard }) => {
   const { restorations, stars, openRestorationPicker } = useGameStore();
 
   const restoredCount = restorations.filter(r => r.isRestored).length;
   const progressPercent = Math.round((restoredCount / restorations.length) * 100);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 max-w-3xl mx-auto pb-4">
       
+      {/* Return to Board Header Bar */}
+      {onBackToBoard && (
+        <div className="flex items-center justify-between bg-white px-3 py-2 rounded-2xl border-2 border-[#D4A373]/60 shadow-xs">
+          <button
+            onClick={onBackToBoard}
+            className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#2A9D8F] to-[#1c6b61] text-white text-xs font-black shadow-sm flex items-center gap-1.5 active:scale-95 transition-transform"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>1. 머지 보드로 복귀</span>
+          </button>
+          <span className="text-xs font-black text-amber-800 bg-amber-100 px-3 py-1 rounded-full border border-amber-300">
+            보유 별: {stars}⭐
+          </span>
+        </div>
+      )}
+
       {/* Overview Banner */}
       <div className="bg-gradient-to-r from-cream-50 via-cream-100 to-cream-50 p-5 rounded-2xl border border-cream-300 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>

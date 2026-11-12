@@ -39,6 +39,25 @@ export const OrderQueueBar: React.FC = () => {
         <div className="absolute bottom-0 left-0 right-0 h-3.5 bg-gradient-to-t from-[#2a1810] via-[#4e342e] to-[#6d4c41] border-t-2 border-[#b87333]/70 shadow-inner" />
       </div>
 
+      {/* Floating Event Badges matching reference screenshot */}
+      <div className="absolute top-2 left-2 z-20 flex flex-col items-center pointer-events-none">
+        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 via-indigo-600 to-purple-700 p-0.5 shadow-lg border-2 border-white flex items-center justify-center">
+          <span className="text-base">😊</span>
+        </div>
+        <span className="text-[8px] font-black text-white bg-slate-900/85 px-1.5 py-0.2 rounded-full border border-purple-300 -mt-1 shadow">
+          0/12
+        </span>
+      </div>
+
+      <div className="absolute top-2 right-2 z-20 flex flex-col items-center pointer-events-none">
+        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 via-rose-500 to-red-500 p-0.5 shadow-lg border-2 border-white flex items-center justify-center">
+          <span className="text-base">🐶</span>
+        </div>
+        <span className="text-[8px] font-black text-amber-200 bg-slate-900/85 px-1.5 py-0.2 rounded-full border border-amber-300 -mt-1 shadow flex items-center gap-0.5">
+          <Clock className="w-2.5 h-2.5" /> 21h
+        </span>
+      </div>
+
       {/* Compact Floating Order Cards Aligned to the Bottom Sill */}
       <div className="absolute inset-0 flex items-end px-2 pb-1 overflow-x-auto no-scrollbar gap-1.5 z-10">
         <AnimatePresence mode="popLayout">
