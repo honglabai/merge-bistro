@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Zap, ShoppingCart, Volume2, VolumeX, RotateCcw, HelpCircle } from 'lucide-react';
+import { Zap, ShoppingCart, Volume2, VolumeX, RotateCcw } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 import { sounds } from '../../utils/soundSynthesizer';
 
@@ -64,57 +64,48 @@ export const ResourceHeader: React.FC<ResourceHeaderProps> = ({ onOpenHelp, onOp
           </div>
         </div>
 
-        {/* Energy Pill with Blue Lightning and Countdown */}
+        {/* Energy Pill Button (Click to Refill Energy) */}
         <div className="flex flex-col items-center">
-          <div className="bg-[#002f52]/90 border-2 border-[#38bdf8]/80 rounded-full pl-2 pr-1 py-0.5 flex items-center gap-1.5 shadow-inner">
+          <button
+            onClick={freeEnergyRefill}
+            title="에너지 무료 충전 (+50)"
+            className="bg-[#002f52]/90 border-2 border-[#38bdf8]/80 rounded-full px-2.5 py-0.5 flex items-center gap-1.5 shadow-inner cursor-pointer hover:scale-105 active:scale-95 transition-transform"
+          >
             <Zap className="w-4 h-4 text-[#38bdf8] fill-[#38bdf8] animate-pulse" />
             <span className="font-black text-xs sm:text-sm text-white tracking-tight">
               {energy}
             </span>
-            <button
-              onClick={freeEnergyRefill}
-              title="에너지 무료 충전 (+50)"
-              className="w-5 h-5 rounded-full bg-gradient-to-tr from-emerald-500 to-green-400 text-white flex items-center justify-center hover:scale-110 active:scale-90 transition-transform shadow-sm"
-            >
-              <Plus className="w-3.5 h-3.5 stroke-[3]" />
-            </button>
-          </div>
+          </button>
           <span className="text-[9px] font-bold text-sky-200/90 tracking-tighter mt-0.5">
             {energy < maxEnergy ? timerText : 'FULL'}
           </span>
         </div>
 
-        {/* Coin Pill */}
-        <div className="bg-[#6b4700]/90 border-2 border-amber-400 rounded-full pl-2 pr-1 py-0.5 flex items-center gap-1.5 shadow-inner">
+        {/* Coin Pill Button (Click to Add Coins) */}
+        <button
+          onClick={() => useGameStore.getState().addCoins(100)}
+          title="코인 무료 보너스 (+100)"
+          className="bg-[#6b4700]/90 border-2 border-amber-400 rounded-full px-2.5 py-0.5 flex items-center gap-1.5 shadow-inner cursor-pointer hover:scale-105 active:scale-95 transition-transform"
+        >
           <div className="w-4 h-4 rounded-full bg-amber-400 flex items-center justify-center text-[10px] text-amber-950 font-black shadow-xs">
             🪙
           </div>
           <span className="font-black text-xs sm:text-sm text-amber-100 tracking-tight">
             {coins.toLocaleString()}
           </span>
-          <button
-            onClick={() => useGameStore.getState().addCoins(100)}
-            title="코인 보너스 (+100)"
-            className="w-5 h-5 rounded-full bg-gradient-to-tr from-emerald-500 to-green-400 text-white flex items-center justify-center hover:scale-110 active:scale-90 transition-transform shadow-sm"
-          >
-            <Plus className="w-3.5 h-3.5 stroke-[3]" />
-          </button>
-        </div>
+        </button>
 
-        {/* Gem Pill */}
-        <div className="bg-[#4a0834]/90 border-2 border-pink-400 rounded-full pl-2 pr-1 py-0.5 flex items-center gap-1.5 shadow-inner">
+        {/* Gem Pill Button (Click to Add Gems) */}
+        <button
+          onClick={() => useGameStore.getState().addGems(10)}
+          title="보석 무료 보너스 (+10)"
+          className="bg-[#4a0834]/90 border-2 border-pink-400 rounded-full px-2.5 py-0.5 flex items-center gap-1.5 shadow-inner cursor-pointer hover:scale-105 active:scale-95 transition-transform"
+        >
           <span className="text-xs">💎</span>
           <span className="font-black text-xs sm:text-sm text-pink-100 tracking-tight">
             {gems.toLocaleString()}
           </span>
-          <button
-            onClick={() => useGameStore.getState().addGems(10)}
-            title="보석 보너스 (+10)"
-            className="w-5 h-5 rounded-full bg-gradient-to-tr from-emerald-500 to-green-400 text-white flex items-center justify-center hover:scale-110 active:scale-90 transition-transform shadow-sm"
-          >
-            <Plus className="w-3.5 h-3.5 stroke-[3]" />
-          </button>
-        </div>
+        </button>
 
         {/* Shop Cart & Sound Menu */}
         <div className="flex items-center gap-1">
