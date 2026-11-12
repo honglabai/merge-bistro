@@ -19,28 +19,24 @@ export const OrderQueueBar: React.FC = () => {
   const cardTimers = ['21h', '10d', '1d', '2d', '6d'];
 
   return (
-    <div className="relative w-full max-w-[500px] mx-auto overflow-hidden rounded-2xl shadow-lg border-2 border-[#126b62] select-none">
+    <div className="relative w-full max-w-[500px] mx-auto overflow-hidden rounded-2xl shadow-lg border-2 border-[#8C6239] select-none">
       
-      {/* Taller Window Cafe Street Background with Curtains (Maximally visible behind cards) */}
-      <div className="relative w-full h-44 sm:h-48 bg-[#c5e6f5] overflow-hidden">
+      {/* Bistro Bakery Hero Background with Cat Barista & Cozy Cafe */}
+      <div className="relative w-full h-44 sm:h-52 bg-[#3e2723] overflow-hidden">
         <img
-          src="/extracted/window_background.png"
-          alt="Window Backdrop"
-          className="w-full h-full object-cover object-top filter brightness-105"
-          onError={(e) => {
-            (e.target as HTMLElement).style.display = 'none';
-          }}
+          src="/bistro-hero.png"
+          alt="Bistro Bakery with Cat Barista"
+          className="w-full h-full object-cover object-[center_30%] filter brightness-105"
         />
 
-        {/* Soft vignette shadow */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-transparent to-black/35 pointer-events-none" />
+        {/* Soft atmospheric gradient to provide depth while keeping cat & shop vivid */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/55 pointer-events-none" />
 
-        {/* Side Curtains Draping effect */}
-        <div className="absolute top-0 left-0 w-7 sm:w-9 h-full bg-gradient-to-r from-amber-50/90 via-amber-100/50 to-transparent pointer-events-none" />
-        <div className="absolute top-0 right-0 w-7 sm:w-9 h-full bg-gradient-to-l from-amber-50/90 via-amber-100/50 to-transparent pointer-events-none" />
+        {/* Warm golden light ambient glow */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400/40 via-amber-200/80 to-amber-400/40 pointer-events-none" />
 
-        {/* Window Sill Shelf on which compact cards rest */}
-        <div className="absolute bottom-0 left-0 right-0 h-3.5 bg-gradient-to-t from-[#0e5c54] to-[#16786e] border-t border-[#38b2a3]" />
+        {/* Bistro Counter Shelf on which compact cards rest */}
+        <div className="absolute bottom-0 left-0 right-0 h-3.5 bg-gradient-to-t from-[#2a1810] via-[#4e342e] to-[#6d4c41] border-t-2 border-[#b87333]/70 shadow-inner" />
       </div>
 
       {/* Compact Floating Order Cards Aligned to the Bottom Sill */}
