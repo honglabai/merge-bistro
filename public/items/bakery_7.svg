@@ -1,25 +1,39 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
   <defs>
-    <filter id="glow-bakery_7" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.25"/>
+    <filter id="shadow-bakery_7" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#1e293b" flood-opacity="0.35"/>
     </filter>
     
+  <linearGradient id="pancakeGrad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#fde047"/>
+    <stop offset="50%" stop-color="#f59e0b"/>
+    <stop offset="100%" stop-color="#b45309"/>
+  </linearGradient>
+  <radialGradient id="pancakeTop" cx="50%" cy="40%" r="55%">
+    <stop offset="0%" stop-color="#fef08a"/>
+    <stop offset="70%" stop-color="#f59e0b"/>
+    <stop offset="100%" stop-color="#b45309"/>
+  </radialGradient>
+  <linearGradient id="mapleSyrup" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#f59e0b"/>
+    <stop offset="100%" stop-color="#78350f"/>
+  </linearGradient>
+
   </defs>
-  <g filter="url(#glow-bakery_7)">
+  <g filter="url(#shadow-bakery_7)">
     
-  <ellipse cx="50" cy="78" rx="28" ry="6" fill="#000" opacity="0.2"/>
-  <!-- Bottom pancake -->
-  <path d="M22 64 C22 56 78 56 78 64 L78 68 C78 74 22 74 22 68 Z" fill="#FFA726" stroke="#5D4037" stroke-width="2"/>
-  <!-- Middle pancake -->
-  <path d="M24 52 C24 44 76 44 76 52 L76 56 C76 62 24 62 24 56 Z" fill="#FFB74D" stroke="#5D4037" stroke-width="2"/>
-  <!-- Top pancake -->
-  <path d="M26 40 C26 32 74 32 74 40 L74 44 C74 50 26 50 26 44 Z" fill="#FFE082" stroke="#5D4037" stroke-width="2"/>
-  <ellipse cx="50" cy="38" rx="24" ry="8" fill="#FFE082" stroke="#5D4037" stroke-width="2"/>
-  <!-- Melting butter cube -->
-  <rect x="44" y="26" width="12" height="9" rx="2" fill="#FFF59D" stroke="#FBC02D" stroke-width="1.5"/>
-  <!-- Dripping syrup -->
-  <path d="M46 36 C46 48 50 54 50 56 Q52 46 54 36 Z" fill="#795548"/>
-  <path d="M60 40 Q62 50 62 54" stroke="#795548" stroke-width="3" stroke-linecap="round"/>
+  <!-- Bottom Pancake -->
+  <ellipse cx="50" cy="74" rx="38" ry="14" fill="url(#pancakeGrad)" stroke="#78350f" stroke-width="2"/>
+  <!-- Middle Pancake -->
+  <ellipse cx="50" cy="58" rx="36" ry="13" fill="url(#pancakeGrad)" stroke="#78350f" stroke-width="2"/>
+  <!-- Top Pancake -->
+  <ellipse cx="50" cy="42" rx="34" ry="12" fill="url(#pancakeTop)" stroke="#78350f" stroke-width="2"/>
+  <!-- Melting Butter Cube -->
+  <rect x="42" y="24" width="16" height="12" rx="3" fill="#fde047" stroke="#ca8a04" stroke-width="1.5" transform="rotate(-6 50 30)"/>
+  <!-- Maple Syrup Drip -->
+  <path d="M44 38 C42 48 38 52 38 60 C38 64 42 66 46 64 C50 62 48 54 52 50 C56 46 62 52 64 62 C65 66 70 66 70 60 C70 50 66 44 62 38 Z" fill="url(#mapleSyrup)" opacity="0.9"/>
+  <!-- Pancake Highlight -->
+  <path d="M30 38 C40 34 60 34 70 38" stroke="#ffffff" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.7"/>
 
   </g>
 </svg>

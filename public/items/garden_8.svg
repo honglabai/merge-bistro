@@ -1,17 +1,32 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
   <defs>
-    <filter id="glow-garden_8" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.25"/>
+    <filter id="shadow-garden_8" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#1e293b" flood-opacity="0.35"/>
     </filter>
     
+  <linearGradient id="jamGrad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#f43f5e"/>
+    <stop offset="60%" stop-color="#e11d48"/>
+    <stop offset="100%" stop-color="#881337"/>
+  </linearGradient>
+
   </defs>
-  <g filter="url(#glow-garden_8)">
+  <g filter="url(#shadow-garden_8)">
     
-  <path d="M38 36 L38 72 C38 76 62 76 62 72 L62 36 L54 30 L54 26 L46 26 L46 30 Z" fill="#A5D6A7" stroke="#2E7D32" stroke-width="2"/>
-  <!-- Dropper rubber top -->
-  <rect x="47" y="16" width="6" height="10" rx="3" fill="#212121"/>
-  <!-- Shiny reflection -->
-  <line x1="42" y1="40" x2="42" y2="68" stroke="#FFF" stroke-width="2" opacity="0.7"/>
+  <!-- Hexagonal Glass Jam Jar -->
+  <rect x="22" y="32" width="56" height="52" rx="10" fill="url(#jamGrad)" stroke="#1e293b" stroke-width="2.5"/>
+  <!-- Gingham Fabric Cloth Lid with Tied Bow -->
+  <ellipse cx="50" cy="30" rx="30" ry="10" fill="#f43f5e" stroke="#be123c" stroke-width="2"/>
+  <path d="M20 30 Q35 38 50 30 Q65 38 80 30" stroke="#ffffff" stroke-width="2" fill="none"/>
+  <rect x="24" y="32" width="52" height="4" fill="#e11d48"/>
+  <!-- Hanging Tied Twine Bow -->
+  <circle cx="50" cy="36" r="3" fill="#fde047"/>
+  <!-- White Vintage Label with Strawberry -->
+  <rect x="30" y="46" width="40" height="26" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <circle cx="50" cy="58" r="6" fill="#ef4444"/>
+  <circle cx="50" cy="52" r="2" fill="#22c55e"/>
+  <!-- Glass Reflection -->
+  <line x1="28" y1="36" x2="28" y2="78" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" opacity="0.75"/>
 
   </g>
 </svg>

@@ -1,23 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
   <defs>
-    <filter id="glow-seafood_6" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.25"/>
+    <filter id="shadow-seafood_6" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#1e293b" flood-opacity="0.35"/>
     </filter>
     
+  <linearGradient id="spongeGrad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#fef9c3"/>
+    <stop offset="100%" stop-color="#fde047"/>
+  </linearGradient>
+
   </defs>
-  <g filter="url(#glow-seafood_6)">
+  <g filter="url(#shadow-seafood_6)">
     
-  <ellipse cx="50" cy="74" rx="28" ry="6" fill="#000" opacity="0.2"/>
-  <!-- Shallow black pan -->
-  <ellipse cx="50" cy="52" rx="28" ry="14" fill="#212121" stroke="#000" stroke-width="2.5"/>
-  <!-- Yellow saffron rice -->
-  <ellipse cx="50" cy="52" rx="25" ry="11" fill="#FDD835"/>
-  <!-- Mussels & Prawns -->
-  <ellipse cx="40" cy="50" rx="5" ry="3" fill="#37474F"/>
-  <ellipse cx="60" cy="50" rx="5" ry="3" fill="#37474F"/>
-  <path d="M46 46 Q54 42 54 48" stroke="#FF5722" stroke-width="3" stroke-linecap="round" fill="none"/>
-  <!-- Lemon wedge -->
-  <path d="M46 54 L54 54 A4 4 0 0 1 46 54 Z" fill="#FFEE58" stroke="#FBC02D" stroke-width="1"/>
+  <!-- Triangular Cake Wedge Shape -->
+  <path d="M16 76 L84 76 L84 46 L16 46 Z" fill="url(#spongeGrad)" stroke="#78350f" stroke-width="2"/>
+  <!-- Cream Layers in Sponge -->
+  <rect x="16" y="58" width="68" height="6" fill="#ffffff"/>
+  <!-- Fresh Strawberry Slices in Cream -->
+  <circle cx="36" cy="61" r="4" fill="#ef4444"/>
+  <circle cx="62" cy="61" r="4" fill="#ef4444"/>
+  <!-- Thick Whipped Cream Topping -->
+  <rect x="14" y="40" width="72" height="10" rx="5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <!-- Piped Whipped Cream Rosettes -->
+  <circle cx="34" cy="34" r="8" fill="#ffffff" stroke="#f1f5f9" stroke-width="1.5"/>
+  <circle cx="66" cy="34" r="8" fill="#ffffff" stroke="#f1f5f9" stroke-width="1.5"/>
+  <!-- Whole Ripe Strawberry Center -->
+  <path d="M50 16 C42 16 38 24 44 34 C48 40 50 42 50 42 C50 42 52 40 56 34 C62 24 58 16 50 16 Z" fill="url(#strawberryGrad)" stroke="#991b1b" stroke-width="2"/>
+  <!-- Strawberry Seeds -->
+  <circle cx="47" cy="26" r="1" fill="#fde047"/>
+  <circle cx="53" cy="28" r="1" fill="#fde047"/>
+  <circle cx="49" cy="34" r="1" fill="#fde047"/>
+  <!-- Strawberry Gloss -->
+  <path d="M44 22 C46 18 52 18 54 22" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" fill="none"/>
 
   </g>
 </svg>

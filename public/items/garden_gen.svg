@@ -1,17 +1,35 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
   <defs>
-    <filter id="glow-garden_gen" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.25"/>
+    <filter id="shadow-garden_gen" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#1e293b" flood-opacity="0.35"/>
     </filter>
     
+  <radialGradient id="appleGrad" cx="35%" cy="30%" r="65%">
+    <stop offset="0%" stop-color="#f87171"/>
+    <stop offset="60%" stop-color="#dc2626"/>
+    <stop offset="100%" stop-color="#7f1d1d"/>
+  </radialGradient>
+  <radialGradient id="lemonGrad" cx="35%" cy="30%" r="65%">
+    <stop offset="0%" stop-color="#fef9c3"/>
+    <stop offset="50%" stop-color="#facc15"/>
+    <stop offset="100%" stop-color="#ca8a04"/>
+  </radialGradient>
+
   </defs>
-  <g filter="url(#glow-garden_gen)">
+  <g filter="url(#shadow-garden_gen)">
     
-  <path d="M32 78 C26 48 34 38 42 34 L58 34 C66 38 74 48 68 78 Z" fill="#8D6E63" stroke="#4E342E" stroke-width="2.5"/>
-  <!-- Tied neck with green ribbon -->
-  <rect x="38" y="32" width="24" height="5" rx="2" fill="#4CAF50"/>
-  <!-- Green Leaf Emblem -->
-  <path d="M50 48 C44 54 44 64 50 66 C56 64 56 54 50 48 Z" fill="#81C784" stroke="#2E7D32" stroke-width="1.5"/>
+  <!-- Woven Harvest Basket overflowing with fresh berries -->
+  <path d="M12 48 C14 86 86 86 88 48 Z" fill="url(#basketGrad)" stroke="#451a03" stroke-width="2.5"/>
+  <!-- Basket Handle -->
+  <path d="M16 50 C16 12 84 12 84 50" fill="none" stroke="#78350f" stroke-width="4.5" stroke-linecap="round"/>
+  <!-- Bountiful Fruits Overflowing -->
+  <circle cx="34" cy="42" r="12" fill="url(#strawberryGrad)" stroke="#991b1b" stroke-width="1.5"/>
+  <circle cx="66" cy="42" r="12" fill="url(#lemonGrad)" stroke="#ca8a04" stroke-width="1.5"/>
+  <circle cx="50" cy="36" r="14" fill="url(#appleGrad)" stroke="#991b1b" stroke-width="2"/>
+  <!-- Fresh Green Leaves -->
+  <path d="M50 22 C44 14 50 8 58 12 C64 16 58 24 50 22 Z" fill="#22c55e" stroke="#15803d" stroke-width="1.5"/>
+  <!-- Basket Texture -->
+  <path d="M16 58 Q50 68 84 58 M20 68 Q50 78 80 68" stroke="#78350f" stroke-width="2" fill="none"/>
 
   </g>
 </svg>

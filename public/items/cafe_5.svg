@@ -1,22 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
   <defs>
-    <filter id="glow-cafe_5" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.25"/>
+    <filter id="shadow-cafe_5" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#1e293b" flood-opacity="0.35"/>
     </filter>
     
   </defs>
-  <g filter="url(#glow-cafe_5)">
+  <g filter="url(#shadow-cafe_5)">
     
-  <ellipse cx="50" cy="74" rx="26" ry="6" fill="#000" opacity="0.2"/>
-  <!-- Wide cup -->
-  <path d="M26 42 C26 66 74 66 74 42 Z" fill="#4E342E" stroke="#3E2723" stroke-width="2.5"/>
-  <ellipse cx="50" cy="42" rx="24" ry="7" fill="#EFEBE9"/>
-  <!-- Froth dome -->
-  <ellipse cx="50" cy="39" rx="21" ry="8" fill="#FFF"/>
-  <!-- Cinnamon dusting swirl -->
-  <path d="M40 38 Q50 33 60 38 Q52 44 42 41" stroke="#8D6E63" stroke-width="2" fill="none" stroke-dasharray="2,2"/>
-  <!-- Handle -->
-  <path d="M72 44 C82 46 82 58 70 60" fill="none" stroke="#3E2723" stroke-width="3"/>
+  <!-- Saucer -->
+  <ellipse cx="50" cy="78" rx="42" ry="11" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <!-- Ceramic Cup -->
+  <path d="M20 40 C20 76 80 76 80 40 Z" fill="#ffffff" stroke="#94a3b8" stroke-width="2.5"/>
+  <path d="M78 44 C90 44 90 62 76 64" fill="none" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
+  <!-- Mound of Velvety Milk Foam -->
+  <ellipse cx="50" cy="40" rx="30" ry="12" fill="#ffffff"/>
+  <path d="M26 40 Q50 20 74 40 Z" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <!-- Cocoa / Cinnamon Dusting -->
+  <circle cx="44" cy="32" r="1.5" fill="#78350f"/>
+  <circle cx="50" cy="28" r="1.5" fill="#78350f"/>
+  <circle cx="56" cy="34" r="1.5" fill="#78350f"/>
+  <circle cx="48" cy="36" r="1.5" fill="#78350f"/>
+  <!-- Rosette Leaf Latte Art Silhouette -->
+  <path d="M50 38 Q50 26 50 24 M46 30 Q50 28 54 30 M44 34 Q50 32 56 34" stroke="#b45309" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  <!-- Cup Gloss -->
+  <path d="M28 52 C30 68 44 72 50 72" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" fill="none"/>
 
   </g>
 </svg>

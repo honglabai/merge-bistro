@@ -1,18 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
   <defs>
-    <filter id="glow-ruins_1" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.25"/>
+    <filter id="shadow-ruins_1" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#1e293b" flood-opacity="0.35"/>
     </filter>
     
   </defs>
-  <g filter="url(#glow-ruins_1)">
+  <g filter="url(#shadow-ruins_1)">
     
-  <!-- Handle -->
-  <line x1="56" y1="56" x2="78" y2="78" stroke="#6D4C41" stroke-width="6" stroke-linecap="round"/>
-  <!-- Brass rim -->
-  <circle cx="42" cy="42" r="22" fill="#E0F7FA" stroke="#F57F17" stroke-width="4"/>
-  <!-- Lens reflection -->
-  <path d="M32 30 Q44 26 52 38" stroke="#FFF" stroke-width="3" fill="none" opacity="0.8"/>
+  <!-- Diagonal French Baker's Wooden Rolling Pin -->
+  <g transform="rotate(-35 50 50)">
+    <!-- Handles on Both Sides -->
+    <rect x="6" y="46" width="16" height="8" rx="3" fill="#78350f" stroke="#451a03" stroke-width="2"/>
+    <rect x="78" y="46" width="16" height="8" rx="3" fill="#78350f" stroke="#451a03" stroke-width="2"/>
+    <!-- Main Rolling Cylinder Body -->
+    <rect x="20" y="38" width="60" height="24" rx="6" fill="url(#woodBoard)" stroke="#451a03" stroke-width="2.5"/>
+    <!-- Woodgrain Lines -->
+    <line x1="26" y1="44" x2="74" y2="44" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="24" y1="56" x2="76" y2="56" stroke="#92400e" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Cylinder Specular Highlight -->
+    <line x1="22" y1="42" x2="78" y2="42" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.75"/>
+  </g>
 
   </g>
 </svg>

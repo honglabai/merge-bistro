@@ -1,17 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
   <defs>
-    <filter id="glow-cafe_1" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.25"/>
+    <filter id="shadow-cafe_1" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#1e293b" flood-opacity="0.35"/>
     </filter>
     
+  <radialGradient id="coffeeBeanTop" cx="40%" cy="30%" r="65%">
+    <stop offset="0%" stop-color="#b45309"/>
+    <stop offset="50%" stop-color="#78350f"/>
+    <stop offset="100%" stop-color="#291206"/>
+  </radialGradient>
+  <radialGradient id="coffeeBean1" cx="45%" cy="35%" r="60%">
+    <stop offset="0%" stop-color="#92400e"/>
+    <stop offset="60%" stop-color="#451a03"/>
+    <stop offset="100%" stop-color="#1c1917"/>
+  </radialGradient>
+
   </defs>
-  <g filter="url(#glow-cafe_1)">
+  <g filter="url(#shadow-cafe_1)">
     
-  <ellipse cx="44" cy="46" rx="12" ry="16" transform="rotate(-25 44 46)" fill="#4E342E" stroke="#271914" stroke-width="2"/>
-  <path d="M40 34 Q45 46 39 58" stroke="#FFE082" stroke-width="2" fill="none"/>
-  
-  <ellipse cx="58" cy="54" rx="11" ry="15" transform="rotate(35 58 54)" fill="#3E2723" stroke="#271914" stroke-width="2"/>
-  <path d="M52 44 Q59 54 55 65" stroke="#FFE082" stroke-width="2" fill="none"/>
+  <!-- Cluster of 3 Shiny Roasted Coffee Beans -->
+  <!-- Left Bean -->
+  <ellipse cx="34" cy="58" rx="18" ry="13" fill="url(#coffeeBean1)" stroke="#1c1917" stroke-width="2" transform="rotate(-35 34 58)"/>
+  <path d="M22 62 Q34 58 46 54" stroke="#1c1917" stroke-width="2.5" fill="none"/>
+  <!-- Right Bean -->
+  <ellipse cx="66" cy="58" rx="18" ry="13" fill="url(#coffeeBean1)" stroke="#1c1917" stroke-width="2" transform="rotate(35 66 58)"/>
+  <path d="M54 54 Q66 58 78 62" stroke="#1c1917" stroke-width="2.5" fill="none"/>
+  <!-- Center Top Bean -->
+  <ellipse cx="50" cy="38" rx="20" ry="14" fill="url(#coffeeBeanTop)" stroke="#1c1917" stroke-width="2.5" transform="rotate(10 50 38)"/>
+  <!-- Characteristic S-Curve Crease -->
+  <path d="M34 40 Q46 36 54 40 Q62 44 66 38" stroke="#1c1917" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <!-- Bean Gloss Highlights -->
+  <ellipse cx="45" cy="32" rx="8" ry="3" fill="#ffffff" opacity="0.6" transform="rotate(10 45 32)"/>
+  <ellipse cx="30" cy="52" rx="6" ry="2.5" fill="#ffffff" opacity="0.5" transform="rotate(-35 30 52)"/>
 
   </g>
 </svg>

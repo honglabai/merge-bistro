@@ -1,24 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
   <defs>
-    <filter id="glow-bakery_4" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.25"/>
+    <filter id="shadow-bakery_4" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#1e293b" flood-opacity="0.35"/>
     </filter>
     
-  <linearGradient id="baguetteGrad" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0%" stop-color="#FFA726"/>
-    <stop offset="50%" stop-color="#FB8C00"/>
-    <stop offset="100%" stop-color="#6D4C41"/>
+  <linearGradient id="baguetteGrad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#f59e0b"/>
+    <stop offset="40%" stop-color="#d97706"/>
+    <stop offset="100%" stop-color="#78350f"/>
   </linearGradient>
 
   </defs>
-  <g filter="url(#glow-bakery_4)">
+  <g filter="url(#shadow-bakery_4)">
     
-  <ellipse cx="50" cy="76" rx="28" ry="6" fill="#000" opacity="0.2"/>
-  <path d="M20 66 C14 58 20 40 32 32 C48 20 72 26 80 38 C86 48 82 62 70 70 C54 80 26 74 20 66 Z" fill="url(#baguetteGrad)" stroke="#5D4037" stroke-width="2.5"/>
-  <!-- Diagonal score cuts -->
-  <ellipse cx="36" cy="46" rx="6" ry="2.5" transform="rotate(-35 36 46)" fill="#FFF9C4" stroke="#8D6E63" stroke-width="1.5"/>
-  <ellipse cx="50" cy="50" rx="7" ry="2.5" transform="rotate(-35 50 50)" fill="#FFF9C4" stroke="#8D6E63" stroke-width="1.5"/>
-  <ellipse cx="64" cy="54" rx="6" ry="2.5" transform="rotate(-35 64 54)" fill="#FFF9C4" stroke="#8D6E63" stroke-width="1.5"/>
+  <!-- Diagonal French Baguette -->
+  <g transform="rotate(-32 50 50)">
+    <rect x="14" y="36" width="72" height="28" rx="14" fill="url(#baguetteGrad)" stroke="#78350f" stroke-width="2.5"/>
+    <!-- Diagonal Score Cuts with Pale Dough Center -->
+    <ellipse cx="32" cy="48" rx="4" ry="9" fill="#fefce8" stroke="#92400e" stroke-width="1.5" transform="rotate(-15 32 48)"/>
+    <ellipse cx="50" cy="48" rx="4" ry="9" fill="#fefce8" stroke="#92400e" stroke-width="1.5" transform="rotate(-15 50 48)"/>
+    <ellipse cx="68" cy="48" rx="4" ry="9" fill="#fefce8" stroke="#92400e" stroke-width="1.5" transform="rotate(-15 68 48)"/>
+    <!-- Golden Gloss Highlights -->
+    <path d="M20 40 C40 37 60 37 80 40" stroke="#ffffff" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.65"/>
+  </g>
 
   </g>
 </svg>

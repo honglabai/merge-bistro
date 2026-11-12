@@ -1,18 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
   <defs>
-    <filter id="glow-ruins_4" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.25"/>
+    <filter id="shadow-ruins_4" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#1e293b" flood-opacity="0.35"/>
     </filter>
     
   </defs>
-  <g filter="url(#glow-ruins_4)">
+  <g filter="url(#shadow-ruins_4)">
     
-  <!-- Metallic Body -->
-  <rect x="36" y="44" width="28" height="34" rx="4" fill="#37474F" stroke="#212121" stroke-width="2.5"/>
-  <!-- Beveled Head -->
-  <path d="M30 44 L36 32 L64 32 L70 44 Z" fill="#607D8B" stroke="#212121" stroke-width="2"/>
-  <!-- Glass lens beaming light -->
-  <ellipse cx="50" cy="32" rx="14" ry="4" fill="#FFF" stroke="#FFD54F" stroke-width="2"/>
+  <!-- Fan of 4 Nested Measuring Spoons on Ring -->
+  <circle cx="28" cy="72" r="6" fill="none" stroke="#64748b" stroke-width="3"/>
+  <!-- Big Spoon -->
+  <g transform="rotate(-30 28 72)">
+    <rect x="28" y="24" width="6" height="48" rx="2" fill="#94a3b8" stroke="#475569" stroke-width="1.5"/>
+    <ellipse cx="31" cy="20" rx="14" ry="10" fill="#e2e8f0" stroke="#475569" stroke-width="2"/>
+  </g>
+  <!-- Medium Spoon -->
+  <g transform="rotate(0 28 72)">
+    <rect x="28" y="30" width="5" height="42" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="1.5"/>
+    <ellipse cx="30" cy="26" rx="11" ry="8" fill="#f8fafc" stroke="#475569" stroke-width="2"/>
+  </g>
+  <!-- Small Spoon -->
+  <g transform="rotate(30 28 72)">
+    <rect x="28" y="36" width="4" height="36" rx="2" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
+    <ellipse cx="30" cy="32" rx="8" ry="6" fill="#ffffff" stroke="#475569" stroke-width="2"/>
+  </g>
+  <!-- Stainless Steel Gleam -->
+  <line x1="32" y1="16" x2="42" y2="22" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
 
   </g>
 </svg>

@@ -1,26 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
   <defs>
-    <filter id="glow-cafe_4" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.25"/>
+    <filter id="shadow-cafe_4" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#1e293b" flood-opacity="0.35"/>
     </filter>
     
   <linearGradient id="latteGrad" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0%" stop-color="#FFF8E1"/>
-    <stop offset="40%" stop-color="#D7CCC8"/>
-    <stop offset="100%" stop-color="#5D4037"/>
+    <stop offset="0%" stop-color="#fefce8"/>
+    <stop offset="35%" stop-color="#fde047" stop-opacity="0.9"/>
+    <stop offset="70%" stop-color="#d97706"/>
+    <stop offset="100%" stop-color="#78350f"/>
   </linearGradient>
 
   </defs>
-  <g filter="url(#glow-cafe_4)">
+  <g filter="url(#shadow-cafe_4)">
     
-  <ellipse cx="50" cy="76" rx="20" ry="5" fill="#000" opacity="0.2"/>
-  <!-- Mug -->
-  <path d="M32 32 L36 70 C36 74 64 74 64 70 L68 32 Z" fill="url(#latteGrad)" stroke="#B0BEC5" stroke-width="2"/>
-  <path d="M66 40 C76 42 76 58 64 62" fill="none" stroke="#B0BEC5" stroke-width="3"/>
-  <!-- Foam surface -->
-  <ellipse cx="50" cy="32" rx="18" ry="6" fill="#FFFDE7" stroke="#FFE082" stroke-width="1.5"/>
+  <!-- Glass Mug with Handle -->
+  <path d="M28 26 L32 78 C33 84 67 84 68 78 L72 26 Z" fill="url(#latteGrad)" stroke="#475569" stroke-width="2.5"/>
+  <path d="M70 34 C82 34 82 56 68 58" fill="none" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+  <!-- Latte Art Foam Surface -->
+  <ellipse cx="50" cy="26" rx="22" ry="7" fill="#fefce8" stroke="#d97706" stroke-width="1.5"/>
   <!-- Heart Latte Art -->
-  <path d="M50 34 C46 30 42 32 46 36 L50 40 L54 36 C58 32 54 30 50 34 Z" fill="#8D6E63"/>
+  <path d="M50 30 C46 24 40 24 44 28 C48 32 50 34 50 34 C50 34 52 32 56 28 C60 24 54 24 50 30 Z" fill="#92400e"/>
+  <!-- Glass Shine -->
+  <line x1="33" y1="28" x2="36" y2="76" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" opacity="0.75"/>
 
   </g>
 </svg>

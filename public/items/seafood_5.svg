@@ -1,19 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
   <defs>
-    <filter id="glow-seafood_5" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.25"/>
+    <filter id="shadow-seafood_5" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#1e293b" flood-opacity="0.35"/>
     </filter>
     
   </defs>
-  <g filter="url(#glow-seafood_5)">
+  <g filter="url(#shadow-seafood_5)">
     
-  <path d="M22 66 C22 36 78 36 78 66 Z" fill="#FFE0B2" stroke="#8D6E63" stroke-width="2"/>
-  <!-- Scallop meat inside -->
-  <ellipse cx="50" cy="54" rx="14" ry="10" fill="#FFFDE7" stroke="#FFB74D" stroke-width="1.5"/>
-  <!-- Bubbling golden butter -->
-  <ellipse cx="50" cy="58" rx="18" ry="4" fill="#FFD54F" opacity="0.8"/>
-  <circle cx="44" cy="52" r="1.5" fill="#388E3C"/>
-  <circle cx="56" cy="54" r="1.5" fill="#388E3C"/>
+  <!-- Layered Tiramisu Slice -->
+  <!-- Bottom Coffee Sponge -->
+  <path d="M14 68 L86 68 L80 82 L20 82 Z" fill="#78350f" stroke="#451a03" stroke-width="1.5"/>
+  <!-- Mascarpone Cream Layer 1 -->
+  <path d="M16 56 L84 56 L86 68 L14 68 Z" fill="#fefce8" stroke="#ca8a04" stroke-width="1"/>
+  <!-- Coffee Sponge Layer 2 -->
+  <path d="M18 46 L82 46 L84 56 L16 56 Z" fill="#78350f" stroke="#451a03" stroke-width="1"/>
+  <!-- Top Mascarpone Cream Swirls -->
+  <path d="M20 36 L80 36 L82 46 L18 46 Z" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <!-- Piped Cream Puffs on Top -->
+  <circle cx="28" cy="32" r="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <circle cx="42" cy="30" r="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <circle cx="58" cy="30" r="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <circle cx="72" cy="32" r="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <!-- Fine Dark Cocoa Powder Dusting -->
+  <ellipse cx="50" cy="30" rx="28" ry="4" fill="#451a03" opacity="0.6"/>
+  <!-- Mint Garnish & Chocolate Curl -->
+  <path d="M46 22 C42 16 46 12 50 14 C54 16 50 22 46 22 Z" fill="#22c55e"/>
 
   </g>
 </svg>
