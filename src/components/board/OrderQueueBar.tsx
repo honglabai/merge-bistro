@@ -20,16 +20,16 @@ export const OrderQueueBar: React.FC = () => {
   return (
     <div className="relative w-full max-w-[500px] mx-auto overflow-hidden rounded-b-2xl shadow-lg border-b-2 border-x-2 border-[#8C6239] select-none">
       
-      {/* Bistro Bakery Hero Background with Cat Barista (Compact height: ~14dvh) */}
-      <div className="relative w-full h-[14dvh] min-h-[115px] max-h-[135px] bg-[#3e2723] overflow-hidden">
+      {/* Bistro Bakery Hero Background with Cat Barista (Cat face centered above cards) */}
+      <div className="relative w-full h-[14.5dvh] min-h-[120px] max-h-[140px] bg-[#3e2723] overflow-hidden">
         <img
           src="/bistro-window-cat.png"
           alt="Bistro Bakery with Cat Barista"
-          className="w-full h-full object-cover object-[center_12%] filter brightness-105"
+          className="w-full h-full object-cover object-[center_50%] filter brightness-105"
         />
 
         {/* Soft atmospheric gradient to provide depth while keeping cat & shop vivid */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/55 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/45 pointer-events-none" />
 
         {/* Warm golden light ambient glow */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400/40 via-amber-200/80 to-amber-400/40 pointer-events-none" />
