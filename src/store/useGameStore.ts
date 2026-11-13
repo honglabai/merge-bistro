@@ -19,6 +19,9 @@ interface GameState {
   stars: number;
   gems: number;
   followers: number;
+  chefName: string;
+  chefAvatar: string;
+  chefTitle: string;
   superchargeMultiplier: 1 | 2 | 4;
   selectedTileIndex: number | null;
   dragOverIndex: number | null;
@@ -54,6 +57,7 @@ interface GameState {
   freeEnergyRefill: () => void;
   addCoins: (amount: number) => void;
   addGems: (amount: number) => void;
+  setChefProfile: (name: string, avatar: string, title?: string) => void;
   showToast: (msg: string) => void;
   resetGame: () => void;
 }
@@ -67,6 +71,9 @@ export const useGameStore = create<GameState>((set, get) => ({
   stars: 5,
   gems: 30,
   followers: 85,
+  chefName: '바닷마을 총괄 셰프',
+  chefAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=160&q=80',
+  chefTitle: '미슐랭 3스타 수석 셰프',
   superchargeMultiplier: 1,
   selectedTileIndex: null,
   dragOverIndex: null,
@@ -193,6 +200,9 @@ export const useGameStore = create<GameState>((set, get) => ({
           stars: typeof parsed.stars === 'number' ? parsed.stars : 5,
           gems: typeof parsed.gems === 'number' ? parsed.gems : 30,
           followers: typeof parsed.followers === 'number' ? parsed.followers : 85,
+          chefName: typeof parsed.chefName === 'string' && parsed.chefName.trim() ? parsed.chefName : '바닷마을 총괄 셰프',
+          chefAvatar: typeof parsed.chefAvatar === 'string' && parsed.chefAvatar ? parsed.chefAvatar : 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=160&q=80',
+          chefTitle: typeof parsed.chefTitle === 'string' && parsed.chefTitle ? parsed.chefTitle : '미슐랭 3스타 수석 셰프',
           orders: activeOrders,
           restorations: parsed.restorations || RESTORATION_NODES,
           posts: parsed.posts || COOKSTAGRAM_POSTS,
@@ -766,6 +776,19 @@ export const useGameStore = create<GameState>((set, get) => ({
     saveState(get());
   },
 
+  setChefProfile: (name: string, avatar: string, title?: string) => {
+    const state = get();
+    sounds.playTapSound();
+    const updated = {
+      chefName: name.trim() || state.chefName,
+      chefAvatar: avatar || state.chefAvatar,
+      chefTitle: title || state.chefTitle
+    };
+    set(updated);
+    saveState(get());
+    state.showToast('✨ 셰프 프로필이 업데이트되었습니다!');
+  },
+
   showToast: (msg: string) => {
     set({ toastMessage: msg });
     setTimeout(() => {
@@ -784,6 +807,9 @@ export const useGameStore = create<GameState>((set, get) => ({
       stars: 5,
       gems: 30,
       followers: 85,
+      chefName: '바닷마을 총괄 셰프',
+      chefAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=160&q=80',
+      chefTitle: '미슐랭 3스타 수석 셰프',
       superchargeMultiplier: 1,
       selectedTileIndex: null,
       dragOverIndex: null,
@@ -805,6 +831,9 @@ function saveState(state: GameState) {
       stars: state.stars,
       gems: state.gems,
       followers: state.followers,
+      chefName: state.chefName,
+      chefAvatar: state.chefAvatar,
+      chefTitle: state.chefTitle,
       orders: state.orders,
       restorations: state.restorations,
       posts: state.posts,

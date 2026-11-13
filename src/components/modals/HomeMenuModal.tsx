@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Gamepad2, Hammer, Camera, Calculator, Volume2, VolumeX, RotateCcw, HelpCircle, Zap, Archive, ChevronRight, Sparkles } from 'lucide-react';
+import { X, Gamepad2, Hammer, Camera, Calculator, Volume2, VolumeX, RotateCcw, HelpCircle, Zap, Archive, ChevronRight, Sparkles, ChefHat } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 import { sounds } from '../../utils/soundSynthesizer';
 import { ItemGraphic } from '../ui/ItemGraphic';
@@ -9,6 +9,7 @@ interface HomeMenuModalProps {
   onClose: () => void;
   currentTab: 'game' | 'restoration' | 'cookstagram' | 'math';
   onSelectTab: (tab: 'game' | 'restoration' | 'cookstagram' | 'math') => void;
+  onOpenMyPage: () => void;
   onOpenHelp: () => void;
   onOpenResetConfirm: () => void;
 }
@@ -18,6 +19,7 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
   onClose,
   currentTab,
   onSelectTab,
+  onOpenMyPage,
   onOpenHelp,
   onOpenResetConfirm
 }) => {
@@ -28,6 +30,9 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
     stars,
     gems,
     followers,
+    chefName,
+    chefAvatar,
+    chefTitle,
     inventoryPocket,
     retrieveFromInventory,
     freeEnergyRefill,
@@ -52,11 +57,18 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
         
         {/* Modal Top Header */}
         <div className="bg-gradient-to-r from-[#3E2723] via-[#4E342E] to-[#3E2723] text-amber-100 p-4 flex items-center justify-between border-b-2 border-amber-600/40">
-          <div className="flex items-center gap-2.5">
+          <div
+            onClick={() => {
+              onClose();
+              onOpenMyPage();
+            }}
+            className="flex items-center gap-2.5 cursor-pointer group active:scale-98 transition-transform"
+            title="마이페이지 & 설정 열기"
+          >
             <div className="relative">
-              <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-amber-300 via-rose-300 to-sky-300 p-0.5 shadow-md overflow-hidden border-2 border-white">
+              <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-amber-300 via-rose-300 to-sky-300 p-0.5 shadow-md overflow-hidden border-2 border-white group-hover:ring-2 group-hover:ring-amber-300 transition-all">
                 <img
-                  src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80"
+                  src={chefAvatar || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80"}
                   alt="Avatar"
                   className="w-full h-full object-cover rounded-full"
                 />
@@ -66,10 +78,10 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
               </div>
             </div>
             <div>
-              <div className="text-sm font-black text-amber-200 flex items-center gap-1.5">
-                <span>비스트로 총괄 본부</span>
+              <div className="text-sm font-black text-amber-200 flex items-center gap-1.5 group-hover:text-white transition-colors">
+                <span>{chefName || '비스트로 총괄 본부'}</span>
                 <span className="text-[10px] bg-amber-500/30 text-amber-300 px-2 py-0.5 rounded-full border border-amber-400/30">
-                  Lv.49 매니저
+                  Lv.49
                 </span>
               </div>
               <div className="text-[11px] text-amber-100/70 font-semibold flex items-center gap-2 mt-0.5">
@@ -308,6 +320,18 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
               )}
             </button>
 
+            {/* My Page & Settings */}
+            <button
+              onClick={() => {
+                onClose();
+                onOpenMyPage();
+              }}
+              className="p-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-black flex items-center justify-center gap-1.5 shadow-sm active:scale-95"
+            >
+              <ChefHat className="w-4 h-4 text-amber-600" />
+              <span>마이페이지 & 설정</span>
+            </button>
+
             {/* Help Guide */}
             <button
               onClick={() => {
@@ -317,7 +341,7 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
               className="p-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-black flex items-center justify-center gap-1.5 shadow-sm active:scale-95"
             >
               <HelpCircle className="w-4 h-4 text-slate-500" />
-              <span>게임 가이드</span>
+              <span>플레이 가이드</span>
             </button>
 
             {/* Reset Game */}

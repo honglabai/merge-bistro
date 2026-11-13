@@ -12,11 +12,13 @@ import { StylePickerModal } from './components/modals/StylePickerModal';
 import { ResetConfirmModal } from './components/modals/ResetConfirmModal';
 import { HelpGuideModal } from './components/modals/HelpGuideModal';
 import { HomeMenuModal } from './components/modals/HomeMenuModal';
+import { MyPageModal } from './components/modals/MyPageModal';
 import { Toast } from './components/ui/Toast';
 import { ParticleCanvas } from './components/ui/ParticleCanvas';
 
 export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<'game' | 'restoration' | 'cookstagram' | 'math'>('game');
+  const [isMyPageOpen, setIsMyPageOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isResetOpen, setIsResetOpen] = useState(false);
   const [isHomeMenuOpen, setIsHomeMenuOpen] = useState(false);
@@ -50,6 +52,7 @@ export const App: React.FC = () => {
         {/* Top Resource & Currency Bar (Avatar, Energy, Coins, Gems, Shop) */}
         <div className="flex-shrink-0 z-30">
           <ResourceHeader
+            onOpenMyPage={() => setIsMyPageOpen(true)}
             onOpenHelp={() => setIsHelpOpen(true)}
             onOpenResetConfirm={() => setIsResetOpen(true)}
           />
@@ -140,6 +143,7 @@ export const App: React.FC = () => {
         onClose={() => setIsHomeMenuOpen(false)}
         currentTab={currentTab}
         onSelectTab={(tab) => setCurrentTab(tab)}
+        onOpenMyPage={() => setIsMyPageOpen(true)}
         onOpenHelp={() => setIsHelpOpen(true)}
         onOpenResetConfirm={() => setIsResetOpen(true)}
       />
@@ -147,6 +151,11 @@ export const App: React.FC = () => {
       <StylePickerModal />
       <ResetConfirmModal isOpen={isResetOpen} onClose={() => setIsResetOpen(false)} />
       <HelpGuideModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+      <MyPageModal
+        isOpen={isMyPageOpen}
+        onClose={() => setIsMyPageOpen(false)}
+        onOpenResetConfirm={() => setIsResetOpen(true)}
+      />
       <Toast />
 
     </div>

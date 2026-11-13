@@ -4,16 +4,18 @@ import { useGameStore } from '../../store/useGameStore';
 import { sounds } from '../../utils/soundSynthesizer';
 
 interface ResourceHeaderProps {
-  onOpenHelp: () => void;
+  onOpenMyPage: () => void;
+  onOpenHelp?: () => void;
   onOpenResetConfirm: () => void;
 }
 
-export const ResourceHeader: React.FC<ResourceHeaderProps> = ({ onOpenHelp, onOpenResetConfirm }) => {
+export const ResourceHeader: React.FC<ResourceHeaderProps> = ({ onOpenMyPage, onOpenHelp, onOpenResetConfirm }) => {
   const {
     energy,
     maxEnergy,
     coins,
     gems,
+    chefAvatar,
     freeEnergyRefill,
     rechargeEnergyTick
   } = useGameStore();
@@ -49,12 +51,16 @@ export const ResourceHeader: React.FC<ResourceHeaderProps> = ({ onOpenHelp, onOp
     <header className="bg-gradient-to-b from-[#1b5853] via-[#104e49] to-[#0c433e] text-white px-1.5 sm:px-3 pt-[max(8px,env(safe-area-inset-top,8px))] pb-2 select-none border-b border-[#1b6b63]/60 shadow-md">
       <div className="max-w-[500px] mx-auto flex items-center justify-between gap-1 sm:gap-2">
         
-        {/* Profile Avatar with Golden Level Badge */}
-        <div className="relative flex-shrink-0 cursor-pointer group" onClick={onOpenHelp} title="게임 도움말">
-          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-tr from-amber-300 via-rose-300 to-sky-300 p-0.5 shadow-md overflow-hidden border-2 border-white">
+        {/* Profile Avatar with Golden Level Badge - Click to Open My Page & Settings */}
+        <div
+          className="relative flex-shrink-0 cursor-pointer group active:scale-95 transition-transform"
+          onClick={onOpenMyPage}
+          title="마이페이지 & 설정"
+        >
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-tr from-amber-300 via-rose-300 to-sky-300 p-0.5 shadow-md overflow-hidden border-2 border-white group-hover:ring-2 group-hover:ring-amber-300 transition-all">
             <img
-              src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80"
-              alt="Avatar"
+              src={chefAvatar || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80"}
+              alt="Chef Avatar"
               className="w-full h-full object-cover rounded-full"
             />
           </div>
