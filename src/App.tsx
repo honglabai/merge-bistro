@@ -49,9 +49,17 @@ export const App: React.FC = () => {
             'repeating-linear-gradient(90deg, #008770 0px, #008770 38px, #007863 39px, #00937b 40px)'
         }}
       >
-        {/* Top Resource & Currency Bar (Avatar, Energy, Coins, Gems, Shop) */}
+        {/* Top Resource & Currency Bar (Map/Board, Energy, Coins, Gems, Shop) */}
         <div className="flex-shrink-0 z-30">
           <ResourceHeader
+            currentTab={currentTab}
+            onToggleRestoration={() => {
+              if (currentTab === 'restoration') {
+                setCurrentTab('game');
+              } else {
+                setCurrentTab('restoration');
+              }
+            }}
             onOpenMyPage={() => setIsMyPageOpen(true)}
             onOpenHelp={() => setIsHelpOpen(true)}
             onOpenResetConfirm={() => setIsResetOpen(true)}
@@ -72,13 +80,14 @@ export const App: React.FC = () => {
               <MergeBoard />
             </div>
 
-            {/* Bottom Stage: 3-Section Navigation Bar (Left Bag/Menu | Center Pill | Right Map Pin) */}
+            {/* Bottom Stage: 3-Section Navigation Bar (Left Bag/Menu | Center Pill | Right MyPage/Settings) */}
             <div className="w-full flex-shrink-0 px-1 pb-[max(0.35rem,env(safe-area-inset-bottom,0.6rem))]">
               <BottomActionBar
                 currentTab={currentTab}
                 onOpenHomeMenu={() => setIsHomeMenuOpen(true)}
                 onGoToBoard={() => setCurrentTab('game')}
                 onGoToRestoration={() => setCurrentTab('restoration')}
+                onOpenMyPage={() => setIsMyPageOpen(true)}
               />
             </div>
           </div>
@@ -96,6 +105,7 @@ export const App: React.FC = () => {
                 onOpenHomeMenu={() => setIsHomeMenuOpen(true)}
                 onGoToBoard={() => setCurrentTab('game')}
                 onGoToRestoration={() => setCurrentTab('restoration')}
+                onOpenMyPage={() => setIsMyPageOpen(true)}
               />
             </div>
           </div>
@@ -113,6 +123,7 @@ export const App: React.FC = () => {
                 onOpenHomeMenu={() => setIsHomeMenuOpen(true)}
                 onGoToBoard={() => setCurrentTab('game')}
                 onGoToRestoration={() => setCurrentTab('restoration')}
+                onOpenMyPage={() => setIsMyPageOpen(true)}
               />
             </div>
           </div>
@@ -130,6 +141,7 @@ export const App: React.FC = () => {
                 onOpenHomeMenu={() => setIsHomeMenuOpen(true)}
                 onGoToBoard={() => setCurrentTab('game')}
                 onGoToRestoration={() => setCurrentTab('restoration')}
+                onOpenMyPage={() => setIsMyPageOpen(true)}
               />
             </div>
           </div>

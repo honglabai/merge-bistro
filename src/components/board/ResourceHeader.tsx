@@ -1,24 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import { Zap, ShoppingCart, Volume2, VolumeX, RotateCcw } from 'lucide-react';
+import { Zap, ShoppingCart, Volume2, VolumeX, RotateCcw, Gamepad2 } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 import { sounds } from '../../utils/soundSynthesizer';
 
 interface ResourceHeaderProps {
-  onOpenMyPage: () => void;
+  currentTab?: 'game' | 'restoration' | 'cookstagram' | 'math';
+  onToggleRestoration?: () => void;
+  onOpenMyPage?: () => void;
   onOpenHelp?: () => void;
   onOpenResetConfirm: () => void;
 }
 
-export const ResourceHeader: React.FC<ResourceHeaderProps> = ({ onOpenMyPage, onOpenHelp, onOpenResetConfirm }) => {
+export const ResourceHeader: React.FC<ResourceHeaderProps> = ({
+  currentTab = 'game',
+  onToggleRestoration,
+  onOpenMyPage,
+  onOpenHelp,
+  onOpenResetConfirm
+}) => {
   const {
     energy,
     maxEnergy,
     coins,
     gems,
-    chefAvatar,
+    stars,
+    restorations,
     freeEnergyRefill,
     rechargeEnergyTick
   } = useGameStore();
+
+  const nextRestorationNode = restorations.find(r => !r.isRestored);
+  const canRestore = nextRestorationNode && stars >= nextRestorationNode.costStars;
 
   const [soundOn, setSoundOn] = useState(sounds.enabled);
   const [secondsUntilRecharge, setSecondsUntilRecharge] = useState(45);
@@ -51,24 +63,33 @@ export const ResourceHeader: React.FC<ResourceHeaderProps> = ({ onOpenMyPage, on
     <header className="bg-gradient-to-b from-[#1b5853] via-[#104e49] to-[#0c433e] text-white px-1.5 sm:px-3 pt-[max(8px,env(safe-area-inset-top,8px))] pb-2 select-none border-b border-[#1b6b63]/60 shadow-md">
       <div className="max-w-[500px] mx-auto flex items-center justify-between gap-1 sm:gap-2">
         
-        {/* Profile Avatar with Golden Level Badge - Click to Open My Page & Settings */}
-        <div
-          className="relative flex-shrink-0 cursor-pointer group active:scale-95 transition-transform"
-          onClick={onOpenMyPage}
-          title="마이페이지 & 설정"
+        {/* Top-Left: Map / Town Restoration Button (Swapped from Bottom-Right) */}
+        <button
+          onClick={onToggleRestoration}
+          title={currentTab === 'restoration' ? '머지 보드로 복귀' : '식당 & 유적 복원 맵으로 이동'}
+          className="relative w-10 h-10 sm:w-11 sm:h-11 p-0 bg-transparent border-0 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0 cursor-pointer drop-shadow-md"
         >
-          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-tr from-amber-300 via-rose-300 to-sky-300 p-0.5 shadow-md overflow-hidden border-2 border-white group-hover:ring-2 group-hover:ring-amber-300 transition-all">
-            <img
-              src={chefAvatar || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80"}
-              alt="Chef Avatar"
-              className="w-full h-full object-cover rounded-full"
-            />
-          </div>
-          {/* Level Star Badge */}
-          <div className="absolute -bottom-1 -left-1 bg-gradient-to-br from-amber-400 to-amber-600 text-white font-black text-[9px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-md">
-            49
-          </div>
-        </div>
+          {currentTab === 'restoration' ? (
+            <div className="w-full h-full rounded-full bg-gradient-to-b from-amber-500 to-orange-600 border-2 border-white shadow-md flex flex-col items-center justify-center text-white">
+              <Gamepad2 className="w-5 h-5 drop-shadow" />
+              <span className="text-[8px] font-black -mt-0.5 tracking-tighter">보드</span>
+            </div>
+          ) : (
+            <>
+              <img
+                src="/extracted/btn_map_clean.png"
+                alt="Map"
+                className="w-full h-full object-contain filter drop-shadow-sm"
+              />
+              {/* Notification ping badge if restoration is ready */}
+              {canRestore && (
+                <div className="absolute -top-1 -right-1 bg-rose-500 text-white font-black text-[8px] px-1 py-0.2 rounded-full flex items-center justify-center border border-white shadow animate-bounce">
+                  ⭐UP!
+                </div>
+              )}
+            </>
+          )}
+        </button>
 
         {/* Energy Pill Button (Click to Refill Energy) */}
         <div className="flex flex-col items-center">

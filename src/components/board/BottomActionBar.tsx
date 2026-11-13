@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, Archive, Sparkles, X, Gamepad2, Hammer, MapPin } from 'lucide-react';
+import { Trash2, Archive, Sparkles, X, Gamepad2, Hammer, MapPin, Settings } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 import { getItemDef, ITEM_CHAINS } from '../../data/itemsData';
 import { ItemGraphic } from '../ui/ItemGraphic';
@@ -9,13 +9,15 @@ interface BottomActionBarProps {
   onOpenHomeMenu: () => void;
   onGoToBoard: () => void;
   onGoToRestoration: () => void;
+  onOpenMyPage: () => void;
 }
 
 export const BottomActionBar: React.FC<BottomActionBarProps> = ({
   currentTab,
   onOpenHomeMenu,
   onGoToBoard,
-  onGoToRestoration
+  onGoToRestoration,
+  onOpenMyPage
 }) => {
   const {
     board,
@@ -25,7 +27,8 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
     inventoryPocket,
     retrieveFromInventory,
     stars,
-    restorations
+    restorations,
+    chefAvatar
   } = useGameStore();
 
   const [isBackpackDrawerOpen, setIsBackpackDrawerOpen] = useState(false);
@@ -38,22 +41,12 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
   const isGen = item?.isGenerator;
   const sellPrice = itemDef?.sellPrice || 1;
   const occupiedBackpackCount = inventoryPocket.filter(Boolean).length;
-  const nextRestorationNode = restorations.find(r => !r.isRestored);
-  const canRestore = nextRestorationNode && stars >= nextRestorationNode.costStars;
 
   const handleLeftButtonClick = () => {
     if (currentTab !== 'game') {
       onGoToBoard();
     } else {
       onOpenHomeMenu();
-    }
-  };
-
-  const handleRightButtonClick = () => {
-    if (currentTab === 'restoration') {
-      onGoToBoard();
-    } else {
-      onGoToRestoration();
     }
   };
 
@@ -213,32 +206,27 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
           )}
         </div>
 
-        {/* Right: Round Map / Restoration Button */}
+        {/* Right: Settings & My Page Button (Swapped from Top-Left) */}
         <button
-          onClick={handleRightButtonClick}
-          title={currentTab === 'restoration' ? '머지 보드로 복귀' : '2. 식당 & 유적 복원 맵으로 이동'}
+          onClick={onOpenMyPage}
+          title="마이페이지 & 게임 설정"
           className="relative w-11 h-11 sm:w-12 sm:h-12 p-0 bg-transparent border-0 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0 cursor-pointer drop-shadow-md"
         >
-          {currentTab === 'restoration' ? (
-            <div className="w-full h-full rounded-full bg-gradient-to-b from-amber-500 to-orange-600 border-2 border-white shadow-md flex flex-col items-center justify-center text-white">
-              <Gamepad2 className="w-5 h-5 drop-shadow" />
-              <span className="text-[8px] font-black -mt-0.5 tracking-tighter">보드</span>
-            </div>
-          ) : (
-            <>
-              <img
-                src="/extracted/btn_map_clean.png"
-                alt="Map"
-                className="w-full h-full object-contain filter drop-shadow-sm"
-              />
-              {/* Notification ping badge if restoration is ready */}
-              {canRestore && (
-                <div className="absolute -top-1 -right-1 bg-rose-500 text-white font-black text-[8px] px-1 py-0.2 rounded-full flex items-center justify-center border border-white shadow animate-bounce">
-                  ⭐UP!
-                </div>
-              )}
-            </>
-          )}
+          <div className="w-full h-full rounded-full bg-gradient-to-tr from-amber-300 via-rose-300 to-sky-300 p-0.5 shadow-md overflow-hidden border-2 border-white hover:ring-2 hover:ring-amber-300 transition-all">
+            <img
+              src={chefAvatar || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80"}
+              alt="Chef Avatar"
+              className="w-full h-full object-cover rounded-full"
+            />
+          </div>
+          {/* Level Star Badge */}
+          <div className="absolute -bottom-1 -left-1 bg-gradient-to-br from-amber-400 to-amber-600 text-white font-black text-[9px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-md">
+            49
+          </div>
+          {/* Settings Gear Badge */}
+          <div className="absolute -top-1 -right-1 bg-stone-800 text-white p-0.5 rounded-full border border-white shadow flex items-center justify-center">
+            <Settings className="w-2.5 h-2.5 text-amber-300" />
+          </div>
         </button>
 
       </div>
