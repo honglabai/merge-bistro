@@ -13,12 +13,14 @@ import { ResetConfirmModal } from './components/modals/ResetConfirmModal';
 import { HelpGuideModal } from './components/modals/HelpGuideModal';
 import { HomeMenuModal } from './components/modals/HomeMenuModal';
 import { MyPageModal } from './components/modals/MyPageModal';
+import { ShopMarketModal } from './components/modals/ShopMarketModal';
 import { Toast } from './components/ui/Toast';
 import { ParticleCanvas } from './components/ui/ParticleCanvas';
 
 export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<'game' | 'restoration' | 'cookstagram' | 'math'>('game');
   const [isMyPageOpen, setIsMyPageOpen] = useState(false);
+  const [isShopOpen, setIsShopOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isResetOpen, setIsResetOpen] = useState(false);
   const [isHomeMenuOpen, setIsHomeMenuOpen] = useState(false);
@@ -61,6 +63,7 @@ export const App: React.FC = () => {
               }
             }}
             onOpenMyPage={() => setIsMyPageOpen(true)}
+            onOpenShop={() => setIsShopOpen(true)}
             onOpenHelp={() => setIsHelpOpen(true)}
             onOpenResetConfirm={() => setIsResetOpen(true)}
           />
@@ -168,6 +171,7 @@ export const App: React.FC = () => {
         onClose={() => setIsMyPageOpen(false)}
         onOpenResetConfirm={() => setIsResetOpen(true)}
       />
+      <ShopMarketModal isOpen={isShopOpen} onClose={() => setIsShopOpen(false)} />
       <Toast />
 
     </div>

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import confetti from 'canvas-confetti';
-import { BoardCell, BoardItem, CustomerOrder, RestorationNode, CookstagramPost } from '../types/gameSchema';
+import { BoardCell, BoardItem, CustomerOrder, RestorationNode, CookstagramPost, ItemChainId } from '../types/gameSchema';
 import { createInitialBoard } from '../data/initialBoardData';
 import { INITIAL_ORDERS, ORDER_POOL, RESTORATION_NODES } from '../data/ordersAndMetaData';
 import { COOKSTAGRAM_POSTS } from '../data/storyAndCookstagramData';
@@ -55,8 +55,12 @@ interface GameState {
   moveSelectedToInventory: () => void;
   retrieveFromInventory: (pocketIdx: number) => void;
   freeEnergyRefill: () => void;
+  addEnergy: (amount: number) => void;
   addCoins: (amount: number) => void;
+  spendCoins: (amount: number) => boolean;
   addGems: (amount: number) => void;
+  spendGems: (amount: number) => boolean;
+  buyItemToBoard: (chainId: ItemChainId, level: number, costCoins: number, costGems: number, itemName: string) => boolean;
   setChefProfile: (name: string, avatar: string, title?: string) => void;
   showToast: (msg: string) => void;
   resetGame: () => void;
@@ -766,6 +770,18 @@ export const useGameStore = create<GameState>((set, get) => ({
     saveState(get());
   },
 
+  spendCoins: (amount: number) => {
+    const state = get();
+    if (state.coins < amount) {
+      sounds.playErrorSound();
+      state.showToast('🪙 코인이 부족합니다!');
+      return false;
+    }
+    set({ coins: state.coins - amount });
+    saveState(get());
+    return true;
+  },
+
   addGems: (amount: number) => {
     const state = get();
     sounds.playTapSound();
@@ -774,6 +790,76 @@ export const useGameStore = create<GameState>((set, get) => ({
       gems: state.gems + amount
     });
     saveState(get());
+  },
+
+  spendGems: (amount: number) => {
+    const state = get();
+    if (state.gems < amount) {
+      sounds.playErrorSound();
+      state.showToast('💎 보석이 부족합니다!');
+      return false;
+    }
+    set({ gems: state.gems - amount });
+    saveState(get());
+    return true;
+  },
+
+  addEnergy: (amount: number) => {
+    const state = get();
+    sounds.playTapSound();
+    const newEnergy = Math.min(state.energy + amount, state.maxEnergy + 200);
+    set({ energy: newEnergy });
+    state.showToast(`+${amount}⚡ 에너지 충전 완료!`);
+    saveState(get());
+  },
+
+  buyItemToBoard: (chainId: ItemChainId, level: number, costCoins: number, costGems: number, itemName: string) => {
+    const state = get();
+    if (costCoins > 0 && state.coins < costCoins) {
+      sounds.playErrorSound();
+      state.showToast('🪙 코인이 부족합니다!');
+      return false;
+    }
+    if (costGems > 0 && state.gems < costGems) {
+      sounds.playErrorSound();
+      state.showToast('💎 보석이 부족합니다!');
+      return false;
+    }
+    const emptyCell = state.board.find(c => c.state === 'OPEN' && !c.item);
+    if (!emptyCell) {
+      sounds.playErrorSound();
+      state.showToast('⚠️ 보드 공간이 가득 찼습니다! 아이템을 정리하거나 보석함에 넣으세요.');
+      return false;
+    }
+
+    const newBoard = [...state.board];
+    const targetCell = { ...newBoard[emptyCell.index] };
+    targetCell.item = {
+      id: `item-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      chainId,
+      level,
+      isGenerator: false
+    };
+    newBoard[emptyCell.index] = targetCell;
+
+    sounds.playOrderComplete();
+
+    if (typeof document !== 'undefined') {
+      const el = document.getElementById(`tile-${emptyCell.index}`);
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        emitMergeParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#F59E0B');
+      }
+    }
+
+    set({
+      board: newBoard,
+      coins: state.coins - costCoins,
+      gems: state.gems - costGems
+    });
+    saveState(get());
+    state.showToast(`🎉 [${itemName}] 배송 완료! 보드에 생성되었습니다.`);
+    return true;
   },
 
   setChefProfile: (name: string, avatar: string, title?: string) => {

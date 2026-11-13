@@ -247,8 +247,7 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
           <div className="bg-white p-3.5 rounded-2xl border-2 border-slate-200 shadow-xs space-y-2">
             <div className="flex justify-between items-center px-0.5">
               <span className="text-xs font-black text-slate-700 flex items-center gap-1.5">
-                <Archive className="w-4 h-4 text-amber-600" />
-                셰프 보관함 ({occupiedBackpackCount}/4)
+                💎 셰프 보석함 ({occupiedBackpackCount}/4)
               </span>
               <span className="text-[10px] text-slate-400 font-semibold">
                 클릭 시 보드로 복귀

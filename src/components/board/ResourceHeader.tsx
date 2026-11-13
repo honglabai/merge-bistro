@@ -7,6 +7,7 @@ interface ResourceHeaderProps {
   currentTab?: 'game' | 'restoration' | 'cookstagram' | 'math';
   onToggleRestoration?: () => void;
   onOpenMyPage?: () => void;
+  onOpenShop?: () => void;
   onOpenHelp?: () => void;
   onOpenResetConfirm: () => void;
 }
@@ -15,6 +16,7 @@ export const ResourceHeader: React.FC<ResourceHeaderProps> = ({
   currentTab = 'game',
   onToggleRestoration,
   onOpenMyPage,
+  onOpenShop,
   onOpenHelp,
   onOpenResetConfirm
 }) => {
@@ -135,13 +137,17 @@ export const ResourceHeader: React.FC<ResourceHeaderProps> = ({
         </button>
 
         {/* Shop Cart & Sound Menu */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 sm:gap-1.5">
+          {/* Circular Shopping Cart Button (Matches corner circular buttons) */}
           <button
-            onClick={onOpenHelp}
-            title="상점 & 이벤트"
-            className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-amber-400 via-amber-500 to-orange-500 border-2 border-amber-200 text-white flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-transform"
+            onClick={onOpenShop || onOpenHelp}
+            title="비스트로 아이템 장터"
+            className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-tr from-amber-400 via-amber-500 to-orange-500 border-2 border-white text-white flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-transform flex-shrink-0 cursor-pointer drop-shadow-md"
           >
-            <ShoppingCart className="w-4 h-4 text-white drop-shadow" />
+            <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow" />
+            <span className="absolute -top-1 -right-1 bg-rose-500 text-white font-black text-[8px] px-1 py-0.2 rounded-full border border-white shadow">
+              장터
+            </span>
           </button>
 
           <button

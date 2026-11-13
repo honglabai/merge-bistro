@@ -58,7 +58,7 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
         <div className="mb-2 bg-[#d5e7ff] p-3 rounded-2xl border-2 border-[#8eb3d9] shadow-xl animate-bounceSubtle">
           <div className="flex justify-between items-center mb-2 px-1">
             <span className="text-xs font-black text-slate-800 flex items-center gap-1">
-              🧳 셰프 보관함 ({occupiedBackpackCount}/4)
+              💎 셰프 보석함 ({occupiedBackpackCount}/4)
             </span>
             <button
               onClick={() => setIsBackpackDrawerOpen(false)}
@@ -97,17 +97,17 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
       {/* Main 3-Section Bottom Bar matching reference screenshot (Compact) */}
       <div className="flex items-center justify-between gap-1.5 px-1">
         
-        {/* Left: Round Backpack Button (Board) or Home Button (Other screens) */}
+        {/* Left: Round Jewelbox Button (Board) or Home Button (Other screens) */}
         <button
           onClick={handleLeftButtonClick}
-          title={currentTab === 'game' ? '홈 메뉴 및 보관함 열기' : '1. 머지 보드로 복귀'}
+          title={currentTab === 'game' ? '보석함 (보관함) & 메뉴 열기' : '1. 머지 보드로 복귀'}
           className="relative w-11 h-11 sm:w-12 sm:h-12 p-0 bg-transparent border-0 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0 cursor-pointer drop-shadow-md"
         >
           {currentTab === 'game' ? (
             <>
               <img
-                src="/extracted/btn_backpack_clean.png"
-                alt="Backpack"
+                src="/extracted/btn_jewelbox_clean.png"
+                alt="Jewel Box"
                 className="w-full h-full object-contain filter drop-shadow-sm"
               />
               {/* Badge */}
