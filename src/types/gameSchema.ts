@@ -48,6 +48,17 @@ export interface CustomerOrder {
   targetLevel: number;
   rewardCoins: number;
   rewardStars: number;
+  isVIP?: boolean;
+  timeLeft?: number; // VIP countdown seconds
+  rewardGems?: number; // VIP bonus gems
+}
+
+export interface LuckyBubble {
+  id: string;
+  cellIndex: number;
+  item: BoardItem;
+  createdAt: number;
+  expiresAt: number;
 }
 
 export interface RestorationStyle {

@@ -31,6 +31,12 @@ export const App: React.FC = () => {
   useEffect(() => {
     setIsMounted(true);
     init();
+
+    const loopTimer = setInterval(() => {
+      useGameStore.getState().tickGameLoop();
+    }, 1000);
+
+    return () => clearInterval(loopTimer);
   }, [init]);
 
   if (!isMounted) {

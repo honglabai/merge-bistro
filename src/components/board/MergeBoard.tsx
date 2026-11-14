@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Lock, Sparkles } from 'lucide-react';
+import { Zap, Lock, Sparkles, Flame } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 import { ItemGraphic } from '../ui/ItemGraphic';
 
@@ -11,7 +11,12 @@ export const MergeBoard: React.FC = () => {
     dragOverIndex,
     setDragOverIndex,
     handleTileClick,
-    mergeOrMoveTile
+    mergeOrMoveTile,
+    comboCount,
+    isFeverActive,
+    feverTimeLeft,
+    luckyBubbles,
+    popLuckyBubble
   } = useGameStore();
 
   const [draggingIdx, setDraggingIdx] = useState<number | null>(null);
@@ -103,21 +108,40 @@ export const MergeBoard: React.FC = () => {
       ref={containerRef}
       className="w-full h-full flex items-center justify-center select-none touch-none px-0 sm:px-1 overflow-hidden"
     >
-      {/* 7x9 = 63 Exact Mathematical 1:1 Square Checkerboard Grid */}
-      <div
-        className="box-content rounded-2xl overflow-hidden shadow-2xl mx-auto flex-shrink-0 border-2 border-[#166d62]/80 ring-1 ring-black/15"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(7, ${boardSize.tileSize}px)`,
-          gridTemplateRows: `repeat(9, ${boardSize.tileSize}px)`,
-          width: `${boardSize.width}px`,
-          height: `${boardSize.height}px`,
-          gap: 0
-        }}
-      >
+      <div className="relative flex-shrink-0">
+        
+        {/* Floating Combo / Fever Status Badge */}
+        {isFeverActive ? (
+          <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-30 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-white font-black text-[11px] px-3 py-0.5 rounded-full shadow-lg border-2 border-white flex items-center gap-1.5 animate-bounce">
+            <Flame className="w-3.5 h-3.5 text-amber-200 fill-amber-200 animate-pulse" />
+            <span>FEVER! 에너지 0 소모 ({feverTimeLeft}s)</span>
+          </div>
+        ) : comboCount >= 2 ? (
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-30 bg-gradient-to-r from-rose-500 via-amber-500 to-orange-500 text-white font-black text-[10px] px-2.5 py-0.5 rounded-full shadow-md border-2 border-white flex items-center gap-1 animate-pulse">
+            <span>🔥 COMBO x{comboCount}!</span>
+          </div>
+        ) : null}
+
+        {/* 7x9 = 63 Exact Mathematical 1:1 Square Checkerboard Grid */}
+        <div
+          className={`box-content rounded-2xl overflow-hidden shadow-2xl mx-auto flex-shrink-0 border-2 transition-all duration-300 ${
+            isFeverActive
+              ? 'border-amber-400 ring-4 ring-amber-300 shadow-[0_0_25px_rgba(245,158,11,0.9)] animate-pulse'
+              : 'border-[#166d62]/80 ring-1 ring-black/15'
+          }`}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(7, ${boardSize.tileSize}px)`,
+            gridTemplateRows: `repeat(9, ${boardSize.tileSize}px)`,
+            width: `${boardSize.width}px`,
+            height: `${boardSize.height}px`,
+            gap: 0
+          }}
+        >
         {board.map(cell => {
           const isSelected = selectedTileIndex === cell.index;
           const isGen = cell.item?.isGenerator;
+          const bubble = luckyBubbles.find(b => b.cellIndex === cell.index);
 
           // 7 columns grid calculation
           const row = Math.floor(cell.index / 7);
@@ -246,9 +270,37 @@ export const MergeBoard: React.FC = () => {
                   </motion.div>
                 </AnimatePresence>
               )}
+              {/* Lucky Mystery Bubble Overlay */}
+              {bubble && (
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    popLuckyBubble(bubble.id);
+                  }}
+                  title="터치하여 럭키 버블 터뜨리기!"
+                  className="absolute inset-0 z-30 flex items-center justify-center cursor-pointer pointer-events-auto"
+                >
+                  <div className="w-[94%] h-[94%] rounded-full bg-gradient-to-tr from-sky-400/50 via-pink-400/50 to-amber-300/60 border-2 border-white/95 shadow-[0_0_12px_rgba(236,72,153,0.9)] backdrop-blur-[1px] flex items-center justify-center relative animate-pulse">
+                    <div className="w-[75%] h-[75%] opacity-90 animate-bounceSubtle">
+                      <ItemGraphic
+                        chainId={bubble.item.chainId}
+                        level={bubble.item.level}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    {/* Bubble shine reflection */}
+                    <div className="absolute top-1 left-2 w-2 h-2 rounded-full bg-white/90" />
+                    {/* Bubble POP text badge */}
+                    <div className="absolute -bottom-1 bg-pink-600 text-white font-black text-[8px] px-1.5 py-0.2 rounded-full border border-white shadow">
+                      POP!
+                    </div>
+                  </div>
+                </div>
+              )}
             </motion.div>
           );
         })}
+      </div>
       </div>
     </div>
   );

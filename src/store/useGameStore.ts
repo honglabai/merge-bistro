@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import confetti from 'canvas-confetti';
-import { BoardCell, BoardItem, CustomerOrder, RestorationNode, CookstagramPost, ItemChainId } from '../types/gameSchema';
+import { BoardCell, BoardItem, CustomerOrder, RestorationNode, CookstagramPost, ItemChainId, LuckyBubble } from '../types/gameSchema';
 import { createInitialBoard } from '../data/initialBoardData';
 import { INITIAL_ORDERS, ORDER_POOL, RESTORATION_NODES } from '../data/ordersAndMetaData';
 import { COOKSTAGRAM_POSTS } from '../data/storyAndCookstagramData';
@@ -34,10 +34,21 @@ interface GameState {
   currentDialogue: { speaker: string; avatar: string; text: string }[] | null;
   dialogueIndex: number;
   pendingRestorationNode: RestorationNode | null;
+  comboCount: number;
+  lastMergeTime: number;
+  isFeverActive: boolean;
+  feverTimeLeft: number;
+  luckyBubbles: LuckyBubble[];
+  vipRushOrder: CustomerOrder | null;
+  vipCountdown: number;
 
   // Actions
   init: () => void;
   rechargeEnergyTick: () => void;
+  tickGameLoop: () => void;
+  popLuckyBubble: (bubbleId: string) => void;
+  triggerFeverMode: (durationSec?: number) => void;
+  spawnVIPRushOrder: () => void;
   selectTile: (index: number | null) => void;
   setDragOverIndex: (index: number | null) => void;
   handleTileClick: (index: number) => void;
@@ -90,6 +101,13 @@ export const useGameStore = create<GameState>((set, get) => ({
   currentDialogue: null,
   dialogueIndex: 0,
   pendingRestorationNode: null,
+  comboCount: 0,
+  lastMergeTime: 0,
+  isFeverActive: false,
+  feverTimeLeft: 0,
+  luckyBubbles: [],
+  vipRushOrder: null,
+  vipCountdown: 45,
 
   init: () => {
     let recoveredOfflineEnergy = 0;
@@ -303,8 +321,9 @@ export const useGameStore = create<GameState>((set, get) => ({
     const cell = state.board[index];
     if (!cell || !cell.item || !cell.item.isGenerator || cell.state !== 'OPEN') return;
 
-    const cost = state.superchargeMultiplier;
-    if (state.energy < cost) {
+    const isFreeFever = state.isFeverActive;
+    const cost = isFreeFever ? 0 : state.superchargeMultiplier;
+    if (!isFreeFever && state.energy < cost) {
       sounds.playErrorSound();
       state.showToast(`⚡ 에너지가 부족합니다! (필요: ${cost}E)`);
       return;
@@ -346,7 +365,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
     }
 
-    const newEnergy = state.energy - cost;
+    const newEnergy = isFreeFever ? state.energy : state.energy - cost;
     set({
       board: newBoard,
       energy: newEnergy,
@@ -449,6 +468,46 @@ export const useGameStore = create<GameState>((set, get) => ({
         }
       }
 
+      // Combo System
+      const now = Date.now();
+      const isQuickMerge = now - state.lastMergeTime < 2800;
+      const newCombo = isQuickMerge ? state.comboCount + 1 : 1;
+      let extraCoins = 0;
+
+      if (state.isFeverActive) {
+        extraCoins += 10;
+      } else if (newCombo >= 2) {
+        extraCoins += newCombo * 2;
+        sounds.playCombo(newCombo);
+      }
+
+      // Check Fever Trigger at 5 combos
+      let newFeverActive = state.isFeverActive;
+      let newFeverTime = state.feverTimeLeft;
+      if (newCombo >= 5 && !state.isFeverActive) {
+        newFeverActive = true;
+        newFeverTime = 15;
+        sounds.playOrderComplete();
+        confetti({
+          particleCount: 70,
+          spread: 80,
+          origin: { y: 0.5 }
+        });
+      }
+
+      // Lucky Mystery Bubble System (28% chance on Lv.3+ merge, max 3 bubbles)
+      const updatedBubbles = [...state.luckyBubbles];
+      if (nextLevel >= 3 && Math.random() < 0.28 && updatedBubbles.length < 3) {
+        const bubbleId = `bubble-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+        updatedBubbles.push({
+          id: bubbleId,
+          cellIndex: dest.index,
+          item: { ...dest.item },
+          createdAt: now,
+          expiresAt: now + 30000
+        });
+      }
+
       if (nextLevel >= 4) {
         confetti({
           particleCount: 25 + nextLevel * 4,
@@ -458,13 +517,27 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
 
       const mergedDef = getItemDef(dest.item.chainId, nextLevel);
-      if (unlockedCount > 0) {
+      if (newCombo >= 5 && !state.isFeverActive) {
+        state.showToast('🔥 5연속 콤보 달성! 15초간 피버 타임 발동! (에너지 소모 0)');
+      } else if (newCombo >= 2 && !state.isFeverActive) {
+        state.showToast(`🔥 COMBO x${newCombo}! +${extraCoins}🪙 보너스 골드!`);
+      } else if (unlockedCount > 0) {
         state.showToast(`🎉 합성 성공! [Lv.${nextLevel} ${mergedDef?.name || '아이템'}] & 🕸️ 거미줄 ${unlockedCount}곳 해금!`);
       } else {
         state.showToast(`🎉 합성 성공! [Lv.${nextLevel} ${mergedDef?.name || '아이템'}] 탄생!`);
       }
 
-      set({ board: newBoard, selectedTileIndex: null, dragOverIndex: null });
+      set({
+        board: newBoard,
+        coins: state.coins + extraCoins,
+        comboCount: newCombo,
+        lastMergeTime: now,
+        isFeverActive: newFeverActive,
+        feverTimeLeft: newFeverTime,
+        luckyBubbles: updatedBubbles,
+        selectedTileIndex: null,
+        dragOverIndex: null
+      });
       saveState(get());
       return;
     }
@@ -517,7 +590,8 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   fulfillOrder: (orderId: string) => {
     const state = get();
-    const order = state.orders.find(o => o.id === orderId);
+    const isVipMatch = state.vipRushOrder?.id === orderId;
+    const order = isVipMatch ? state.vipRushOrder : state.orders.find(o => o.id === orderId);
     if (!order) return;
 
     const matchingCell = state.board.find(
@@ -534,6 +608,29 @@ export const useGameStore = create<GameState>((set, get) => ({
     const newCoins = state.coins + order.rewardCoins;
     const newStars = state.stars + order.rewardStars;
     const newFollowers = state.followers + Math.floor(order.rewardStars * 6);
+
+    // VIP Order fulfillment
+    if (order.isVIP || isVipMatch) {
+      const extraGems = order.rewardGems || 3;
+      sounds.playRestorationFanfare();
+      confetti({
+        particleCount: 90,
+        spread: 80,
+        origin: { y: 0.5 }
+      });
+      state.showToast(`👑 [VIP 특급 성공!] +${order.rewardCoins}🪙 +${order.rewardStars}⭐ +${extraGems}💎 보석 획득!`);
+      set({
+        board: newBoard,
+        coins: newCoins,
+        stars: newStars,
+        gems: state.gems + extraGems,
+        followers: newFollowers + 50,
+        vipRushOrder: null,
+        vipCountdown: 90
+      });
+      saveState(get());
+      return;
+    }
 
     sounds.playOrderComplete();
     confetti({
@@ -873,6 +970,183 @@ export const useGameStore = create<GameState>((set, get) => ({
     set(updated);
     saveState(get());
     state.showToast('✨ 셰프 프로필이 업데이트되었습니다!');
+  },
+
+  triggerFeverMode: (durationSec = 15) => {
+    sounds.playRestorationFanfare();
+    confetti({
+      particleCount: 80,
+      spread: 90,
+      origin: { y: 0.5 }
+    });
+    set({
+      isFeverActive: true,
+      feverTimeLeft: durationSec
+    });
+    get().showToast('🔥 BISTRO FEVER! 15초간 에너지 소모 0 & 보너스 골드 폭포!');
+  },
+
+  popLuckyBubble: (bubbleId: string) => {
+    const state = get();
+    const bubble = state.luckyBubbles.find(b => b.id === bubbleId);
+    if (!bubble) return;
+
+    sounds.playBubblePop();
+    if (typeof document !== 'undefined') {
+      const el = document.getElementById(`tile-${bubble.cellIndex}`);
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        emitMergeParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#EC4899');
+      }
+    }
+
+    const roll = Math.random();
+    const emptyCell = state.board.find(c => c.state === 'OPEN' && !c.item);
+    let toastMsg = '';
+    let newBoard = state.board;
+    let extraEnergy = 0;
+    let extraCoins = 0;
+    let extraGems = 0;
+
+    if (roll < 0.45 && emptyCell) {
+      newBoard = [...state.board];
+      const target = { ...newBoard[emptyCell.index] };
+      target.item = {
+        id: `bubble-item-${Date.now()}`,
+        chainId: bubble.item.chainId,
+        level: bubble.item.level,
+        isGenerator: false
+      };
+      newBoard[emptyCell.index] = target;
+      const def = getItemDef(bubble.item.chainId, bubble.item.level);
+      toastMsg = `🫧 럭키 버블 팝! [Lv.${bubble.item.level} ${def?.name}] 무료 복사!`;
+    } else if (roll < 0.75) {
+      extraEnergy = 25;
+      toastMsg = '🫧 럭키 버블 팝! +25⚡ 에너지 잭팟 획득!';
+    } else {
+      extraCoins = 60;
+      extraGems = 2;
+      toastMsg = '🫧 럭키 버블 팝! +60🪙 코인 & +2💎 보석 잭팟!';
+    }
+
+    set({
+      board: newBoard,
+      energy: Math.min(state.energy + extraEnergy, state.maxEnergy + 200),
+      coins: state.coins + extraCoins,
+      gems: state.gems + extraGems,
+      luckyBubbles: state.luckyBubbles.filter(b => b.id !== bubbleId)
+    });
+    saveState(get());
+    state.showToast(toastMsg);
+  },
+
+  spawnVIPRushOrder: () => {
+    const state = get();
+    if (state.vipRushOrder) return;
+
+    const vipCustomers = [
+      {
+        name: '미식가 사자 공작 레오',
+        avatar: '🦁',
+        role: '황실 수석 미식 평론가',
+        quote: '소문을 듣고 찾아왔네! 2분 안에 최고의 요리를 대접해주게!'
+      },
+      {
+        name: '황금 고양이 국왕 펠릭스',
+        avatar: '👑',
+        role: '바닷마을 왕국 통치자',
+        quote: '국왕의 혀를 만족시킬 디저트를 어서 내오너라냥!'
+      },
+      {
+        name: '비스트로 마스터 펭귄 핀',
+        avatar: '🐧',
+        role: '남극 미슐랭 심사위원',
+        quote: '신선함이 생명! 제한 시간 내에 완벽한 커피를 부탁해!'
+      }
+    ];
+
+    const chosenVip = vipCustomers[Math.floor(Math.random() * vipCustomers.length)];
+    const chains: ItemChainId[] = ['bakery', 'cafe', 'seafood', 'garden'];
+    const randomChain = chains[Math.floor(Math.random() * chains.length)];
+    const targetLevel = 3 + Math.floor(Math.random() * 2);
+
+    const vipOrder: CustomerOrder = {
+      id: `vip-order-${Date.now()}`,
+      customerId: `vip-${Date.now()}`,
+      customerName: chosenVip.name,
+      customerAvatar: chosenVip.avatar,
+      customerRole: chosenVip.role,
+      customerQuote: chosenVip.quote,
+      targetChainId: randomChain,
+      targetLevel,
+      rewardCoins: 350 + targetLevel * 50,
+      rewardStars: 16 + targetLevel * 4,
+      rewardGems: 3,
+      isVIP: true,
+      timeLeft: 120
+    };
+
+    set({
+      vipRushOrder: vipOrder,
+      vipCountdown: 120
+    });
+    sounds.playRestorationFanfare();
+    state.showToast(`🚨 [돌발 VIP 주문!] ${chosenVip.name} 도착! (제한시간 2분)`);
+  },
+
+  tickGameLoop: () => {
+    const state = get();
+    const now = Date.now();
+
+    // 1. Combo timeout reset
+    let newCombo = state.comboCount;
+    if (newCombo > 0 && now - state.lastMergeTime >= 3000) {
+      newCombo = 0;
+    }
+
+    // 2. Fever countdown
+    let newFeverActive = state.isFeverActive;
+    let newFeverTime = state.feverTimeLeft;
+    if (newFeverActive) {
+      newFeverTime -= 1;
+      if (newFeverTime <= 0) {
+        newFeverActive = false;
+        newFeverTime = 0;
+        state.showToast('✨ 피버 타임이 종료되었습니다.');
+      }
+    }
+
+    // 3. Clean up expired lucky bubbles
+    const validBubbles = state.luckyBubbles.filter(b => b.expiresAt > now);
+
+    // 4. VIP timer & spawn
+    let vipOrder = state.vipRushOrder;
+    let vipCountdown = state.vipCountdown;
+    if (vipOrder && vipOrder.timeLeft !== undefined) {
+      const nextTime = vipOrder.timeLeft - 1;
+      if (nextTime <= 0) {
+        vipOrder = null;
+        vipCountdown = 90;
+        state.showToast('🚨 VIP 손님이 시간이 지나 자리를 떴습니다.');
+      } else {
+        vipOrder = { ...vipOrder, timeLeft: nextTime };
+      }
+    } else {
+      vipCountdown -= 1;
+      if (vipCountdown <= 0) {
+        state.spawnVIPRushOrder();
+        return;
+      }
+    }
+
+    set({
+      comboCount: newCombo,
+      isFeverActive: newFeverActive,
+      feverTimeLeft: newFeverTime,
+      luckyBubbles: validBubbles,
+      vipRushOrder: vipOrder,
+      vipCountdown
+    });
   },
 
   showToast: (msg: string) => {
