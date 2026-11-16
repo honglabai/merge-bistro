@@ -100,10 +100,10 @@ export const StylePickerModal: React.FC = () => {
           </div>
           <button
             onClick={() => confirmRestoration(node.id, selectedStyleIndex)}
-            className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-terracotta-500 hover:from-amber-600 hover:to-terracotta-600 text-white font-black text-xs sm:text-sm shadow-md flex items-center gap-2 active:scale-95 transition-all"
+            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-terracotta-500 hover:from-amber-600 hover:to-terracotta-600 text-white font-black text-xs shadow-md flex items-center gap-1.5 active:scale-95 transition-all whitespace-nowrap flex-shrink-0"
           >
-            <Sparkles className="w-4 h-4" />
-            <span>선택한 스타일로 복원 확정</span>
+            <Sparkles className="w-3.5 h-3.5 flex-shrink-0" />
+            <span className="whitespace-nowrap">스타일 복원 확정</span>
           </button>
         </div>
 

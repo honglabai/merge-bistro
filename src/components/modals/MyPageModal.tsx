@@ -231,20 +231,20 @@ export const MyPageModal: React.FC<MyPageModalProps> = ({
         </div>
 
         {/* 4 Navigation Tabs */}
-        <div className="flex items-center bg-[#ECE4D8] border-b border-[#D4A373]/40 px-2 pt-2 gap-1 overflow-x-auto no-scrollbar">
+        <div className="flex items-center bg-[#ECE4D8] border-b border-[#D4A373]/40 px-1 pt-1.5 gap-1 overflow-x-auto no-scrollbar">
           <button
             onClick={() => {
               setActiveTab('profile');
               sounds.playTapSound();
             }}
-            className={`flex-1 min-w-[70px] py-2 px-1.5 text-xs font-black rounded-t-xl flex items-center justify-center gap-1.5 transition-all ${
+            className={`flex-1 py-1.5 px-1 text-[11px] font-black rounded-t-xl flex items-center justify-center gap-1 transition-all whitespace-nowrap ${
               activeTab === 'profile'
                 ? 'bg-[#FAF7F2] text-[#4E342E] border-t-2 border-x-2 border-[#8C6239] shadow-xs'
                 : 'text-stone-600 hover:text-stone-900 hover:bg-black/5'
             }`}
           >
-            <User className="w-3.5 h-3.5 text-amber-600" />
-            <span>프로필</span>
+            <User className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+            <span className="whitespace-nowrap">프로필</span>
           </button>
 
           <button
@@ -252,14 +252,14 @@ export const MyPageModal: React.FC<MyPageModalProps> = ({
               setActiveTab('stats');
               sounds.playTapSound();
             }}
-            className={`flex-1 min-w-[70px] py-2 px-1.5 text-xs font-black rounded-t-xl flex items-center justify-center gap-1.5 transition-all ${
+            className={`flex-1 py-1.5 px-1 text-[11px] font-black rounded-t-xl flex items-center justify-center gap-1 transition-all whitespace-nowrap ${
               activeTab === 'stats'
                 ? 'bg-[#FAF7F2] text-[#4E342E] border-t-2 border-x-2 border-[#8C6239] shadow-xs'
                 : 'text-stone-600 hover:text-stone-900 hover:bg-black/5'
             }`}
           >
-            <Award className="w-3.5 h-3.5 text-amber-600" />
-            <span>비스트로 통계</span>
+            <Award className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+            <span className="whitespace-nowrap">통계</span>
           </button>
 
           <button
@@ -267,14 +267,14 @@ export const MyPageModal: React.FC<MyPageModalProps> = ({
               setActiveTab('settings');
               sounds.playTapSound();
             }}
-            className={`flex-1 min-w-[70px] py-2 px-1.5 text-xs font-black rounded-t-xl flex items-center justify-center gap-1.5 transition-all ${
+            className={`flex-1 py-1.5 px-1 text-[11px] font-black rounded-t-xl flex items-center justify-center gap-1 transition-all whitespace-nowrap ${
               activeTab === 'settings'
                 ? 'bg-[#FAF7F2] text-[#4E342E] border-t-2 border-x-2 border-[#8C6239] shadow-xs'
                 : 'text-stone-600 hover:text-stone-900 hover:bg-black/5'
             }`}
           >
-            <Sliders className="w-3.5 h-3.5 text-amber-600" />
-            <span>게임 설정</span>
+            <Sliders className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+            <span className="whitespace-nowrap">설정</span>
           </button>
 
           <button
@@ -282,14 +282,14 @@ export const MyPageModal: React.FC<MyPageModalProps> = ({
               setActiveTab('guide');
               sounds.playTapSound();
             }}
-            className={`flex-1 min-w-[70px] py-2 px-1.5 text-xs font-black rounded-t-xl flex items-center justify-center gap-1.5 transition-all ${
+            className={`flex-1 py-1.5 px-1 text-[11px] font-black rounded-t-xl flex items-center justify-center gap-1 transition-all whitespace-nowrap ${
               activeTab === 'guide'
                 ? 'bg-[#FAF7F2] text-[#4E342E] border-t-2 border-x-2 border-[#8C6239] shadow-xs'
                 : 'text-stone-600 hover:text-stone-900 hover:bg-black/5'
             }`}
           >
-            <HelpCircle className="w-3.5 h-3.5 text-amber-600" />
-            <span>도움말</span>
+            <HelpCircle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+            <span className="whitespace-nowrap">도움말</span>
           </button>
         </div>
 

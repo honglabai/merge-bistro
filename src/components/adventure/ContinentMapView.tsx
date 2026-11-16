@@ -62,12 +62,12 @@ export const ContinentMapView: React.FC<ContinentMapViewProps> = ({
     <div className="w-full max-w-3xl mx-auto space-y-3 pb-6 select-none">
       
       {/* 1. Header: Navigation & Currency Badges */}
-      <div className="flex items-center justify-between bg-white px-2.5 py-2 rounded-2xl border-2 border-[#D4A373]/60 shadow-sm">
-        <div className="flex items-center gap-1.5">
+      <div className="flex items-center justify-between bg-white px-2 py-1.5 rounded-2xl border-2 border-[#D4A373]/60 shadow-sm">
+        <div className="flex items-center gap-1">
           {onBackToBoard && (
             <button
               onClick={onBackToBoard}
-              className="px-2.5 py-1 rounded-xl bg-gradient-to-r from-[#2A9D8F] to-[#1c6b61] text-white text-[11px] font-black shadow-xs flex items-center gap-1 active:scale-95 transition-transform"
+              className="px-2 py-1 rounded-xl bg-gradient-to-r from-[#2A9D8F] to-[#1c6b61] text-white text-[11px] font-black shadow-xs flex items-center gap-1 active:scale-95 transition-transform whitespace-nowrap flex-shrink-0"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>머지 보드</span>
@@ -76,7 +76,7 @@ export const ContinentMapView: React.FC<ContinentMapViewProps> = ({
           {onGoToRestoration && (
             <button
               onClick={onGoToRestoration}
-              className="px-2 py-1 rounded-xl bg-[#FAF7F2] border border-[#D4A373] text-[#8C6239] text-[10px] font-bold shadow-2xs hover:bg-amber-50 active:scale-95 transition-transform"
+              className="px-2 py-1 rounded-xl bg-[#FAF7F2] border border-[#D4A373] text-[#8C6239] text-[10px] font-bold shadow-2xs hover:bg-amber-50 active:scale-95 transition-transform whitespace-nowrap flex-shrink-0"
             >
               🏰 시설 복원
             </button>
@@ -84,15 +84,15 @@ export const ContinentMapView: React.FC<ContinentMapViewProps> = ({
         </div>
 
         {/* Currency & Relic summary */}
-        <div className="flex items-center gap-1.5 text-[10px] font-black">
+        <div className="flex items-center gap-1 text-[10px] font-black">
           <button
             onClick={() => setShowRelicVault(true)}
-            className="flex items-center gap-1 bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded-full shadow-2xs hover:bg-amber-200 active:scale-95 transition-all"
+            className="flex items-center gap-1 bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded-full shadow-2xs hover:bg-amber-200 active:scale-95 transition-all whitespace-nowrap flex-shrink-0"
           >
             <Trophy className="w-3 h-3 text-amber-600" />
             <span>유물 {relicsInventory.length}/5</span>
           </button>
-          <span className="bg-emerald-100 text-emerald-900 border border-emerald-300 px-2 py-0.5 rounded-full">
+          <span className="bg-emerald-100 text-emerald-900 border border-emerald-300 px-2 py-0.5 rounded-full whitespace-nowrap flex-shrink-0">
             탐험 {progressPercent}%
           </span>
         </div>
@@ -319,18 +319,18 @@ export const ContinentMapView: React.FC<ContinentMapViewProps> = ({
                       : 'bg-white border-cream-200 hover:border-amber-300'
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-start justify-between gap-1.5">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-black text-slate-900">
+                      <div className="flex items-center gap-1 min-w-0">
+                        <span className="text-xs font-black text-slate-900 truncate whitespace-nowrap">
                           {mission.title}
                         </span>
                         {isClaimed ? (
-                          <span className="text-[8px] font-black bg-slate-200 text-slate-600 px-1.5 py-0.2 rounded-full">
+                          <span className="text-[8px] font-black bg-slate-200 text-slate-600 px-1 py-0.2 rounded-full whitespace-nowrap flex-shrink-0">
                             완료됨
                           </span>
                         ) : isDone ? (
-                          <span className="text-[8px] font-black bg-emerald-500 text-white px-1.5 py-0.2 rounded-full animate-pulse">
+                          <span className="text-[8px] font-black bg-emerald-500 text-white px-1.5 py-0.2 rounded-full animate-pulse whitespace-nowrap flex-shrink-0">
                             수령 가능!
                           </span>
                         ) : null}
@@ -341,25 +341,25 @@ export const ContinentMapView: React.FC<ContinentMapViewProps> = ({
                       </p>
 
                       {/* Character Quote */}
-                      <div className="mt-1 flex items-center gap-1 text-[9.5px] text-amber-800 bg-amber-50/80 px-2 py-0.5 rounded-md border border-amber-200/60">
+                      <div className="mt-1 flex items-center gap-1 text-[9.5px] text-amber-800 bg-amber-50/80 px-1.5 py-0.5 rounded-md border border-amber-200/60">
                         <span>{mission.storyQuote.avatar}</span>
-                        <span className="font-bold">{mission.storyQuote.speaker}:</span>
-                        <span className="italic">"{mission.storyQuote.text}"</span>
+                        <span className="font-bold whitespace-nowrap">{mission.storyQuote.speaker}:</span>
+                        <span className="italic truncate">"{mission.storyQuote.text}"</span>
                       </div>
                     </div>
 
                     {/* Reward Tag */}
                     <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
-                      <div className="text-[10px] font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">
+                      <div className="text-[9.5px] font-black text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full border border-amber-300 whitespace-nowrap flex-shrink-0">
                         +{mission.reward.coins}🪙 +{mission.reward.gems}💎 +{mission.reward.stars}⭐
                       </div>
                     </div>
                   </div>
 
                   {/* Progress Gauge & Action Button */}
-                  <div className="flex items-center justify-between gap-3 pt-1 border-t border-cream-100">
+                  <div className="flex items-center justify-between gap-2 pt-1 border-t border-cream-100">
                     <div className="flex-1">
-                      <div className="flex justify-between text-[9.5px] font-bold text-slate-600 mb-0.5">
+                      <div className="flex justify-between text-[9.5px] font-bold text-slate-600 mb-0.5 whitespace-nowrap">
                         <span>진행도</span>
                         <span>
                           {mission.currentCount} / {mission.targetCount} ({percent}%)
@@ -378,32 +378,32 @@ export const ContinentMapView: React.FC<ContinentMapViewProps> = ({
                     </div>
 
                     {/* Action Button */}
-                    <div>
+                    <div className="flex-shrink-0">
                       {isClaimed ? (
                         <button
                           disabled
-                          className="px-3 py-1 rounded-lg bg-slate-200 text-slate-500 text-[10px] font-black cursor-not-allowed"
+                          className="px-2.5 py-1 rounded-lg bg-slate-200 text-slate-500 text-[10px] font-black cursor-not-allowed whitespace-nowrap"
                         >
                           수령 완료
                         </button>
                       ) : isDone ? (
                         <button
                           onClick={() => claimMissionReward(mission.id)}
-                          className="px-3 py-1 rounded-lg bg-gradient-to-r from-amber-500 via-emerald-500 to-amber-500 text-white text-[11px] font-black shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-1 animate-pulse"
+                          className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-500 via-emerald-500 to-amber-500 text-white text-[10.5px] font-black shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-1 animate-pulse whitespace-nowrap"
                         >
-                          <Sparkles className="w-3 h-3 text-amber-200" />
+                          <Sparkles className="w-3 h-3 text-amber-200 flex-shrink-0" />
                           <span>보상 수령!</span>
                         </button>
                       ) : onBackToBoard ? (
                         <button
                           onClick={onBackToBoard}
-                          className="px-2.5 py-1 rounded-lg bg-[#2A9D8F] hover:bg-[#1f7369] text-white text-[10px] font-black shadow-xs active:scale-95 transition-transform flex items-center gap-0.5"
+                          className="px-2 py-1 rounded-lg bg-[#2A9D8F] hover:bg-[#1f7369] text-white text-[10px] font-black shadow-xs active:scale-95 transition-transform flex items-center gap-0.5 whitespace-nowrap"
                         >
                           <span>보드로 이동</span>
-                          <ChevronRight className="w-3 h-3" />
+                          <ChevronRight className="w-3 h-3 flex-shrink-0" />
                         </button>
                       ) : (
-                        <span className="text-[10px] font-bold text-slate-400">진행 중</span>
+                        <span className="text-[10px] font-bold text-slate-400 whitespace-nowrap">진행 중</span>
                       )}
                     </div>
                   </div>

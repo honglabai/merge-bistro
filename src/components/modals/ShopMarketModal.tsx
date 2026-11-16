@@ -244,20 +244,20 @@ export const ShopMarketModal: React.FC<ShopMarketModalProps> = ({ isOpen, onClos
         </div>
 
         {/* Category Navigation Tabs */}
-        <div className="flex items-center bg-[#ECE4D8] border-b border-[#D4A373]/40 px-2 pt-2 gap-1">
+        <div className="flex items-center bg-[#ECE4D8] border-b border-[#D4A373]/40 px-1.5 pt-1.5 gap-1">
           <button
             onClick={() => {
               setActiveCategory('energy');
               sounds.playTapSound();
             }}
-            className={`flex-1 py-2 px-2 text-xs font-black rounded-t-xl flex items-center justify-center gap-1.5 transition-all ${
+            className={`flex-1 py-1.5 px-1 text-[11px] font-black rounded-t-xl flex items-center justify-center gap-1 transition-all whitespace-nowrap ${
               activeCategory === 'energy'
                 ? 'bg-[#FAF7F2] text-[#4E342E] border-t-2 border-x-2 border-[#8C6239] shadow-xs'
                 : 'text-stone-600 hover:text-stone-900 hover:bg-black/5'
             }`}
           >
-            <Zap className="w-3.5 h-3.5 text-sky-500 fill-sky-500" />
-            <span>⚡ 에너지 충전</span>
+            <Zap className="w-3.5 h-3.5 text-sky-500 fill-sky-500 flex-shrink-0" />
+            <span className="whitespace-nowrap">⚡ 에너지</span>
           </button>
 
           <button
@@ -265,14 +265,14 @@ export const ShopMarketModal: React.FC<ShopMarketModalProps> = ({ isOpen, onClos
               setActiveCategory('ingredients');
               sounds.playTapSound();
             }}
-            className={`flex-1 py-2 px-2 text-xs font-black rounded-t-xl flex items-center justify-center gap-1.5 transition-all ${
+            className={`flex-1 py-1.5 px-1 text-[11px] font-black rounded-t-xl flex items-center justify-center gap-1 transition-all whitespace-nowrap ${
               activeCategory === 'ingredients'
                 ? 'bg-[#FAF7F2] text-[#4E342E] border-t-2 border-x-2 border-[#8C6239] shadow-xs'
                 : 'text-stone-600 hover:text-stone-900 hover:bg-black/5'
             }`}
           >
-            <Package className="w-3.5 h-3.5 text-amber-600" />
-            <span>🥐 신선 재료 직배송</span>
+            <Package className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+            <span className="whitespace-nowrap">🥐 신선 재료</span>
           </button>
 
           <button
@@ -280,14 +280,14 @@ export const ShopMarketModal: React.FC<ShopMarketModalProps> = ({ isOpen, onClos
               setActiveCategory('currency');
               sounds.playTapSound();
             }}
-            className={`flex-1 py-2 px-2 text-xs font-black rounded-t-xl flex items-center justify-center gap-1.5 transition-all ${
+            className={`flex-1 py-1.5 px-1 text-[11px] font-black rounded-t-xl flex items-center justify-center gap-1 transition-all whitespace-nowrap ${
               activeCategory === 'currency'
                 ? 'bg-[#FAF7F2] text-[#4E342E] border-t-2 border-x-2 border-[#8C6239] shadow-xs'
                 : 'text-stone-600 hover:text-stone-900 hover:bg-black/5'
             }`}
           >
-            <Gem className="w-3.5 h-3.5 text-pink-500" />
-            <span>💎 재화 & 부스터</span>
+            <Gem className="w-3.5 h-3.5 text-pink-500 flex-shrink-0" />
+            <span className="whitespace-nowrap">💎 재화/부스터</span>
           </button>
         </div>
 

@@ -127,11 +127,11 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
         </button>
 
         {/* Center: Sleek Rounded Pill Inspector Bar (#d5e7ff) */}
-        <div className="flex-1 h-11 sm:h-12 bg-[#d5e7ff] rounded-full border-2 border-[#8eb3d9] shadow-sm flex items-center justify-between px-2.5 overflow-hidden">
+        <div className="flex-1 h-11 sm:h-12 bg-[#d5e7ff] rounded-full border-2 border-[#8eb3d9] shadow-sm flex items-center justify-between px-2 overflow-hidden">
           {currentTab === 'game' ? (
             item && itemDef ? (
-              <div className="w-full flex items-center justify-between gap-1.5">
-                <div className="flex items-center gap-1.5 min-w-0">
+              <div className="w-full flex items-center justify-between gap-1">
+                <div className="flex items-center gap-1 min-w-0">
                   <div className="w-7 h-7 sm:w-8 sm:h-8 flex-shrink-0 flex items-center justify-center">
                     <ItemGraphic
                       chainId={item.chainId}
@@ -141,10 +141,10 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
                     />
                   </div>
                   <div className="min-w-0 leading-tight">
-                    <div className="text-[11px] sm:text-xs font-black text-slate-800 truncate">
+                    <div className="text-[11px] sm:text-xs font-black text-slate-800 truncate whitespace-nowrap">
                       {itemDef.name}
                     </div>
-                    <div className="text-[9px] sm:text-[10px] text-slate-500 font-bold truncate">
+                    <div className="text-[9px] sm:text-[10px] text-slate-500 font-bold truncate whitespace-nowrap">
                       {chainDef?.name} · Lv.{item.level}
                     </div>
                   </div>
@@ -157,14 +157,14 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
                       <button
                         onClick={moveSelectedToInventory}
                         title="보관함 이동"
-                        className="p-1 rounded-md bg-white/90 hover:bg-white text-slate-700 shadow-2xs border border-slate-300 active:scale-90"
+                        className="p-1 rounded-md bg-white/90 hover:bg-white text-slate-700 shadow-2xs border border-slate-300 active:scale-90 flex-shrink-0"
                       >
                         <Archive className="w-3.5 h-3.5 text-slate-600" />
                       </button>
                       <button
                         onClick={sellSelectedItem}
                         title="판매"
-                        className="px-1.5 py-0.5 rounded-md bg-amber-400 hover:bg-amber-300 text-amber-950 text-[10px] font-black shadow-2xs flex items-center gap-0.5 active:scale-90"
+                        className="px-1.5 py-0.5 rounded-md bg-amber-400 hover:bg-amber-300 text-amber-950 text-[10px] font-black shadow-2xs flex items-center gap-0.5 active:scale-90 whitespace-nowrap flex-shrink-0"
                       >
                         <Trash2 className="w-2.5 h-2.5" />
                         <span>+{sellPrice}🪙</span>
@@ -172,7 +172,7 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
                     </>
                   )}
                   {isGen && (
-                    <span className="text-[9px] font-black text-pink-700 bg-pink-100 px-1.5 py-0.5 rounded-md border border-pink-300 flex items-center gap-0.5">
+                    <span className="text-[9px] font-black text-pink-700 bg-pink-100 px-1.5 py-0.5 rounded-md border border-pink-300 flex items-center gap-0.5 whitespace-nowrap flex-shrink-0">
                       <Sparkles className="w-2.5 h-2.5 text-pink-500" />
                       생성기
                     </span>
@@ -180,40 +180,40 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="w-full flex items-center justify-center gap-1 text-[11px] font-black text-slate-600/90 tracking-tight">
-                <span>💡 동일한 아이템 2개를 합쳐 상위 레벨을 만드세요</span>
+              <div className="w-full flex items-center justify-center gap-1 text-[10.5px] font-black text-slate-600/90 tracking-tight whitespace-nowrap truncate px-0.5">
+                <span className="whitespace-nowrap truncate">💡 동일 아이템 2개를 합쳐 레벨업하세요</span>
               </div>
             )
           ) : currentTab === 'adventure' ? (
-            <div className="w-full flex items-center justify-between px-1">
-              <div className="flex items-center gap-1.5 min-w-0">
+            <div className="w-full flex items-center justify-between px-0.5">
+              <div className="flex items-center gap-1 min-w-0">
                 <MapPin className="w-3.5 h-3.5 text-emerald-700 flex-shrink-0 animate-bounce" />
-                <span className="text-xs font-black text-slate-800 truncate">
+                <span className="text-[11px] sm:text-xs font-black text-slate-800 truncate whitespace-nowrap">
                   🗺️ 아스테리아 대륙 모험 중
                 </span>
               </div>
-              <span className="text-[11px] font-black text-amber-800 bg-amber-100/90 px-1.5 py-0.5 rounded-full border border-amber-300 flex-shrink-0">
+              <span className="text-[10px] font-black text-amber-800 bg-amber-100/90 px-1.5 py-0.5 rounded-full border border-amber-300 flex-shrink-0 whitespace-nowrap">
                 유물 {relicsInventory.length}/5 🏆
               </span>
             </div>
           ) : currentTab === 'restoration' ? (
-            <div className="w-full flex items-center justify-between px-1">
-              <div className="flex items-center gap-1.5 min-w-0">
+            <div className="w-full flex items-center justify-between px-0.5">
+              <div className="flex items-center gap-1 min-w-0">
                 <Hammer className="w-3.5 h-3.5 text-amber-700 flex-shrink-0" />
-                <span className="text-xs font-black text-slate-800 truncate">
+                <span className="text-[11px] sm:text-xs font-black text-slate-800 truncate whitespace-nowrap">
                   2. 식당 & 유적 복원 진행 중
                 </span>
               </div>
-              <span className="text-[11px] font-black text-amber-700 bg-amber-100/90 px-1.5 py-0.5 rounded-full border border-amber-300 flex-shrink-0">
+              <span className="text-[10px] font-black text-amber-700 bg-amber-100/90 px-1.5 py-0.5 rounded-full border border-amber-300 flex-shrink-0 whitespace-nowrap">
                 보유: {stars}⭐
               </span>
             </div>
           ) : currentTab === 'cookstagram' ? (
-            <div className="w-full text-center text-xs font-black text-slate-800">
+            <div className="w-full text-center text-[11px] font-black text-slate-800 whitespace-nowrap truncate">
               📸 3. 쿡스타그램 & 크루 소식
             </div>
           ) : (
-            <div className="w-full text-center text-xs font-black text-slate-800">
+            <div className="w-full text-center text-[11px] font-black text-slate-800 whitespace-nowrap truncate">
               📊 4. 수리 경제 & 통계 시뮬레이터
             </div>
           )}

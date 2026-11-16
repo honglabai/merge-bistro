@@ -158,12 +158,12 @@ export const OrderQueueBar: React.FC = () => {
                     }`}
                   >
                     {/* Left: Reward Coins */}
-                    <span className="text-[7.5px] sm:text-[8px] font-black text-amber-300 tracking-tight flex items-center gap-0.5 leading-none">
+                    <span className="text-[7.5px] sm:text-[8px] font-black text-amber-300 tracking-tight flex items-center gap-0.5 leading-none whitespace-nowrap flex-shrink-0">
                       +{order.rewardCoins}🪙
                     </span>
 
                     {/* Right: Timer or Deliver Button */}
-                    <div className="flex items-center gap-0.5 text-[7px] sm:text-[7.5px] font-black text-white leading-none">
+                    <div className="flex items-center gap-0.5 text-[7px] sm:text-[7.5px] font-black text-white leading-none whitespace-nowrap flex-shrink-0">
                       {hasItem ? (
                         <>
                           <Check className="w-2 h-2 stroke-[3]" />

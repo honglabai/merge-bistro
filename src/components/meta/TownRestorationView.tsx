@@ -21,27 +21,27 @@ export const TownRestorationView: React.FC<TownRestorationViewProps> = ({
       
       {/* Return to Board & Adventure Header Bar */}
       {(onBackToBoard || onGoToAdventure) && (
-        <div className="flex items-center justify-between bg-white px-3 py-2 rounded-2xl border-2 border-[#D4A373]/60 shadow-xs">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between bg-white px-2.5 py-1.5 rounded-2xl border-2 border-[#D4A373]/60 shadow-xs">
+          <div className="flex items-center gap-1.5">
             {onBackToBoard && (
               <button
                 onClick={onBackToBoard}
-                className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#2A9D8F] to-[#1c6b61] text-white text-xs font-black shadow-sm flex items-center gap-1.5 active:scale-95 transition-transform"
+                className="px-2.5 py-1 rounded-xl bg-gradient-to-r from-[#2A9D8F] to-[#1c6b61] text-white text-[11px] font-black shadow-xs flex items-center gap-1 active:scale-95 transition-transform whitespace-nowrap flex-shrink-0"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="w-3.5 h-3.5" />
                 <span>머지 보드</span>
               </button>
             )}
             {onGoToAdventure && (
               <button
                 onClick={onGoToAdventure}
-                className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-black shadow-sm flex items-center gap-1.5 active:scale-95 transition-transform"
+                className="px-2.5 py-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[11px] font-black shadow-xs flex items-center gap-1 active:scale-95 transition-transform whitespace-nowrap flex-shrink-0"
               >
                 <span>🗺️ 대륙 모험 지도</span>
               </button>
             )}
           </div>
-          <span className="text-xs font-black text-amber-800 bg-amber-100 px-3 py-1 rounded-full border border-amber-300">
+          <span className="text-[11px] font-black text-amber-800 bg-amber-100 px-2.5 py-1 rounded-full border border-amber-300 whitespace-nowrap flex-shrink-0">
             보유 별: {stars}⭐
           </span>
         </div>
@@ -150,21 +150,21 @@ export const TownRestorationView: React.FC<TownRestorationViewProps> = ({
                     </span>
                   </div>
                 ) : (
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="text-[11px] text-slate-500">
-                      인테리어 3종 중 선택 가능
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-[11px] text-slate-500 whitespace-nowrap truncate">
+                      인테리어 3종 선택
                     </div>
                     <button
                       onClick={() => openRestorationPicker(node)}
                       disabled={!canRestore}
-                      className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 shadow ${
+                      className={`px-3 py-1.5 rounded-xl text-[11px] font-black transition-all flex items-center gap-1 shadow whitespace-nowrap flex-shrink-0 ${
                         canRestore
                           ? 'bg-gradient-to-r from-amber-500 to-terracotta-500 hover:from-amber-600 hover:to-terracotta-600 text-white active:scale-95 animate-pulse'
                           : 'bg-cream-200 text-slate-400 cursor-not-allowed'
                       }`}
                     >
-                      <Hammer className="w-3.5 h-3.5" />
-                      <span>{canRestore ? '복원하기 (스타일 선택)' : `별 부족 (${stars}/${node.costStars}⭐)`}</span>
+                      <Hammer className="w-3.5 h-3.5 flex-shrink-0" />
+                      <span className="whitespace-nowrap">{canRestore ? '복원하기 (스타일 선택)' : `별 부족 (${stars}/${node.costStars}⭐)`}</span>
                     </button>
                   </div>
                 )}
