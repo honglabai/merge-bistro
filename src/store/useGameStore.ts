@@ -17,7 +17,7 @@ import {
   LevelUpEvent
 } from '../types/gameSchema';
 import { createInitialBoard } from '../data/initialBoardData';
-import { INITIAL_ORDERS, ORDER_POOL, RESTORATION_NODES } from '../data/ordersAndMetaData';
+import { INITIAL_ORDERS, ORDER_POOL, RESTORATION_NODES, generateDynamicOrder, generateInitialOrders } from '../data/ordersAndMetaData';
 import { COOKSTAGRAM_POSTS } from '../data/storyAndCookstagramData';
 import { CONTINENT_REGIONS } from '../data/adventureMissionsData';
 import { calculateExpForLevel, getTierForLevel, LEVEL_MILESTONES, STAT_INFO } from '../data/characterProgressionData';
@@ -256,28 +256,28 @@ export const useGameStore = create<GameState>((set, get) => ({
           }
         ];
 
-        let replCount = 0;
-        const rawOrders = Array.isArray(parsed.orders) && parsed.orders.length > 0 ? parsed.orders : INITIAL_ORDERS;
-        const sanitizedOrders = rawOrders.map((ord: CustomerOrder) => {
-          if (ord.targetChainId === 'ruins') {
-            const repl = BISTRO_REPLACEMENTS[replCount % BISTRO_REPLACEMENTS.length];
-            replCount++;
-            return {
-              ...ord,
-              ...repl,
-              id: ord.id || `ord-migrated-${Date.now()}-${replCount}`
-            };
-          }
-          return ord;
-        });
+        const rawOrders = Array.isArray(parsed.orders) && parsed.orders.length > 0 ? (parsed.orders as CustomerOrder[]) : generateInitialOrders(storedLevel);
+        const activeOrders: CustomerOrder[] = rawOrders.filter(Boolean).slice(0, 4);
 
-        // Ensure exactly 4 active orders are maintained
-        const activeOrders = sanitizedOrders.slice(0, 4);
+        // Ensure exactly 4 active orders are maintained with dynamic level scaling
         while (activeOrders.length < 4) {
-          const poolOrd = ORDER_POOL[activeOrders.length % ORDER_POOL.length];
-          activeOrders.push({
-            ...poolOrd,
-            id: `ord-init-${Date.now()}-${activeOrders.length}`
+          activeOrders.push(
+            generateDynamicOrder({
+              playerLevel: storedLevel,
+              existingOrders: activeOrders,
+              slotIndex: activeOrders.length
+            })
+          );
+        }
+
+        // Progression refresh: If player is higher level (Lv.4+), ensure at least 1 order reflects their advanced tier
+        const maxActiveOrderLevel = Math.max(...activeOrders.map((o: CustomerOrder) => o.targetLevel || 2));
+        const expectedLevel = Math.max(3, Math.min(Math.floor(storedLevel * 0.4) + 2, 9));
+        if (storedLevel >= 4 && maxActiveOrderLevel < expectedLevel && activeOrders.length === 4) {
+          activeOrders[3] = generateDynamicOrder({
+            playerLevel: storedLevel,
+            existingOrders: activeOrders.slice(0, 3),
+            slotIndex: 3
           });
         }
 
@@ -692,17 +692,52 @@ export const useGameStore = create<GameState>((set, get) => ({
     const newBoard = [...state.board];
     const targetCell = newBoard[emptyCell.index];
 
-    let spawnLevel = 1;
-    if (state.superchargeMultiplier === 2) spawnLevel = 2;
-    if (state.superchargeMultiplier === 4) spawnLevel = 3;
+    const lvl = state.level;
+    const luck = state.stats.luck || 0;
+    const luckBonus = luck * 0.008;
 
-    if (Math.random() < 0.1 && spawnLevel < 4) {
-      spawnLevel += 1;
+    // 1. Chain Selection with 14% Chef Tool (ruins) or cross-culinary drop
+    let spawnChainId: ItemChainId = cell.item.chainId;
+    const rollSynergy = Math.random();
+
+    if (rollSynergy < 0.14 + luckBonus) {
+      // 14% chance to drop Chef Tool (5th chain 'ruins')
+      spawnChainId = 'ruins';
+    } else if (rollSynergy < 0.18 + luckBonus) {
+      // 4% chance to drop complementary garden fruit / herb
+      spawnChainId = cell.item.chainId === 'garden' ? 'bakery' : 'garden';
     }
+
+    // 2. Level-scaled spawn level distribution (Higher level chefs produce better ingredients)
+    const rollLevel = Math.random();
+    let bonusLvl = 0;
+
+    if (lvl >= 20) {
+      // Grandmaster: 32% Lv.2, 10% Lv.3
+      if (rollLevel < 0.10 + luckBonus) bonusLvl = 2;
+      else if (rollLevel < 0.42 + luckBonus) bonusLvl = 1;
+    } else if (lvl >= 12) {
+      // Head Pâtissier: 26% Lv.2, 5% Lv.3
+      if (rollLevel < 0.05 + luckBonus) bonusLvl = 2;
+      else if (rollLevel < 0.31 + luckBonus) bonusLvl = 1;
+    } else if (lvl >= 5) {
+      // Junior Chef: 20% Lv.2
+      if (rollLevel < 0.20 + luckBonus) bonusLvl = 1;
+    } else {
+      // Novice Chef: 10% Lv.2
+      if (rollLevel < 0.10) bonusLvl = 1;
+    }
+
+    let spawnLevel = 1 + bonusLvl;
+    if (state.superchargeMultiplier === 2) spawnLevel = Math.max(2, spawnLevel + 1);
+    if (state.superchargeMultiplier === 4) spawnLevel = Math.max(3, spawnLevel + 2);
+
+    const maxChainLvl = ITEM_CHAINS[spawnChainId]?.items.length || 10;
+    spawnLevel = Math.min(spawnLevel, Math.min(4, maxChainLvl));
 
     targetCell.item = {
       id: `item-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-      chainId: cell.item.chainId,
+      chainId: spawnChainId,
       level: spawnLevel,
       isGenerator: false
     };
@@ -714,7 +749,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       const el = document.getElementById(`tile-${emptyCell.index}`);
       if (el) {
         const rect = el.getBoundingClientRect();
-        emitMergeParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#FBBF24');
+        emitMergeParticles(
+          rect.left + rect.width / 2,
+          rect.top + rect.height / 2,
+          spawnChainId === 'ruins' ? '#A855F7' : '#FBBF24'
+        );
       }
     }
 
@@ -725,8 +764,13 @@ export const useGameStore = create<GameState>((set, get) => ({
       selectedTileIndex: null
     });
 
-    const itemDef = getItemDef(cell.item.chainId, spawnLevel);
-    state.showToast(`✨ ${cell.item.chainId.toUpperCase()} [${itemDef?.name || '아이템'}] 생성 완료!`);
+    const itemDef = getItemDef(spawnChainId, spawnLevel);
+    const chainDef = ITEM_CHAINS[spawnChainId];
+    if (spawnChainId === 'ruins') {
+      state.showToast(`✨ [셰프 조리 도구] Lv.${spawnLevel} ${itemDef?.name || '도구'} 획득!`);
+    } else {
+      state.showToast(`✨ ${chainDef?.name || spawnChainId} [${itemDef?.name || '아이템'}] 생성 완료!`);
+    }
     saveState(get());
   },
 
@@ -1021,16 +1065,15 @@ export const useGameStore = create<GameState>((set, get) => ({
       origin: { y: 0.5 }
     });
 
-    const randomPoolOrder = ORDER_POOL[Math.floor(Math.random() * ORDER_POOL.length)];
-    const newOrders = state.orders.map(o => {
-      if (o.id === orderId) {
-        return {
-          ...randomPoolOrder,
-          id: `ord-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`
-        };
-      }
-      return o;
+    const slotIdx = state.orders.findIndex(o => o.id === orderId);
+    const remainingOrders = state.orders.filter(o => o.id !== orderId);
+    const nextOrder = generateDynamicOrder({
+      playerLevel: state.level,
+      existingOrders: remainingOrders,
+      slotIndex: slotIdx >= 0 ? slotIdx : Math.floor(Math.random() * 4)
     });
+
+    const newOrders = state.orders.map(o => (o.id === orderId ? nextOrder : o));
 
     state.showToast(`🛎️ ${order.customerName} 서빙 완료! +${awardedCoins}🪙 +${awardedStars}⭐ 획득!`);
 
@@ -1435,54 +1478,21 @@ export const useGameStore = create<GameState>((set, get) => ({
     const state = get();
     if (state.vipRushOrder) return;
 
-    const vipCustomers = [
-      {
-        name: '미식가 사자 공작 레오',
-        avatar: '🦁',
-        role: '황실 수석 미식 평론가',
-        quote: '소문을 듣고 찾아왔네! 2분 안에 최고의 요리를 대접해주게!'
-      },
-      {
-        name: '황금 고양이 국왕 펠릭스',
-        avatar: '👑',
-        role: '바닷마을 왕국 통치자',
-        quote: '국왕의 혀를 만족시킬 디저트를 어서 내오너라냥!'
-      },
-      {
-        name: '비스트로 마스터 펭귄 핀',
-        avatar: '🐧',
-        role: '남극 미슐랭 심사위원',
-        quote: '신선함이 생명! 제한 시간 내에 완벽한 커피를 부탁해!'
-      }
-    ];
-
-    const chosenVip = vipCustomers[Math.floor(Math.random() * vipCustomers.length)];
-    const chains: ItemChainId[] = ['bakery', 'cafe', 'seafood', 'garden'];
-    const randomChain = chains[Math.floor(Math.random() * chains.length)];
-    const targetLevel = 3 + Math.floor(Math.random() * 2);
-
-    const vipOrder: CustomerOrder = {
-      id: `vip-order-${Date.now()}`,
-      customerId: `vip-${Date.now()}`,
-      customerName: chosenVip.name,
-      customerAvatar: chosenVip.avatar,
-      customerRole: chosenVip.role,
-      customerQuote: chosenVip.quote,
-      targetChainId: randomChain,
-      targetLevel,
-      rewardCoins: 350 + targetLevel * 50,
-      rewardStars: 16 + targetLevel * 4,
-      rewardGems: 3,
-      isVIP: true,
-      timeLeft: 120
-    };
+    // Generate a high-stake, level-appropriate VIP order
+    const vipOrder = generateDynamicOrder({
+      playerLevel: state.level,
+      existingOrders: state.orders,
+      slotIndex: 3,
+      isVIP: true
+    });
+    vipOrder.timeLeft = 120;
 
     set({
       vipRushOrder: vipOrder,
       vipCountdown: 120
     });
     sounds.playRestorationFanfare();
-    state.showToast(`🚨 [돌발 VIP 주문!] ${chosenVip.name} 도착! (제한시간 2분)`);
+    state.showToast(`🚨 [돌발 VIP 주문!] ${vipOrder.customerName} 도착! (제한시간 2분)`);
   },
 
   tickGameLoop: () => {

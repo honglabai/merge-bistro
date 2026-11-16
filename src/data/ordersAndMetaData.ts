@@ -1,178 +1,289 @@
-import { CustomerOrder, RestorationNode } from '../types/gameSchema';
+import { CustomerOrder, RestorationNode, ItemChainId } from '../types/gameSchema';
+import { ITEM_CHAINS, getItemDef } from './itemsData';
 
-export const INITIAL_ORDERS: CustomerOrder[] = [
+export interface CustomerProfile {
+  id: string;
+  name: string;
+  avatar: string;
+  role: string;
+  preferredChains: ItemChainId[];
+  quoteTemplates: string[];
+}
+
+export const CUSTOMER_ROSTER: CustomerProfile[] = [
   {
-    id: 'ord-1',
-    customerId: 'barnaby',
-    customerName: '부엉이 촌장 버나비',
-    customerAvatar: '🦉',
-    customerRole: '바닷마을 자치위원장',
-    customerQuote: '폭풍우에 상심하지 말게! 이 따끈한 반죽으로 마을 사람들의 기운을 북돋아주게.',
-    targetChainId: 'bakery',
-    targetLevel: 2, // 발효 반죽
-    rewardCoins: 40,
-    rewardStars: 3
+    id: 'bruno',
+    name: '파티시에 곰 브루노',
+    avatar: '🐻',
+    role: '명예 제빵 마스터',
+    preferredChains: ['bakery', 'seafood', 'ruins'],
+    quoteTemplates: [
+      '화덕의 열기가 최고조다곰! 황금빛 [ITEM]을 완성할 차례라곰!',
+      '버터의 결이 살아 숨쉬는 완벽한 [ITEM]을 부탁한다곰!',
+      '이 [ITEM]의 고소한 향은 온 마을 사람들을 행복하게 만든다곰!'
+    ]
   },
   {
-    id: 'ord-2',
-    customerId: 'milo',
-    customerName: '바리스타 고양이 밀로',
-    customerAvatar: '🐱',
-    customerRole: '비스트로 수석 바리스타',
-    customerQuote: '모닝 커피 한 잔이 없으면 손님들이 안 와요냥! 갓 내린 샷 한 잔 부탁해냥!',
-    targetChainId: 'cafe',
-    targetLevel: 2, // 에스프레소 샷
-    rewardCoins: 40,
-    rewardStars: 3
+    id: 'milo',
+    name: '바리스타 고양이 밀로',
+    avatar: '🐱',
+    role: '비스트로 수석 바리스타',
+    preferredChains: ['cafe', 'seafood', 'ruins'],
+    quoteTemplates: [
+      '부드러운 크레마와 깊은 풍미! [ITEM]을 주문받았냥!',
+      '골골송이 절로 나오는 환상적인 [ITEM] 부탁한다냥!',
+      '나른한 오후엔 역시 갓 만든 [ITEM]이 최고다냥!'
+    ]
   },
   {
-    id: 'ord-3',
-    customerId: 'toby',
-    customerName: '집배원 강아지 토비',
-    customerAvatar: '🐶',
-    customerRole: '비스트로 전속 배달원',
-    customerQuote: '멍멍! 아침 우편물 배달 돌기 전에 갓 구운 고소한 식빵이 꼭 필요해요!',
-    targetChainId: 'bakery',
-    targetLevel: 3, // 갓 구운 식빵
-    rewardCoins: 75,
-    rewardStars: 5
+    id: 'barnaby',
+    name: '부엉이 촌장 버나비',
+    avatar: '🦉',
+    role: '바닷마을 자치위원장',
+    preferredChains: ['cafe', 'bakery', 'ruins'],
+    quoteTemplates: [
+      '마을 주민 회의 전에 따끈한 [ITEM]이 큰 활력이 되겠구려.',
+      '오랜 세월을 살았지만 비스트로의 [ITEM]은 언제나 명품일세.',
+      '바닷바람을 맞으며 맛보는 [ITEM] 한 접시를 기대하겠네.'
+    ]
   },
   {
-    id: 'ord-4',
-    customerId: 'fiona',
-    customerName: '여우 고고학자 피오나',
-    customerAvatar: '🦊',
-    customerRole: '고대 유적 탐사원',
-    customerQuote: '유적 문서에 의하면 사장님이 즐겨 쓰던 약초가 있었어요. 신선한 바질을 구해줄 수 있나요?',
-    targetChainId: 'garden',
-    targetLevel: 2, // 스위트 바질 잎
-    rewardCoins: 50,
-    rewardStars: 4
+    id: 'waddles',
+    name: '선장 펭귄 와들스',
+    avatar: '🐧',
+    role: '달콤 디저트 미식가',
+    preferredChains: ['seafood', 'cafe', 'garden'],
+    quoteTemplates: [
+      '끄아악! 거친 바다 항해를 마치고 즐기는 달콤한 [ITEM]은 천상의 맛이지!',
+      '디저트 쇼케이스에서 가장 빛나는 [ITEM]을 부탁하네!',
+      '선원들과 함께 당 충전을 하려면 [ITEM]이 제격일세!'
+    ]
+  },
+  {
+    id: 'fiona',
+    name: '여우 고고학자 피오나',
+    avatar: '🦊',
+    role: '고대 유적 탐사원',
+    preferredChains: ['garden', 'ruins', 'bakery'],
+    quoteTemplates: [
+      '고문서 해독 중 집중력을 높여줄 [ITEM]이 꼭 필요해요!',
+      '대륙 유적 발굴 현장에서 팀원들과 함께 나눌 [ITEM]을 부탁해요!',
+      '고대 벽화에도 기록된 전설의 맛, 바로 [ITEM]이군요!'
+    ]
+  },
+  {
+    id: 'toby',
+    name: '집배원 강아지 토비',
+    avatar: '🐶',
+    role: '비스트로 전속 배달원',
+    preferredChains: ['bakery', 'cafe', 'garden'],
+    quoteTemplates: [
+      '멍멍! 바닷마을 골목길 배달을 돌기 전에 든든한 [ITEM]이 꼭 필요해요!',
+      '꼬리가 절로 흔들리는 환상의 [ITEM]! 얼른 맛보고 싶어요!',
+      '마을 주민들에게 특종으로 자랑하고 싶은 [ITEM]이에요!'
+    ]
+  },
+  {
+    id: 'pip',
+    name: '다람쥐 정원사 핍',
+    avatar: '🐿️',
+    role: '비스트로 플랜테리어',
+    preferredChains: ['garden', 'bakery', 'cafe'],
+    quoteTemplates: [
+      '온실 텃밭 식물들도 반해버린 싱그러운 [ITEM]을 부탁드려요!',
+      '테이블을 예쁘게 꾸미며 향긋한 [ITEM]도 곁들이고 싶어요!',
+      '도토리보다 백 배는 더 달콤하고 신선한 [ITEM]이에요!'
+    ]
+  },
+  {
+    id: 'leo',
+    name: '미식가 사자 공작 레오',
+    avatar: '🦁',
+    role: '황실 수석 미식 평론가',
+    preferredChains: ['seafood', 'bakery', 'ruins'],
+    quoteTemplates: [
+      '황실의 이름으로 명하노라! 최고급 [ITEM]의 품격을 보여주게!',
+      '왕립 미식 평론지에 실릴 세기의 명작, 바로 [ITEM]일세!',
+      '이 맛... 입안 가득 감동이 밀려오는 완벽한 [ITEM]이로군!'
+    ]
+  },
+  {
+    id: 'felix',
+    name: '황금 고양이 국왕 펠릭스',
+    avatar: '👑',
+    role: '바닷마을 왕국 통치자',
+    preferredChains: ['bakery', 'cafe', 'seafood', 'ruins'],
+    quoteTemplates: [
+      '짐의 입맛을 사로잡을 궁극의 명작, [ITEM]을 대령하라!',
+      '왕국의 번영을 축하하는 성대한 축제에 [ITEM]이 빠질 수 없지!',
+      '비스트로의 셰프여, 그대의 실력을 담은 [ITEM]을 하사하라!'
+    ]
+  },
+  {
+    id: 'chloe',
+    name: '토끼 소믈리에 클로이',
+    avatar: '🐰',
+    role: '허브 & 티 마스터',
+    preferredChains: ['garden', 'cafe', 'seafood'],
+    quoteTemplates: [
+      '은은한 티 아로마와 완벽한 조화를 이루는 [ITEM]을 페어링할 시간이에요!',
+      '달콤하고 싱그러운 [ITEM] 향에 귀가 쫑긋해져요!',
+      '정원의 햇살을 듬뿍 머금은 [ITEM]을 부탁드려요!'
+    ]
+  },
+  {
+    id: 'bartolo',
+    name: '물개 무역상 바르톨로',
+    avatar: '🦭',
+    role: '대양 향신료 무역상',
+    preferredChains: ['seafood', 'garden', 'ruins'],
+    quoteTemplates: [
+      '남쪽 대양 군도에서 무역선을 타고 왔소! 소문난 [ITEM]을 맛보러 왔지!',
+      '진귀한 향신료 자루를 풀기 전에 최고급 [ITEM] 한 상 부탁하오!',
+      '바다 건너 전 대륙에서도 이만한 [ITEM]은 본 적이 없소!'
+    ]
+  },
+  {
+    id: 'ariel',
+    name: '사슴 음유시인 아리엘',
+    avatar: '🦌',
+    role: '숲속의 궁정 악사',
+    preferredChains: ['cafe', 'bakery', 'garden'],
+    quoteTemplates: [
+      '선율에 영감을 불어넣어 줄 감미로운 [ITEM]을 노래하고 싶어요.',
+      '숲의 정령들도 춤추게 만드는 매혹적인 [ITEM]의 향기예요.',
+      '비스트로의 따스함을 담은 [ITEM]으로 하프를 연주할게요.'
+    ]
   }
 ];
 
-export const ORDER_POOL: Omit<CustomerOrder, 'id'>[] = [
-  {
-    customerId: 'bruno',
-    customerName: '파티시에 곰 브루노',
-    customerAvatar: '🐻',
-    customerRole: '명예 제빵 마스터',
-    customerQuote: '화덕의 온도가 올라가고 있어 곰! 파삭파삭한 프랑스식 바게트를 만들 차례라곰!',
-    targetChainId: 'bakery',
-    targetLevel: 4,
-    rewardCoins: 110,
-    rewardStars: 7
-  },
-  {
-    customerId: 'barnaby',
-    customerName: '부엉이 촌장 버나비',
-    customerAvatar: '🦉',
-    customerRole: '바닷마을 자치위원장',
-    customerQuote: '회의 도중 마실 시원한 아메리카노가 간절하구려. 부탁하네!',
-    targetChainId: 'cafe',
-    targetLevel: 3,
-    rewardCoins: 80,
-    rewardStars: 5
-  },
-  {
-    customerId: 'waddles',
-    customerName: '선장 펭귄 와들스',
-    customerAvatar: '🐧',
-    customerRole: '달콤 디저트 미식가',
-    customerQuote: '끄아악! 핑크빛 딸기 글레이즈 도넛의 달콤함은 그 무엇과도 바꿀 수 없지!',
-    targetChainId: 'seafood',
-    targetLevel: 2,
-    rewardCoins: 60,
-    rewardStars: 4
-  },
-  {
-    customerId: 'pip',
-    customerName: '다람쥐 정원사 핍',
-    customerAvatar: '🐿️',
-    customerRole: '비스트로 플랜테리어',
-    customerQuote: '텃밭에서 진한 향이 피어오르고 있어요! 꽃 화분을 가져다주시면 테이블을 꾸며볼게요!',
-    targetChainId: 'garden',
-    targetLevel: 3,
-    rewardCoins: 85,
-    rewardStars: 6
-  },
-  {
-    customerId: 'milo',
-    customerName: '바리스타 고양이 밀로',
-    customerAvatar: '🐱',
-    customerRole: '비스트로 수석 바리스타',
-    customerQuote: '부드러운 우유 거품과 에스프레소의 조화! 부드러운 카페라떼를 주문받았냥!',
-    targetChainId: 'cafe',
-    targetLevel: 4,
-    rewardCoins: 125,
-    rewardStars: 8
-  },
-  {
-    customerId: 'bruno',
-    customerName: '파티시에 곰 브루노',
-    customerAvatar: '🐻',
-    customerRole: '명예 제빵 마스터',
-    customerQuote: '이 버터의 층을 보라곰! 황금빛 결이 살아있는 골든 버터 크루아상이다곰!',
-    targetChainId: 'bakery',
-    targetLevel: 5,
-    rewardCoins: 180,
-    rewardStars: 11
-  },
-  {
-    customerId: 'waddles',
-    customerName: '선장 펭귄 와들스',
-    customerAvatar: '🐧',
-    customerRole: '달콤 디저트 미식가',
-    customerQuote: '진한 다크 초콜릿 글레이즈가 듬뿍 올라간 프랑스식 에클레어를 부탁하네!',
-    targetChainId: 'seafood',
-    targetLevel: 3,
-    rewardCoins: 100,
-    rewardStars: 7
-  },
-  {
-    customerId: 'fiona',
-    customerName: '여우 고고학자 피오나',
-    customerAvatar: '🦊',
-    customerRole: '고대 유적 탐사원',
-    customerQuote: '고문서 연구에는 달콤한 티라미수가 최고예요! 부드러운 치즈 향이 집중력을 높여줘요!',
-    targetChainId: 'seafood',
-    targetLevel: 5,
-    rewardCoins: 180,
-    rewardStars: 11
-  },
-  {
-    customerId: 'toby',
-    customerName: '집배원 강아지 토비',
-    customerAvatar: '🐶',
-    customerRole: '비스트로 전속 배달원',
-    customerQuote: '배달 중 간식으로는 훈제연어 베이글이 최고예요! 꼬리가 절로 흔들려요!',
-    targetChainId: 'bakery',
-    targetLevel: 6,
-    rewardCoins: 260,
-    rewardStars: 15
-  },
-  {
-    customerId: 'barnaby',
-    customerName: '부엉이 촌장 버나비',
-    customerAvatar: '🦉',
-    customerRole: '바닷마을 자치위원장',
-    customerQuote: '시나몬 가루를 듬뿍 얹은 카푸치노 한 모금에 하루의 피로가 사르르 녹는군.',
-    targetChainId: 'cafe',
-    targetLevel: 5,
-    rewardCoins: 210,
-    rewardStars: 13
-  },
-  {
-    customerId: 'fiona',
-    customerName: '여우 고고학자 피오나',
-    customerAvatar: '🦊',
-    customerRole: '고대 유적 탐사원',
-    customerQuote: '탐사팀 모두가 지쳤을 때 달콤한 케이크만한 게 없죠. 시그니처 딸기 쇼트케이크를 부탁해요!',
-    targetChainId: 'seafood',
-    targetLevel: 6,
-    rewardCoins: 320,
-    rewardStars: 18
+export interface DynamicOrderParams {
+  playerLevel: number;
+  existingOrders?: CustomerOrder[];
+  slotIndex?: number;
+  isVIP?: boolean;
+}
+
+export function generateDynamicOrder({
+  playerLevel = 1,
+  existingOrders = [],
+  slotIndex = 0,
+  isVIP = false
+}: DynamicOrderParams): CustomerOrder {
+  // 1. Calculate Target Item Level based on Player Level & Slot Role
+  let baseLevel = 2;
+  const safeLvl = Math.max(1, playerLevel);
+
+  if (slotIndex === 0) {
+    // Slot 0: Quick Turnover Order (Low-Medium)
+    baseLevel = Math.max(2, Math.min(Math.floor(safeLvl * 0.22) + 2, 5));
+  } else if (slotIndex === 1) {
+    // Slot 1: Balanced Menu Order
+    baseLevel = Math.max(2, Math.min(Math.floor(safeLvl * 0.32) + 2, 7));
+  } else if (slotIndex === 2) {
+    // Slot 2: Specialty / Delicacy Order
+    baseLevel = Math.max(3, Math.min(Math.floor(safeLvl * 0.42) + 2, 8));
+  } else {
+    // Slot 3: Challenge Gourmet Order (High Level Aspirations)
+    baseLevel = Math.max(3, Math.min(Math.floor(safeLvl * 0.52) + 3, 10));
   }
+
+  if (isVIP) {
+    baseLevel = Math.min(10, baseLevel + 1);
+  }
+
+  // Small random level jitter (-1, 0, +1)
+  const jitter = Math.floor(Math.random() * 3) - 1;
+  const targetLevel = Math.max(2, baseLevel + jitter);
+
+  // 2. Select Chain with Strict Diversity Balancing (Avoid repeating chains)
+  const allChains: ItemChainId[] = ['bakery', 'cafe', 'seafood', 'garden', 'ruins'];
+  const chainCounts: Record<ItemChainId, number> = {
+    bakery: 0,
+    cafe: 0,
+    seafood: 0,
+    garden: 0,
+    ruins: 0
+  };
+
+  existingOrders.forEach(o => {
+    if (chainCounts[o.targetChainId] !== undefined) {
+      chainCounts[o.targetChainId]++;
+    }
+  });
+
+  const minCount = Math.min(...Object.values(chainCounts));
+  const candidateChains = allChains.filter(c => chainCounts[c] === minCount);
+  const selectedChain = candidateChains[Math.floor(Math.random() * candidateChains.length)];
+
+  // Cap target level by chain's actual maximum item level
+  const chainDef = ITEM_CHAINS[selectedChain];
+  const maxChainLevel = chainDef ? chainDef.items.length : 10;
+  const finalLevel = Math.min(targetLevel, maxChainLevel);
+
+  // Get item metadata
+  const itemDef = getItemDef(selectedChain, finalLevel) || {
+    name: '특제 비스트로 요리',
+    icon: '🍽️',
+    description: '',
+    sellPrice: 10,
+    level: finalLevel
+  };
+
+  // 3. Select Matching Customer
+  const candidateCustomers = CUSTOMER_ROSTER.filter(c => c.preferredChains.includes(selectedChain));
+  const customer = candidateCustomers.length > 0
+    ? candidateCustomers[Math.floor(Math.random() * candidateCustomers.length)]
+    : CUSTOMER_ROSTER[Math.floor(Math.random() * CUSTOMER_ROSTER.length)];
+
+  const quoteTemplate = customer.quoteTemplates[Math.floor(Math.random() * customer.quoteTemplates.length)];
+  const customerQuote = quoteTemplate.replace(/\[ITEM\]/g, itemDef.name);
+
+  // 4. Calculate Scaled Rewards
+  const rewardCoins = Math.floor(25 + Math.pow(finalLevel, 2.15) * 8.5 + (isVIP ? 120 : 0));
+  const rewardStars = Math.max(3, Math.floor(finalLevel * 2.2));
+  let rewardGems = 0;
+  if (isVIP) rewardGems = 3;
+  else if (finalLevel >= 9) rewardGems = 2;
+  else if (finalLevel >= 7) rewardGems = 1;
+
+  return {
+    id: `ord-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    customerId: customer.id,
+    customerName: customer.name,
+    customerAvatar: customer.avatar,
+    customerRole: customer.role,
+    customerQuote,
+    targetChainId: selectedChain,
+    targetLevel: finalLevel,
+    rewardCoins,
+    rewardStars,
+    isVIP,
+    rewardGems
+  };
+}
+
+export function generateInitialOrders(playerLevel = 1): CustomerOrder[] {
+  const result: CustomerOrder[] = [];
+  for (let i = 0; i < 4; i++) {
+    result.push(
+      generateDynamicOrder({
+        playerLevel,
+        existingOrders: result,
+        slotIndex: i
+      })
+    );
+  }
+  return result;
+}
+
+export const INITIAL_ORDERS: CustomerOrder[] = generateInitialOrders(1);
+
+export const ORDER_POOL: Omit<CustomerOrder, 'id'>[] = [
+  ...generateInitialOrders(3).map(({ id, ...rest }) => rest),
+  ...generateInitialOrders(6).map(({ id, ...rest }) => rest),
+  ...generateInitialOrders(10).map(({ id, ...rest }) => rest),
+  ...generateInitialOrders(15).map(({ id, ...rest }) => rest)
 ];
 
 export const RESTORATION_NODES: RestorationNode[] = [
