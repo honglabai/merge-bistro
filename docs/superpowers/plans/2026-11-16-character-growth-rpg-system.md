@@ -105,7 +105,7 @@
 - Project-wide verification
 
 - [x] Execute `npx tsc --noEmit` and `npm run build` to verify 0 errors.
-- [ ] Verify EXP gains across merging, order fulfillment, and quest completion.
-- [ ] Verify stat allocation and persistent storage across browser refresh.
-- [ ] Git commit and push to `origin main`.
-- [ ] Verify live Vercel deployment and test on production URL.
+- [x] Verify EXP gains across merging, order fulfillment, and quest completion.
+- [x] Verify stat allocation and persistent storage across browser refresh.
+- [x] Git commit and push to `origin main`.
+- [x] Verify live Vercel deployment and test on production URL.
