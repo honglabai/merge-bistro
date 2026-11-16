@@ -179,11 +179,12 @@ export const STAT_INFO: Record<
 };
 
 /**
- * Calculates EXP required to reach next level from current level
+ * Calculates EXP required to reach next level from current level.
+ * Balanced curve: prevents overly frequent level-ups while maintaining steady progression.
  */
 export function calculateExpForLevel(level: number): number {
-  if (level <= 1) return 80;
-  return Math.floor(60 + Math.pow(level, 1.55) * 22);
+  if (level <= 1) return 300;
+  return Math.floor(200 + Math.pow(level, 1.75) * 85);
 }
 
 /**

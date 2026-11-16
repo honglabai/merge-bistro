@@ -224,10 +224,12 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
         {/* Right: Settings & My Page Button (Swapped from Top-Left) */}
         <button
           onClick={onOpenMyPage}
-          title="마이페이지 & 게임 설정"
+          title={statPoints > 0 ? `마이페이지 (스탯 ${statPoints}PT 분배 가능)` : '마이페이지 & 게임 설정'}
           className="relative w-11 h-11 sm:w-12 sm:h-12 p-0 bg-transparent border-0 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0 cursor-pointer drop-shadow-md"
         >
-          <div className="w-full h-full rounded-full bg-gradient-to-tr from-amber-300 via-rose-300 to-sky-300 p-0.5 shadow-md overflow-hidden border-2 border-white hover:ring-2 hover:ring-amber-300 transition-all">
+          <div className={`w-full h-full rounded-full bg-gradient-to-tr from-amber-300 via-rose-300 to-sky-300 p-0.5 shadow-md overflow-hidden border-2 border-white transition-all ${
+            statPoints > 0 ? 'ring-2 ring-amber-400 ring-offset-1 ring-offset-[#008770] animate-pulse' : 'hover:ring-2 hover:ring-amber-300'
+          }`}>
             <img
               src={chefAvatar || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80"}
               alt="Chef Avatar"
@@ -240,8 +242,8 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
           </div>
           {/* Settings Gear Badge or Unspent Stat Points Notification */}
           {statPoints > 0 ? (
-            <div className="absolute -top-1 -right-1 bg-rose-600 text-white font-black text-[8px] px-1 py-0.2 rounded-full border border-white shadow animate-bounce">
-              +{statPoints}
+            <div className="absolute -top-1 -right-1 bg-gradient-to-r from-rose-500 to-amber-500 text-white font-black text-[8px] px-1.5 py-0.2 rounded-full border border-white shadow-md animate-bounce whitespace-nowrap">
+              +{statPoints}PT
             </div>
           ) : (
             <div className="absolute -top-1 -right-1 bg-stone-800 text-white p-0.5 rounded-full border border-white shadow flex items-center justify-center">

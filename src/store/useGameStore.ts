@@ -382,9 +382,9 @@ export const useGameStore = create<GameState>((set, get) => ({
 
       sounds.playRestorationFanfare();
       confetti({
-        particleCount: 100,
-        spread: 90,
-        origin: { y: 0.4 }
+        particleCount: 50,
+        spread: 70,
+        origin: { y: 0.6 }
       });
 
       set({
@@ -395,8 +395,13 @@ export const useGameStore = create<GameState>((set, get) => ({
         coins: state.coins + totalRewardCoins,
         gems: state.gems + totalRewardGems,
         energy: Math.max(state.energy, refilledEnergy),
-        pendingLevelUp: levelUpEvent
+        pendingLevelUp: null
       });
+
+      const tierNotice = hasTierUp ? ` [${newTier.name} 승급!]` : '';
+      get().showToast(
+        `🎉 [LEVEL UP!] Lv.${currentLevel} 달성!${tierNotice} +${totalStatPointsGained}PT 스탯 포인트 획득! (우측 하단 셰프 프로필에서 언제든 분배 가능)`
+      );
 
       saveState(get());
     } else {
@@ -595,10 +600,10 @@ export const useGameStore = create<GameState>((set, get) => ({
     });
 
     // Award Adventure Mission EXP
-    get().addExp(120, '대륙 모험 미션 완수');
+    get().addExp(50, '대륙 모험 미션 완수');
 
     saveState(get());
-    state.showToast(`🎁 [모험 보상 수령!] +${rCoins}🪙 +${rGems}💎 +${rStars}⭐ +120 EXP 획득!`);
+    state.showToast(`🎁 [모험 보상 수령!] +${rCoins}🪙 +${rGems}💎 +${rStars}⭐ +50 EXP 획득!`);
   },
 
   closeAdventureDialogue: () => {
@@ -900,8 +905,8 @@ export const useGameStore = create<GameState>((set, get) => ({
         dragOverIndex: null
       });
 
-      // Award EXP for successful merge with Dexterity boost
-      const mergeExp = Math.max(6, nextLevel * 3 + Math.floor((state.stats.dexterity || 0) * 1.5));
+      // Award balanced EXP for successful merge with Dexterity boost
+      const mergeExp = Math.max(2, Math.floor(nextLevel * 1.5 + ((state.stats.dexterity || 0) * 0.6)));
       get().addExp(mergeExp, '아이템 합성');
 
       saveState(get());
@@ -1002,7 +1007,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       });
 
       // Award VIP Order EXP
-      const vipExp = Math.floor(60 + order.rewardStars * 12 + ((state.stats.charisma || 0) * 4));
+      const vipExp = Math.floor(45 + order.rewardStars * 5 + ((state.stats.charisma || 0) * 2));
       get().addExp(vipExp, 'VIP 특급 서빙 완료');
 
       saveState(get());
@@ -1038,7 +1043,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     });
 
     // Award Normal Order EXP
-    const normalExp = Math.floor(25 + order.rewardStars * 8 + ((state.stats.charisma || 0) * 3));
+    const normalExp = Math.floor(18 + order.rewardStars * 3 + ((state.stats.charisma || 0) * 1.5));
     get().addExp(normalExp, '손님 주문 서빙 완료');
 
     saveState(get());
@@ -1365,7 +1370,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       feverTimeLeft: durationSec
     });
     get().checkMissionProgress('trigger_fever');
-    get().addExp(35, '피버 타임 발동');
+    get().addExp(15, '피버 타임 발동');
     get().showToast('🔥 BISTRO FEVER! 15초간 에너지 소모 0 & 보너스 골드 폭포!');
   },
 
@@ -1421,7 +1426,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       luckyBubbles: state.luckyBubbles.filter(b => b.id !== bubbleId)
     });
 
-    get().addExp(25, '럭키 버블 오픈');
+    get().addExp(10, '럭키 버블 오픈');
     saveState(get());
     state.showToast(toastMsg);
   },
