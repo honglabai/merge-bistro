@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Gamepad2, Hammer, Camera, Calculator, Volume2, VolumeX, RotateCcw, HelpCircle, Zap, Archive, ChevronRight, Sparkles, ChefHat } from 'lucide-react';
+import { X, Gamepad2, Hammer, Camera, Calculator, Volume2, VolumeX, RotateCcw, HelpCircle, Zap, Archive, ChevronRight, Sparkles, ChefHat, Compass, Trophy } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 import { sounds } from '../../utils/soundSynthesizer';
 import { ItemGraphic } from '../ui/ItemGraphic';
@@ -7,8 +7,8 @@ import { ItemGraphic } from '../ui/ItemGraphic';
 interface HomeMenuModalProps {
   isOpen: boolean;
   onClose: () => void;
-  currentTab: 'game' | 'restoration' | 'cookstagram' | 'math';
-  onSelectTab: (tab: 'game' | 'restoration' | 'cookstagram' | 'math') => void;
+  currentTab: 'game' | 'adventure' | 'restoration' | 'cookstagram' | 'math';
+  onSelectTab: (tab: 'game' | 'adventure' | 'restoration' | 'cookstagram' | 'math') => void;
   onOpenMyPage: () => void;
   onOpenHelp: () => void;
   onOpenResetConfirm: () => void;
@@ -36,7 +36,8 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
     inventoryPocket,
     retrieveFromInventory,
     freeEnergyRefill,
-    restorations
+    restorations,
+    continentRegions
   } = useGameStore();
 
   const [soundOn, setSoundOn] = React.useState(sounds.enabled);
@@ -45,6 +46,7 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
 
   const nextRestorationNode = restorations.find(r => !r.isRestored);
   const occupiedBackpackCount = inventoryPocket.filter(Boolean).length;
+  const hasClaimableMission = continentRegions.some(r => r.missions.some(m => m.isCompleted && !m.isClaimed));
 
   const handleToggleSound = () => {
     const next = sounds.toggleSound();
@@ -137,6 +139,42 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
                   </div>
                   <div className="text-[11px] text-slate-500 font-medium">
                     빵, 커피, 디저트를 합성하고 손님 주문 서빙
+                  </div>
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 text-slate-400" />
+            </button>
+
+            {/* 1.5번: 아스테리아 대륙 모험 지도 (RPG) */}
+            <button
+              onClick={() => {
+                onSelectTab('adventure');
+                onClose();
+              }}
+              className={`w-full p-3.5 rounded-2xl border-2 transition-all flex items-center justify-between shadow-sm active:scale-98 ${
+                currentTab === 'adventure'
+                  ? 'bg-gradient-to-r from-emerald-500/15 to-teal-500/5 border-emerald-500 text-emerald-900 ring-2 ring-emerald-400/20 font-black'
+                  : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-800 font-bold'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-600 to-indigo-700 text-white flex items-center justify-center shadow-md relative">
+                  <Compass className="w-5 h-5 text-amber-200 animate-spin" />
+                  {hasClaimableMission && (
+                    <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-amber-400 rounded-full border-2 border-white animate-bounce" />
+                  )}
+                </div>
+                <div className="text-left">
+                  <div className="text-sm font-black flex items-center gap-1.5">
+                    <span>🗺️ 아스테리아 대륙 모험기</span>
+                    {hasClaimableMission && (
+                      <span className="text-[10px] bg-amber-500 text-white font-black px-1.5 py-0.2 rounded-full animate-pulse">
+                        보상 수령!
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-[11px] text-slate-500 font-medium">
+                    가상 대륙 5대 지역 탐험, RPG 시나리오 퀘스트 & 전설 유물 수집
                   </div>
                 </div>
               </div>

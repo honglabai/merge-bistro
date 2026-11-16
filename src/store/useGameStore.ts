@@ -1,9 +1,21 @@
 import { create } from 'zustand';
 import confetti from 'canvas-confetti';
-import { BoardCell, BoardItem, CustomerOrder, RestorationNode, CookstagramPost, ItemChainId, LuckyBubble } from '../types/gameSchema';
+import {
+  BoardCell,
+  BoardItem,
+  CustomerOrder,
+  RestorationNode,
+  CookstagramPost,
+  ItemChainId,
+  LuckyBubble,
+  ContinentRegion,
+  ContinentRelic,
+  AdventureMissionType
+} from '../types/gameSchema';
 import { createInitialBoard } from '../data/initialBoardData';
 import { INITIAL_ORDERS, ORDER_POOL, RESTORATION_NODES } from '../data/ordersAndMetaData';
 import { COOKSTAGRAM_POSTS } from '../data/storyAndCookstagramData';
+import { CONTINENT_REGIONS } from '../data/adventureMissionsData';
 import { ITEM_CHAINS, getItemDef } from '../data/itemsData';
 import { sounds } from '../utils/soundSynthesizer';
 import { emitMergeParticles } from '../components/ui/ParticleCanvas';
@@ -42,8 +54,25 @@ interface GameState {
   vipRushOrder: CustomerOrder | null;
   vipCountdown: number;
 
+  // Adventure RPG Continent State
+  continentRegions: ContinentRegion[];
+  activeRegionId: string;
+  relicsInventory: ContinentRelic[];
+  activeAdventureDialogue: { speaker: string; avatar: string; text: string } | null;
+
   // Actions
   init: () => void;
+  selectAdventureRegion: (regionId: string) => void;
+  checkMissionProgress: (
+    type: AdventureMissionType,
+    params?: {
+      level?: number;
+      chainId?: ItemChainId;
+      combo?: number;
+    }
+  ) => void;
+  claimMissionReward: (missionId: string) => void;
+  closeAdventureDialogue: () => void;
   rechargeEnergyTick: () => void;
   tickGameLoop: () => void;
   popLuckyBubble: (bubbleId: string) => void;
@@ -108,6 +137,10 @@ export const useGameStore = create<GameState>((set, get) => ({
   luckyBubbles: [],
   vipRushOrder: null,
   vipCountdown: 45,
+  continentRegions: CONTINENT_REGIONS,
+  activeRegionId: 'region-1',
+  relicsInventory: [],
+  activeAdventureDialogue: null,
 
   init: () => {
     let recoveredOfflineEnergy = 0;
@@ -229,6 +262,9 @@ export const useGameStore = create<GameState>((set, get) => ({
           restorations: parsed.restorations || RESTORATION_NODES,
           posts: parsed.posts || COOKSTAGRAM_POSTS,
           inventoryPocket: parsed.inventoryPocket || [null, null, null, null],
+          continentRegions: Array.isArray(parsed.continentRegions) && parsed.continentRegions.length === 5 ? parsed.continentRegions : CONTINENT_REGIONS,
+          activeRegionId: typeof parsed.activeRegionId === 'string' ? parsed.activeRegionId : 'region-1',
+          relicsInventory: Array.isArray(parsed.relicsInventory) ? parsed.relicsInventory : [],
           lastEnergyRecharge: Date.now()
         });
 
@@ -255,6 +291,171 @@ export const useGameStore = create<GameState>((set, get) => ({
         saveState(get());
       }, 5000);
     }
+  },
+
+  selectAdventureRegion: (regionId: string) => {
+    set({ activeRegionId: regionId });
+  },
+
+  checkMissionProgress: (
+    type: AdventureMissionType,
+    params?: {
+      level?: number;
+      chainId?: ItemChainId;
+      combo?: number;
+    }
+  ) => {
+    const state = get();
+    let updatedAny = false;
+    let newlyCompletedTitle: string | null = null;
+
+    const newRegions = state.continentRegions.map(region => {
+      // Check missions in unlocked & incomplete regions
+      if (!region.isUnlocked || region.isCompleted) return region;
+
+      let regionUpdated = false;
+      const newMissions = region.missions.map(mission => {
+        if (mission.isCompleted || mission.type !== type) return mission;
+
+        let shouldIncrement = false;
+
+        if (type === 'merge_item') {
+          const lvlMatch = !mission.targetLevel || (params?.level !== undefined && params.level >= mission.targetLevel);
+          const chainMatch = !mission.targetChainId || (params?.chainId !== undefined && params.chainId === mission.targetChainId);
+          if (lvlMatch && chainMatch) {
+            shouldIncrement = true;
+          }
+        } else if (type === 'fulfill_order') {
+          shouldIncrement = true;
+        } else if (type === 'reach_combo') {
+          if (params?.combo !== undefined && params.combo >= mission.targetCount) {
+            shouldIncrement = true;
+          }
+        } else if (type === 'pop_bubble' || type === 'trigger_fever') {
+          shouldIncrement = true;
+        }
+
+        if (shouldIncrement) {
+          regionUpdated = true;
+          updatedAny = true;
+          const nextCount =
+            type === 'reach_combo' && params?.combo
+              ? Math.max(mission.currentCount, params.combo)
+              : mission.currentCount + 1;
+          const isDone = nextCount >= mission.targetCount;
+          if (isDone && !mission.isCompleted) {
+            newlyCompletedTitle = mission.title;
+          }
+          return {
+            ...mission,
+            currentCount: Math.min(nextCount, mission.targetCount),
+            isCompleted: isDone
+          };
+        }
+
+        return mission;
+      });
+
+      if (regionUpdated) {
+        return {
+          ...region,
+          missions: newMissions
+        };
+      }
+      return region;
+    });
+
+    if (updatedAny) {
+      set({ continentRegions: newRegions });
+      saveState(get());
+      if (newlyCompletedTitle) {
+        sounds.playOrderComplete();
+        confetti({ particleCount: 50, spread: 60, origin: { y: 0.4 } });
+        get().showToast(`🎯 [모험 미션 달성!] "${newlyCompletedTitle}" 완료! 지도에서 보상을 수령하세요!`);
+      }
+    }
+  },
+
+  claimMissionReward: (missionId: string) => {
+    const state = get();
+    let targetReward: { coins: number; gems: number; stars: number } | null = null;
+    let targetRegionId: string | null = null;
+
+    const newRegions = state.continentRegions.map(region => {
+      let regionModified = false;
+      const newMissions = region.missions.map(m => {
+        if (m.id === missionId && m.isCompleted && !m.isClaimed) {
+          targetReward = m.reward;
+          targetRegionId = region.id;
+          regionModified = true;
+          return { ...m, isClaimed: true };
+        }
+        return m;
+      });
+
+      if (!regionModified) return region;
+
+      // Check if all missions in this region are completed & claimed
+      const allDone = newMissions.every(m => m.isCompleted && m.isClaimed);
+      return {
+        ...region,
+        missions: newMissions,
+        isCompleted: allDone
+      };
+    });
+
+    if (!targetReward) {
+      sounds.playErrorSound();
+      return;
+    }
+
+    sounds.playRestorationFanfare();
+    confetti({ particleCount: 80, spread: 75, origin: { y: 0.5 } });
+
+    // Check if region was newly completed and unlock next region
+    const currentReg = newRegions.find(r => r.id === targetRegionId);
+    const updatedRelics = [...state.relicsInventory];
+    let nextRegionId = state.activeRegionId;
+    let completionDialogue: { speaker: string; avatar: string; text: string } | null = null;
+
+    if (currentReg && currentReg.isCompleted) {
+      // Award relic if not present
+      if (!updatedRelics.some(r => r.id === currentReg.relicReward.id)) {
+        updatedRelics.push(currentReg.relicReward);
+      }
+
+      // Unlock next region by stageNumber
+      const nextStage = currentReg.stageNumber + 1;
+      const nextReg = newRegions.find(r => r.stageNumber === nextStage);
+      if (nextReg) {
+        nextReg.isUnlocked = true;
+        nextRegionId = nextReg.id;
+      }
+
+      completionDialogue = {
+        speaker: '여우 고고학자 피오나',
+        avatar: '🦊',
+        text: `대단해요! [${currentReg.name}]의 모든 미션을 완수하고 전설의 유물 [${currentReg.relicReward.name}]을(를) 손에 넣었습니다! 다음 여정지로 이동할 수 있어요!`
+      };
+    }
+
+    const { coins: rCoins, gems: rGems, stars: rStars } = targetReward;
+    set({
+      continentRegions: newRegions,
+      coins: state.coins + rCoins,
+      gems: state.gems + rGems,
+      stars: state.stars + rStars,
+      relicsInventory: updatedRelics,
+      activeRegionId: nextRegionId,
+      activeAdventureDialogue: completionDialogue
+    });
+
+    saveState(get());
+    state.showToast(`🎁 [모험 보상 수령!] +${rCoins}🪙 +${rGems}💎 +${rStars}⭐ 획득!`);
+  },
+
+  closeAdventureDialogue: () => {
+    set({ activeAdventureDialogue: null });
   },
 
   rechargeEnergyTick: () => {
@@ -495,6 +696,18 @@ export const useGameStore = create<GameState>((set, get) => ({
         });
       }
 
+      // Track Adventure Missions: merge_item, reach_combo, trigger_fever
+      state.checkMissionProgress('merge_item', {
+        level: nextLevel,
+        chainId: dest.item.chainId
+      });
+      if (newCombo >= 2) {
+        state.checkMissionProgress('reach_combo', { combo: newCombo });
+      }
+      if (newCombo >= 5 && !state.isFeverActive) {
+        state.checkMissionProgress('trigger_fever');
+      }
+
       // Lucky Mystery Bubble System (28% chance on Lv.3+ merge, max 3 bubbles)
       const updatedBubbles = [...state.luckyBubbles];
       if (nextLevel >= 3 && Math.random() < 0.28 && updatedBubbles.length < 3) {
@@ -608,6 +821,9 @@ export const useGameStore = create<GameState>((set, get) => ({
     const newCoins = state.coins + order.rewardCoins;
     const newStars = state.stars + order.rewardStars;
     const newFollowers = state.followers + Math.floor(order.rewardStars * 6);
+
+    // Track Adventure Mission progress for orders
+    state.checkMissionProgress('fulfill_order');
 
     // VIP Order fulfillment
     if (order.isVIP || isVipMatch) {
@@ -983,6 +1199,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       isFeverActive: true,
       feverTimeLeft: durationSec
     });
+    get().checkMissionProgress('trigger_fever');
     get().showToast('🔥 BISTRO FEVER! 15초간 에너지 소모 0 & 보너스 골드 폭포!');
   },
 
@@ -992,6 +1209,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     if (!bubble) return;
 
     sounds.playBubblePop();
+    state.checkMissionProgress('pop_bubble');
     if (typeof document !== 'undefined') {
       const el = document.getElementById(`tile-${bubble.cellIndex}`);
       if (el) {
@@ -1177,6 +1395,10 @@ export const useGameStore = create<GameState>((set, get) => ({
       restorations: RESTORATION_NODES,
       posts: COOKSTAGRAM_POSTS,
       inventoryPocket: [null, null, null, null],
+      continentRegions: CONTINENT_REGIONS,
+      activeRegionId: 'region-1',
+      relicsInventory: [],
+      activeAdventureDialogue: null,
       toastMessage: '🔄 게임이 초기 상태로 초기화되었습니다.'
     });
   }
@@ -1198,6 +1420,9 @@ function saveState(state: GameState) {
       restorations: state.restorations,
       posts: state.posts,
       inventoryPocket: state.inventoryPocket,
+      continentRegions: state.continentRegions,
+      activeRegionId: state.activeRegionId,
+      relicsInventory: state.relicsInventory,
       lastEnergyRecharge: state.lastEnergyRecharge
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));

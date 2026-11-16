@@ -5,7 +5,7 @@ import { getItemDef, ITEM_CHAINS } from '../../data/itemsData';
 import { ItemGraphic } from '../ui/ItemGraphic';
 
 interface BottomActionBarProps {
-  currentTab: 'game' | 'restoration' | 'cookstagram' | 'math';
+  currentTab: 'game' | 'adventure' | 'restoration' | 'cookstagram' | 'math';
   onOpenHomeMenu: () => void;
   onGoToBoard: () => void;
   onGoToRestoration: () => void;
@@ -28,7 +28,8 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
     retrieveFromInventory,
     stars,
     restorations,
-    chefAvatar
+    chefAvatar,
+    relicsInventory
   } = useGameStore();
 
   const [isBackpackDrawerOpen, setIsBackpackDrawerOpen] = useState(false);
@@ -183,6 +184,18 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
                 <span>💡 동일한 아이템 2개를 합쳐 상위 레벨을 만드세요</span>
               </div>
             )
+          ) : currentTab === 'adventure' ? (
+            <div className="w-full flex items-center justify-between px-1">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <MapPin className="w-3.5 h-3.5 text-emerald-700 flex-shrink-0 animate-bounce" />
+                <span className="text-xs font-black text-slate-800 truncate">
+                  🗺️ 아스테리아 대륙 모험 중
+                </span>
+              </div>
+              <span className="text-[11px] font-black text-amber-800 bg-amber-100/90 px-1.5 py-0.5 rounded-full border border-amber-300 flex-shrink-0">
+                유물 {relicsInventory.length}/5 🏆
+              </span>
+            </div>
           ) : currentTab === 'restoration' ? (
             <div className="w-full flex items-center justify-between px-1">
               <div className="flex items-center gap-1.5 min-w-0">

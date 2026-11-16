@@ -4,7 +4,8 @@ import { useGameStore } from '../../store/useGameStore';
 import { sounds } from '../../utils/soundSynthesizer';
 
 interface ResourceHeaderProps {
-  currentTab?: 'game' | 'restoration' | 'cookstagram' | 'math';
+  currentTab?: 'game' | 'adventure' | 'restoration' | 'cookstagram' | 'math';
+  onToggleAdventure?: () => void;
   onToggleRestoration?: () => void;
   onOpenMyPage?: () => void;
   onOpenShop?: () => void;
@@ -14,6 +15,7 @@ interface ResourceHeaderProps {
 
 export const ResourceHeader: React.FC<ResourceHeaderProps> = ({
   currentTab = 'game',
+  onToggleAdventure,
   onToggleRestoration,
   onOpenMyPage,
   onOpenShop,
@@ -27,12 +29,16 @@ export const ResourceHeader: React.FC<ResourceHeaderProps> = ({
     gems,
     stars,
     restorations,
+    continentRegions,
     freeEnergyRefill,
     rechargeEnergyTick
   } = useGameStore();
 
   const nextRestorationNode = restorations.find(r => !r.isRestored);
   const canRestore = nextRestorationNode && stars >= nextRestorationNode.costStars;
+  const hasClaimableQuest = continentRegions.some(r =>
+    r.missions.some(m => m.isCompleted && !m.isClaimed)
+  );
 
   const [soundOn, setSoundOn] = useState(sounds.enabled);
   const [secondsUntilRecharge, setSecondsUntilRecharge] = useState(45);
@@ -65,13 +71,17 @@ export const ResourceHeader: React.FC<ResourceHeaderProps> = ({
     <header className="bg-gradient-to-b from-[#1b5853] via-[#104e49] to-[#0c433e] text-white px-1.5 sm:px-3 pt-[max(8px,env(safe-area-inset-top,8px))] pb-2 select-none border-b border-[#1b6b63]/60 shadow-md">
       <div className="max-w-[500px] mx-auto flex items-center justify-between gap-1 sm:gap-2">
         
-        {/* Top-Left: Map / Town Restoration Button (Swapped from Bottom-Right) */}
+        {/* Top-Left: Continent Adventure Map Button */}
         <button
-          onClick={onToggleRestoration}
-          title={currentTab === 'restoration' ? '머지 보드로 복귀' : '식당 & 유적 복원 맵으로 이동'}
+          onClick={onToggleAdventure || onToggleRestoration}
+          title={
+            currentTab === 'adventure' || currentTab === 'restoration'
+              ? '머지 보드로 복귀'
+              : '아스테리아 대륙 모험 지도로 이동'
+          }
           className="relative w-10 h-10 sm:w-11 sm:h-11 p-0 bg-transparent border-0 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0 cursor-pointer drop-shadow-md"
         >
-          {currentTab === 'restoration' ? (
+          {currentTab === 'adventure' || currentTab === 'restoration' ? (
             <div className="w-full h-full rounded-full bg-gradient-to-b from-amber-500 to-orange-600 border-2 border-white shadow-md flex flex-col items-center justify-center text-white">
               <Gamepad2 className="w-5 h-5 drop-shadow" />
               <span className="text-[8px] font-black -mt-0.5 tracking-tighter">보드</span>
@@ -83,12 +93,16 @@ export const ResourceHeader: React.FC<ResourceHeaderProps> = ({
                 alt="Map"
                 className="w-full h-full object-contain filter drop-shadow-sm"
               />
-              {/* Notification ping badge if restoration is ready */}
-              {canRestore && (
+              {/* Notification badge if quest claimable or restoration ready */}
+              {hasClaimableQuest ? (
+                <div className="absolute -top-1 -right-1 bg-amber-400 text-amber-950 font-black text-[8px] px-1 py-0.2 rounded-full flex items-center justify-center border border-white shadow animate-bounce">
+                  🎯UP!
+                </div>
+              ) : canRestore ? (
                 <div className="absolute -top-1 -right-1 bg-rose-500 text-white font-black text-[8px] px-1 py-0.2 rounded-full flex items-center justify-center border border-white shadow animate-bounce">
                   ⭐UP!
                 </div>
-              )}
+              ) : null}
             </>
           )}
         </button>

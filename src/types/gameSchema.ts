@@ -113,3 +113,65 @@ export interface StaffCharacter {
   passivePerk: string;
   lore: string;
 }
+
+export type AdventureMissionType =
+  | 'merge_item'
+  | 'fulfill_order'
+  | 'reach_combo'
+  | 'spend_stars'
+  | 'pop_bubble'
+  | 'trigger_fever';
+
+export interface AdventureMission {
+  id: string;
+  regionId: string;
+  title: string;
+  description: string;
+  storyQuote: {
+    speaker: string;
+    avatar: string;
+    text: string;
+  };
+  type: AdventureMissionType;
+  targetCount: number;
+  targetLevel?: number;
+  targetChainId?: ItemChainId;
+  currentCount: number;
+  isCompleted: boolean;
+  isClaimed: boolean;
+  reward: {
+    coins: number;
+    gems: number;
+    stars: number;
+  };
+}
+
+export interface ContinentRelic {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  perk: string;
+  unlockedAtRegion: string;
+}
+
+export interface ContinentRegion {
+  id: string;
+  stageNumber: number;
+  name: string;
+  subtitle: string;
+  themeColor: string;
+  accentBg: string;
+  icon: string;
+  mapCoords: {
+    x: number; // 0..100% on map
+    y: number; // 0..100% on map
+  };
+  recommendedLevel: number;
+  lore: string;
+  missions: AdventureMission[];
+  isUnlocked: boolean;
+  isCompleted: boolean;
+  relicReward: ContinentRelic;
+}
+

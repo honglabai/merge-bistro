@@ -5,6 +5,7 @@ import { OrderQueueBar } from './components/board/OrderQueueBar';
 import { MergeBoard } from './components/board/MergeBoard';
 import { BottomActionBar } from './components/board/BottomActionBar';
 import { TownRestorationView } from './components/meta/TownRestorationView';
+import { ContinentMapView } from './components/adventure/ContinentMapView';
 import { CookstagramView } from './components/meta/CookstagramView';
 import { MathSimulatorView } from './components/meta/MathSimulatorView';
 import { DialogueModal } from './components/modals/DialogueModal';
@@ -18,7 +19,7 @@ import { Toast } from './components/ui/Toast';
 import { ParticleCanvas } from './components/ui/ParticleCanvas';
 
 export const App: React.FC = () => {
-  const [currentTab, setCurrentTab] = useState<'game' | 'restoration' | 'cookstagram' | 'math'>('game');
+  const [currentTab, setCurrentTab] = useState<'game' | 'adventure' | 'restoration' | 'cookstagram' | 'math'>('game');
   const [isMyPageOpen, setIsMyPageOpen] = useState(false);
   const [isShopOpen, setIsShopOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
@@ -61,6 +62,13 @@ export const App: React.FC = () => {
         <div className="flex-shrink-0 z-30">
           <ResourceHeader
             currentTab={currentTab}
+            onToggleAdventure={() => {
+              if (currentTab === 'adventure') {
+                setCurrentTab('game');
+              } else {
+                setCurrentTab('adventure');
+              }
+            }}
             onToggleRestoration={() => {
               if (currentTab === 'restoration') {
                 setCurrentTab('game');
@@ -95,6 +103,27 @@ export const App: React.FC = () => {
                 currentTab={currentTab}
                 onOpenHomeMenu={() => setIsHomeMenuOpen(true)}
                 onGoToBoard={() => setCurrentTab('game')}
+                onGoToRestoration={() => setCurrentTab('adventure')}
+                onOpenMyPage={() => setIsMyPageOpen(true)}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* 1.5번: 아스테리아 대륙 모험 지도 (RPG 시나리오) 화면 */}
+        {currentTab === 'adventure' && (
+          <div className="flex-1 min-h-0 flex flex-col justify-between w-full bg-[#FAF7F2] overflow-hidden">
+            <div className="flex-1 min-h-0 overflow-y-auto px-2.5 py-2.5 no-scrollbar">
+              <ContinentMapView
+                onBackToBoard={() => setCurrentTab('game')}
+                onGoToRestoration={() => setCurrentTab('restoration')}
+              />
+            </div>
+            <div className="flex-shrink-0 p-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom,0.75rem))] border-t border-[#D4A373]/40 bg-[#008770]">
+              <BottomActionBar
+                currentTab={currentTab}
+                onOpenHomeMenu={() => setIsHomeMenuOpen(true)}
+                onGoToBoard={() => setCurrentTab('game')}
                 onGoToRestoration={() => setCurrentTab('restoration')}
                 onOpenMyPage={() => setIsMyPageOpen(true)}
               />
@@ -106,7 +135,10 @@ export const App: React.FC = () => {
         {currentTab === 'restoration' && (
           <div className="flex-1 min-h-0 flex flex-col justify-between w-full bg-[#FAF7F2] overflow-hidden">
             <div className="flex-1 min-h-0 overflow-y-auto px-3 py-3 no-scrollbar">
-              <TownRestorationView onBackToBoard={() => setCurrentTab('game')} />
+              <TownRestorationView
+                onBackToBoard={() => setCurrentTab('game')}
+                onGoToAdventure={() => setCurrentTab('adventure')}
+              />
             </div>
             <div className="flex-shrink-0 p-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom,0.75rem))] border-t border-[#D4A373]/40 bg-[#008770]">
               <BottomActionBar
