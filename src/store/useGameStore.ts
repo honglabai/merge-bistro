@@ -10,12 +10,17 @@ import {
   LuckyBubble,
   ContinentRegion,
   ContinentRelic,
-  AdventureMissionType
+  AdventureMissionType,
+  CharacterStats,
+  CharacterEvolutionTier,
+  LevelMilestone,
+  LevelUpEvent
 } from '../types/gameSchema';
 import { createInitialBoard } from '../data/initialBoardData';
 import { INITIAL_ORDERS, ORDER_POOL, RESTORATION_NODES } from '../data/ordersAndMetaData';
 import { COOKSTAGRAM_POSTS } from '../data/storyAndCookstagramData';
 import { CONTINENT_REGIONS } from '../data/adventureMissionsData';
+import { calculateExpForLevel, getTierForLevel, LEVEL_MILESTONES, STAT_INFO } from '../data/characterProgressionData';
 import { ITEM_CHAINS, getItemDef } from '../data/itemsData';
 import { sounds } from '../utils/soundSynthesizer';
 import { emitMergeParticles } from '../components/ui/ParticleCanvas';
@@ -54,6 +59,14 @@ interface GameState {
   vipRushOrder: CustomerOrder | null;
   vipCountdown: number;
 
+  // Character RPG Progression State
+  level: number;
+  exp: number;
+  expToNextLevel: number;
+  statPoints: number;
+  stats: CharacterStats;
+  pendingLevelUp: LevelUpEvent | null;
+
   // Adventure RPG Continent State
   continentRegions: ContinentRegion[];
   activeRegionId: string;
@@ -62,6 +75,9 @@ interface GameState {
 
   // Actions
   init: () => void;
+  addExp: (amount: number, reason?: string) => void;
+  allocateStatPoint: (stat: keyof CharacterStats) => void;
+  dismissLevelUpModal: () => void;
   selectAdventureRegion: (regionId: string) => void;
   checkMissionProgress: (
     type: AdventureMissionType,
@@ -137,6 +153,12 @@ export const useGameStore = create<GameState>((set, get) => ({
   luckyBubbles: [],
   vipRushOrder: null,
   vipCountdown: 45,
+  level: 1,
+  exp: 0,
+  expToNextLevel: calculateExpForLevel(1),
+  statPoints: 0,
+  stats: { dexterity: 0, vitality: 0, luck: 0, charisma: 0 },
+  pendingLevelUp: null,
   continentRegions: CONTINENT_REGIONS,
   activeRegionId: 'region-1',
   relicsInventory: [],
@@ -151,7 +173,18 @@ export const useGameStore = create<GameState>((set, get) => ({
         const parsed = JSON.parse(saved);
         const storedLastRecharge = typeof parsed.lastEnergyRecharge === 'number' ? parsed.lastEnergyRecharge : Date.now();
         const storedEnergy = typeof parsed.energy === 'number' ? parsed.energy : 100;
-        const maxE = 100;
+        const storedLevel = typeof parsed.level === 'number' && parsed.level >= 1 ? parsed.level : 1;
+        const storedExp = typeof parsed.exp === 'number' && parsed.exp >= 0 ? parsed.exp : 0;
+        const storedStatPoints = typeof parsed.statPoints === 'number' && parsed.statPoints >= 0 ? parsed.statPoints : 0;
+        const storedStats: CharacterStats = parsed.stats && typeof parsed.stats.dexterity === 'number'
+          ? {
+              dexterity: parsed.stats.dexterity || 0,
+              vitality: parsed.stats.vitality || 0,
+              luck: parsed.stats.luck || 0,
+              charisma: parsed.stats.charisma || 0
+            }
+          : { dexterity: 0, vitality: 0, luck: 0, charisma: 0 };
+        const maxE = 100 + storedStats.vitality * 5;
 
         // Calculate offline elapsed energy
         const elapsedSec = Math.floor((Date.now() - storedLastRecharge) / 1000);
@@ -251,6 +284,12 @@ export const useGameStore = create<GameState>((set, get) => ({
         set({
           board: sanitizedBoard,
           energy: Math.min(maxE, storedEnergy + recoveredOfflineEnergy),
+          maxEnergy: maxE,
+          level: storedLevel,
+          exp: storedExp,
+          expToNextLevel: calculateExpForLevel(storedLevel),
+          statPoints: storedStatPoints,
+          stats: storedStats,
           coins: typeof parsed.coins === 'number' ? parsed.coins : 150,
           stars: typeof parsed.stars === 'number' ? parsed.stars : 5,
           gems: typeof parsed.gems === 'number' ? parsed.gems : 30,
@@ -291,6 +330,111 @@ export const useGameStore = create<GameState>((set, get) => ({
         saveState(get());
       }, 5000);
     }
+  },
+
+  addExp: (amount: number, reason?: string) => {
+    const state = get();
+    if (amount <= 0) return;
+
+    let currentLevel = state.level;
+    let currentExp = state.exp + amount;
+    let expRequired = calculateExpForLevel(currentLevel);
+    let levelsGained = 0;
+    let totalStatPointsGained = 0;
+    let totalRewardCoins = 0;
+    let totalRewardGems = 0;
+
+    while (currentExp >= expRequired && currentLevel < 100) {
+      currentExp -= expRequired;
+      currentLevel++;
+      levelsGained++;
+      totalStatPointsGained += 3;
+      totalRewardCoins += currentLevel * 100;
+      totalRewardGems += Math.min(25, 5 + Math.floor(currentLevel / 2));
+      expRequired = calculateExpForLevel(currentLevel);
+    }
+
+    if (levelsGained > 0) {
+      const oldTier = getTierForLevel(state.level);
+      const newTier = getTierForLevel(currentLevel);
+      const hasTierUp = newTier.tierId > oldTier.tierId;
+      const milestone = LEVEL_MILESTONES.find(m => m.level === currentLevel);
+
+      if (milestone) {
+        totalRewardCoins += milestone.rewardCoins;
+        totalRewardGems += milestone.rewardGems;
+      }
+
+      const maxE = 100 + state.stats.vitality * 5;
+      const energyBonus = 50;
+      const refilledEnergy = maxE + energyBonus;
+
+      const levelUpEvent: LevelUpEvent = {
+        oldLevel: state.level,
+        newLevel: currentLevel,
+        statPointsGained: totalStatPointsGained,
+        rewardCoins: totalRewardCoins,
+        rewardGems: totalRewardGems,
+        energyRefilled: refilledEnergy,
+        newTier: hasTierUp ? newTier : undefined,
+        milestone: milestone || undefined
+      };
+
+      sounds.playRestorationFanfare();
+      confetti({
+        particleCount: 100,
+        spread: 90,
+        origin: { y: 0.4 }
+      });
+
+      set({
+        level: currentLevel,
+        exp: currentExp,
+        expToNextLevel: expRequired,
+        statPoints: state.statPoints + totalStatPointsGained,
+        coins: state.coins + totalRewardCoins,
+        gems: state.gems + totalRewardGems,
+        energy: Math.max(state.energy, refilledEnergy),
+        pendingLevelUp: levelUpEvent
+      });
+
+      saveState(get());
+    } else {
+      set({
+        exp: currentExp,
+        expToNextLevel: expRequired
+      });
+    }
+  },
+
+  allocateStatPoint: (stat: keyof CharacterStats) => {
+    const state = get();
+    if (state.statPoints <= 0) {
+      sounds.playErrorSound();
+      state.showToast('사용 가능한 스탯 포인트가 부족합니다!');
+      return;
+    }
+
+    sounds.playUnlockSound();
+    const newStats = {
+      ...state.stats,
+      [stat]: (state.stats[stat] || 0) + 1
+    };
+    const newMaxEnergy = 100 + newStats.vitality * 5;
+
+    set({
+      statPoints: state.statPoints - 1,
+      stats: newStats,
+      maxEnergy: newMaxEnergy,
+      energy: stat === 'vitality' ? state.energy + 5 : state.energy
+    });
+
+    saveState(get());
+    state.showToast(`✨ ${STAT_INFO[stat].name} +1 상승!`);
+  },
+
+  dismissLevelUpModal: () => {
+    set({ pendingLevelUp: null });
   },
 
   selectAdventureRegion: (regionId: string) => {
@@ -450,8 +594,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       activeAdventureDialogue: completionDialogue
     });
 
+    // Award Adventure Mission EXP
+    get().addExp(120, '대륙 모험 미션 완수');
+
     saveState(get());
-    state.showToast(`🎁 [모험 보상 수령!] +${rCoins}🪙 +${rGems}💎 +${rStars}⭐ 획득!`);
+    state.showToast(`🎁 [모험 보상 수령!] +${rCoins}🪙 +${rGems}💎 +${rStars}⭐ +120 EXP 획득!`);
   },
 
   closeAdventureDialogue: () => {
@@ -669,11 +816,11 @@ export const useGameStore = create<GameState>((set, get) => ({
         }
       }
 
-      // Combo System
+      // Combo System & Dexterity Coin Bonus
       const now = Date.now();
       const isQuickMerge = now - state.lastMergeTime < 2800;
       const newCombo = isQuickMerge ? state.comboCount + 1 : 1;
-      let extraCoins = 0;
+      let extraCoins = Math.floor((state.stats.dexterity || 0) * 3);
 
       if (state.isFeverActive) {
         extraCoins += 10;
@@ -708,9 +855,10 @@ export const useGameStore = create<GameState>((set, get) => ({
         state.checkMissionProgress('trigger_fever');
       }
 
-      // Lucky Mystery Bubble System (28% chance on Lv.3+ merge, max 3 bubbles)
+      // Lucky Mystery Bubble System (28% base chance + Luck stat boost, max 3 bubbles)
       const updatedBubbles = [...state.luckyBubbles];
-      if (nextLevel >= 3 && Math.random() < 0.28 && updatedBubbles.length < 3) {
+      const luckBonusRate = (state.stats.luck || 0) * 0.015;
+      if (nextLevel >= 3 && Math.random() < (0.28 + luckBonusRate) && updatedBubbles.length < 3) {
         const bubbleId = `bubble-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
         updatedBubbles.push({
           id: bubbleId,
@@ -751,6 +899,11 @@ export const useGameStore = create<GameState>((set, get) => ({
         selectedTileIndex: null,
         dragOverIndex: null
       });
+
+      // Award EXP for successful merge with Dexterity boost
+      const mergeExp = Math.max(6, nextLevel * 3 + Math.floor((state.stats.dexterity || 0) * 1.5));
+      get().addExp(mergeExp, '아이템 합성');
+
       saveState(get());
       return;
     }
@@ -818,9 +971,12 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
 
     const newBoard = state.board.map(c => (c.index === matchingCell.index ? { ...c, item: null } : c));
-    const newCoins = state.coins + order.rewardCoins;
-    const newStars = state.stars + order.rewardStars;
-    const newFollowers = state.followers + Math.floor(order.rewardStars * 6);
+    const charismaMultiplier = 1 + ((state.stats.charisma || 0) * 0.02);
+    const awardedCoins = Math.floor(order.rewardCoins * charismaMultiplier);
+    const awardedStars = Math.max(1, Math.floor(order.rewardStars * charismaMultiplier));
+    const newCoins = state.coins + awardedCoins;
+    const newStars = state.stars + awardedStars;
+    const newFollowers = state.followers + Math.floor(awardedStars * 6);
 
     // Track Adventure Mission progress for orders
     state.checkMissionProgress('fulfill_order');
@@ -834,7 +990,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         spread: 80,
         origin: { y: 0.5 }
       });
-      state.showToast(`👑 [VIP 특급 성공!] +${order.rewardCoins}🪙 +${order.rewardStars}⭐ +${extraGems}💎 보석 획득!`);
+      state.showToast(`👑 [VIP 특급 성공!] +${awardedCoins}🪙 +${awardedStars}⭐ +${extraGems}💎 보석 획득!`);
       set({
         board: newBoard,
         coins: newCoins,
@@ -844,6 +1000,11 @@ export const useGameStore = create<GameState>((set, get) => ({
         vipRushOrder: null,
         vipCountdown: 90
       });
+
+      // Award VIP Order EXP
+      const vipExp = Math.floor(60 + order.rewardStars * 12 + ((state.stats.charisma || 0) * 4));
+      get().addExp(vipExp, 'VIP 특급 서빙 완료');
+
       saveState(get());
       return;
     }
@@ -866,7 +1027,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       return o;
     });
 
-    state.showToast(`🛎️ ${order.customerName} 서빙 완료! +${order.rewardCoins}🪙 +${order.rewardStars}⭐ 획득!`);
+    state.showToast(`🛎️ ${order.customerName} 서빙 완료! +${awardedCoins}🪙 +${awardedStars}⭐ 획득!`);
 
     set({
       board: newBoard,
@@ -875,6 +1036,10 @@ export const useGameStore = create<GameState>((set, get) => ({
       followers: newFollowers,
       orders: newOrders
     });
+
+    // Award Normal Order EXP
+    const normalExp = Math.floor(25 + order.rewardStars * 8 + ((state.stats.charisma || 0) * 3));
+    get().addExp(normalExp, '손님 주문 서빙 완료');
 
     saveState(get());
   },
@@ -1200,6 +1365,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       feverTimeLeft: durationSec
     });
     get().checkMissionProgress('trigger_fever');
+    get().addExp(35, '피버 타임 발동');
     get().showToast('🔥 BISTRO FEVER! 15초간 에너지 소모 0 & 보너스 골드 폭포!');
   },
 
@@ -1254,6 +1420,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       gems: state.gems + extraGems,
       luckyBubbles: state.luckyBubbles.filter(b => b.id !== bubbleId)
     });
+
+    get().addExp(25, '럭키 버블 오픈');
     saveState(get());
     state.showToast(toastMsg);
   },
@@ -1381,6 +1549,13 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({
       board: createInitialBoard(),
       energy: 100,
+      maxEnergy: 100,
+      level: 1,
+      exp: 0,
+      expToNextLevel: calculateExpForLevel(1),
+      statPoints: 0,
+      stats: { dexterity: 0, vitality: 0, luck: 0, charisma: 0 },
+      pendingLevelUp: null,
       coins: 150,
       stars: 5,
       gems: 30,
@@ -1416,6 +1591,10 @@ function saveState(state: GameState) {
       chefName: state.chefName,
       chefAvatar: state.chefAvatar,
       chefTitle: state.chefTitle,
+      level: state.level,
+      exp: state.exp,
+      statPoints: state.statPoints,
+      stats: state.stats,
       orders: state.orders,
       restorations: state.restorations,
       posts: state.posts,

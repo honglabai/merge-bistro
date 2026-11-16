@@ -3,6 +3,7 @@ import { X, Gamepad2, Hammer, Camera, Calculator, Volume2, VolumeX, RotateCcw, H
 import { useGameStore } from '../../store/useGameStore';
 import { sounds } from '../../utils/soundSynthesizer';
 import { ItemGraphic } from '../ui/ItemGraphic';
+import { getTierForLevel } from '../../data/characterProgressionData';
 
 interface HomeMenuModalProps {
   isOpen: boolean;
@@ -37,8 +38,12 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
     retrieveFromInventory,
     freeEnergyRefill,
     restorations,
-    continentRegions
+    continentRegions,
+    level,
+    statPoints
   } = useGameStore();
+
+  const tier = getTierForLevel(level);
 
   const [soundOn, setSoundOn] = React.useState(sounds.enabled);
 
@@ -76,15 +81,23 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
                 />
               </div>
               <div className="absolute -bottom-1 -right-1 bg-gradient-to-br from-amber-400 to-amber-600 text-white font-black text-[9px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow">
-                49
+                {level}
               </div>
             </div>
             <div>
               <div className="text-sm font-black text-amber-200 flex items-center gap-1.5 group-hover:text-white transition-colors">
                 <span>{chefName || '비스트로 총괄 본부'}</span>
-                <span className="text-[10px] bg-amber-500/30 text-amber-300 px-2 py-0.5 rounded-full border border-amber-400/30">
-                  Lv.49
+                <span className="text-[10px] bg-amber-500/30 text-amber-300 px-2 py-0.5 rounded-full border border-amber-400/30 font-black">
+                  Lv.{level}
                 </span>
+                <span className="text-[10px] text-amber-300/80 font-bold hidden sm:inline">
+                  {tier.badge} {tier.name}
+                </span>
+                {statPoints > 0 && (
+                  <span className="text-[9px] bg-rose-500 text-white font-black px-1.5 py-0.2 rounded-full animate-pulse shadow-xs">
+                    +{statPoints} PT
+                  </span>
+                )}
               </div>
               <div className="text-[11px] text-amber-100/70 font-semibold flex items-center gap-2 mt-0.5">
                 <span>⭐ {stars}</span>

@@ -15,6 +15,7 @@ import { HelpGuideModal } from './components/modals/HelpGuideModal';
 import { HomeMenuModal } from './components/modals/HomeMenuModal';
 import { MyPageModal } from './components/modals/MyPageModal';
 import { ShopMarketModal } from './components/modals/ShopMarketModal';
+import { LevelUpModal } from './components/modals/LevelUpModal';
 import { Toast } from './components/ui/Toast';
 import { ParticleCanvas } from './components/ui/ParticleCanvas';
 
@@ -210,6 +211,7 @@ export const App: React.FC = () => {
         onOpenResetConfirm={() => setIsResetOpen(true)}
       />
       <ShopMarketModal isOpen={isShopOpen} onClose={() => setIsShopOpen(false)} />
+      <LevelUpModal onOpenMyPage={() => setIsMyPageOpen(true)} />
       <Toast />
 
     </div>

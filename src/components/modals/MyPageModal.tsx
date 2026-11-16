@@ -25,6 +25,8 @@ import {
 } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 import { sounds } from '../../utils/soundSynthesizer';
+import { getTierForLevel, LEVEL_MILESTONES, STAT_INFO } from '../../data/characterProgressionData';
+import { CharacterStats } from '../../types/gameSchema';
 
 interface MyPageModalProps {
   isOpen: boolean;
@@ -135,8 +137,17 @@ export const MyPageModal: React.FC<MyPageModalProps> = ({
     restorations,
     inventoryPocket,
     energy,
-    maxEnergy
+    maxEnergy,
+    level,
+    exp,
+    expToNextLevel,
+    statPoints,
+    stats,
+    allocateStatPoint
   } = useGameStore();
+
+  const tier = getTierForLevel(level);
+  const progressPercent = Math.min(100, Math.round((exp / (expToNextLevel || 1)) * 100));
 
   const [activeTab, setActiveTab] = useState<'profile' | 'stats' | 'settings' | 'guide'>(initialTab);
 
@@ -212,12 +223,12 @@ export const MyPageModal: React.FC<MyPageModalProps> = ({
             <div>
               <h2 className="text-sm sm:text-base font-black text-amber-100 flex items-center gap-1.5">
                 <span>마이페이지 & 설정</span>
-                <span className="text-[10px] bg-amber-500/30 text-amber-300 px-2 py-0.5 rounded-full border border-amber-400/30">
-                  Lv.49
+                <span className="text-[10px] bg-amber-500/30 text-amber-300 px-2 py-0.5 rounded-full border border-amber-400/30 font-black">
+                  Lv.{level}
                 </span>
               </h2>
-              <p className="text-[10px] sm:text-[11px] text-amber-200/70 font-medium">
-                바닷마을 비스트로 1호점 셰프 공간
+              <p className="text-[10px] sm:text-[11px] text-amber-200/80 font-medium">
+                {tier.badge} {tier.name} · {tier.title}
               </p>
             </div>
           </div>
@@ -237,14 +248,19 @@ export const MyPageModal: React.FC<MyPageModalProps> = ({
               setActiveTab('profile');
               sounds.playTapSound();
             }}
-            className={`flex-1 py-1.5 px-1 text-[11px] font-black rounded-t-xl flex items-center justify-center gap-1 transition-all whitespace-nowrap ${
+            className={`flex-1 py-1.5 px-1 text-[11px] font-black rounded-t-xl flex items-center justify-center gap-1 transition-all whitespace-nowrap relative ${
               activeTab === 'profile'
                 ? 'bg-[#FAF7F2] text-[#4E342E] border-t-2 border-x-2 border-[#8C6239] shadow-xs'
                 : 'text-stone-600 hover:text-stone-900 hover:bg-black/5'
             }`}
           >
             <User className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
-            <span className="whitespace-nowrap">프로필</span>
+            <span className="whitespace-nowrap">셰프 성장</span>
+            {statPoints > 0 && (
+              <span className="text-[9px] bg-rose-500 text-white font-black px-1 rounded-full animate-pulse shadow-xs">
+                +{statPoints}
+              </span>
+            )}
           </button>
 
           <button
@@ -296,102 +312,230 @@ export const MyPageModal: React.FC<MyPageModalProps> = ({
         {/* Modal Tab Content Area */}
         <div className="p-3.5 sm:p-4 overflow-y-auto space-y-4 no-scrollbar flex-1 text-slate-800">
           
-          {/* TAB 1: 셰프 프로필 */}
+          {/* TAB 1: 셰프 캐릭터 성장 센터 & 프로필 */}
           {activeTab === 'profile' && (
-            <div className="space-y-4">
+            <div className="space-y-3.5">
               
-              {/* Profile Main Card */}
-              <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300/80 rounded-2xl p-3.5 sm:p-4 shadow-sm flex flex-col sm:flex-row items-center gap-3.5">
-                {/* Big Avatar */}
-                <div className="relative flex-shrink-0">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-amber-300 via-rose-300 to-sky-300 p-1 shadow-md overflow-hidden border-2 border-white">
-                    <img
-                      src={chefAvatar}
-                      alt="Current Chef Avatar"
-                      className="w-full h-full object-cover rounded-full"
-                    />
+              {/* 1. Hero Character Tier & Growth Card */}
+              <div className="bg-gradient-to-br from-[#fffdfa] via-amber-50/70 to-orange-50/50 border-2 border-amber-300/80 rounded-2xl p-3 sm:p-3.5 shadow-sm">
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                  {/* Avatar with Tier Ring & Level Badge */}
+                  <div className="relative flex-shrink-0">
+                    <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-full bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 p-1 shadow-md overflow-hidden border-2 border-white">
+                      <img
+                        src={chefAvatar}
+                        alt="Current Chef Avatar"
+                        className="w-full h-full object-cover rounded-full"
+                      />
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 bg-gradient-to-br from-amber-600 to-amber-800 text-white font-black text-[11px] px-1.5 py-0.5 rounded-full border-2 border-white shadow flex items-center justify-center">
+                      Lv.{level}
+                    </div>
                   </div>
-                  <div className="absolute -bottom-1 -right-1 bg-gradient-to-br from-amber-500 to-amber-700 text-white font-black text-[10px] w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow">
-                    49
+
+                  {/* Profile Details & Tier Name */}
+                  <div className="flex-1 w-full text-center sm:text-left">
+                    <div className="flex items-center justify-center sm:justify-start gap-1.5">
+                      {isEditingName ? (
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="text"
+                            value={nameInput}
+                            onChange={(e) => setNameInput(e.target.value)}
+                            maxLength={12}
+                            className="px-2 py-0.5 rounded-lg border-2 border-amber-400 text-xs sm:text-sm font-extrabold text-slate-900 bg-white focus:outline-hidden"
+                            placeholder="셰프 닉네임"
+                            autoFocus
+                          />
+                          <button
+                            onClick={handleSaveName}
+                            className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-black shadow-xs"
+                          >
+                            저장
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <h3 className="text-base sm:text-lg font-black text-stone-900 flex items-center gap-1">
+                            <span>{chefName}</span>
+                          </h3>
+                          <button
+                            onClick={() => {
+                              setIsEditingName(true);
+                              setNameInput(chefName);
+                            }}
+                            className="p-1 rounded-full text-stone-400 hover:text-amber-700 hover:bg-amber-100 transition-colors"
+                            title="닉네임 변경"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Tier Badge & Title */}
+                    <div className="flex items-center justify-center sm:justify-start gap-1.5 mt-0.5">
+                      <span className="text-xs bg-amber-600/10 text-amber-900 font-extrabold px-2 py-0.5 rounded-full border border-amber-300 flex items-center gap-1">
+                        <span>{tier.badge}</span>
+                        <span>{tier.name}</span>
+                      </span>
+                      <span className="text-[11px] text-stone-500 font-bold truncate">
+                        ({tier.title})
+                      </span>
+                    </div>
+
+                    {/* Live EXP Gauge */}
+                    <div className="mt-2.5 w-full">
+                      <div className="flex justify-between items-center text-[10px] font-black text-stone-600 mb-1">
+                        <span className="flex items-center gap-1">
+                          <Zap className="w-3 h-3 text-amber-500 fill-amber-500" />
+                          <span>EXP 진행도 (Lv.{level} ➔ Lv.{level + 1})</span>
+                        </span>
+                        <span className="text-amber-700 font-black">
+                          {exp.toLocaleString()} / {expToNextLevel.toLocaleString()} ({progressPercent}%)
+                        </span>
+                      </div>
+                      <div className="w-full bg-amber-200/50 rounded-full h-2.5 overflow-hidden border border-amber-300/80 p-0.5 shadow-inner">
+                        <div
+                          className="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 h-full rounded-full transition-all duration-500 shadow-xs"
+                          style={{ width: `${progressPercent}%` }}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Profile Information & Name Edit */}
-                <div className="flex-1 w-full text-center sm:text-left">
-                  <div className="flex items-center justify-center sm:justify-start gap-2">
-                    {isEditingName ? (
-                      <div className="flex items-center gap-1.5">
-                        <input
-                          type="text"
-                          value={nameInput}
-                          onChange={(e) => setNameInput(e.target.value)}
-                          maxLength={12}
-                          className="px-2 py-0.5 rounded-lg border-2 border-amber-400 text-xs sm:text-sm font-extrabold text-slate-900 bg-white focus:outline-hidden"
-                          placeholder="셰프 닉네임"
-                          autoFocus
-                        />
-                        <button
-                          onClick={handleSaveName}
-                          className="px-2 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-black shadow-xs"
-                        >
-                          저장
-                        </button>
-                      </div>
-                    ) : (
-                      <>
-                        <h3 className="text-base sm:text-lg font-black text-stone-900 flex items-center gap-1.5">
-                          <span>{chefName}</span>
-                        </h3>
-                        <button
-                          onClick={() => {
-                            setIsEditingName(true);
-                            setNameInput(chefName);
-                          }}
-                          className="p-1 rounded-full text-stone-400 hover:text-amber-700 hover:bg-amber-100 transition-colors"
-                          title="닉네임 변경"
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                        </button>
-                      </>
-                    )}
-                  </div>
-
-                  <p className="text-xs font-bold text-amber-800 mt-0.5 flex items-center justify-center sm:justify-start gap-1">
-                    <span>👑</span>
-                    <span>{chefTitle}</span>
-                  </p>
-
-                  {/* Level & EXP Progress Bar */}
-                  <div className="mt-2 w-full">
-                    <div className="flex justify-between items-center text-[10px] font-black text-stone-600 mb-1">
-                      <span>EXP 레벨 진행도 (Lv.49 ➔ Lv.50)</span>
-                      <span className="text-amber-700 font-extrabold">4,850 / 5,000 (97%)</span>
-                    </div>
-                    <div className="w-full bg-amber-200/60 rounded-full h-2.5 overflow-hidden border border-amber-300">
-                      <div
-                        className="bg-gradient-to-r from-amber-500 to-orange-500 h-full rounded-full transition-all duration-500"
-                        style={{ width: '97%' }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Quick Tags */}
-                  <div className="flex flex-wrap gap-1.5 mt-2.5 justify-center sm:justify-start text-[10px] font-bold">
-                    <span className="bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full border border-amber-300/80">
-                      ⭐️ 미슐랭 3스타
-                    </span>
-                    <span className="bg-sky-100 text-sky-900 px-2 py-0.5 rounded-full border border-sky-300/80">
-                      🌊 바닷마을 1호점
-                    </span>
-                    <span className="bg-rose-100 text-rose-900 px-2 py-0.5 rounded-full border border-rose-300/80">
-                      ❤️ 평점 4.98
-                    </span>
-                  </div>
+                {/* Evolution Tier Passive Perk */}
+                <div className="mt-2.5 pt-2 border-t border-amber-200/60 flex items-center gap-2 text-[11px] text-amber-950 font-medium bg-amber-100/50 rounded-xl px-2.5 py-1.5">
+                  <span className="text-sm flex-shrink-0">✨</span>
+                  <span className="leading-snug">
+                    <strong className="text-amber-900 font-black">티어 특전:</strong> {tier.passiveBonus}
+                  </span>
                 </div>
               </div>
 
-              {/* Title Selector */}
-              <div className="bg-white rounded-2xl p-3.5 border border-stone-200 shadow-xs">
+              {/* 2. RPG Stat Points & Attribute Allocation */}
+              <div className="bg-white rounded-2xl p-3 sm:p-3.5 border border-stone-200 shadow-xs">
+                <div className="flex items-center justify-between mb-2.5">
+                  <div className="flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-amber-500" />
+                    <span className="text-xs font-black text-stone-900">셰프 역량 강화 (RPG 스탯)</span>
+                  </div>
+                  <div className={`px-2.5 py-0.5 rounded-full text-[11px] font-black border flex items-center gap-1 ${
+                    statPoints > 0
+                      ? 'bg-rose-50 text-rose-700 border-rose-300 animate-pulse'
+                      : 'bg-stone-100 text-stone-600 border-stone-200'
+                  }`}>
+                    <span>보유 포인트:</span>
+                    <strong className="text-xs">{statPoints} PT</strong>
+                  </div>
+                </div>
+
+                {statPoints > 0 && (
+                  <div className="mb-2.5 bg-gradient-to-r from-rose-500/10 via-amber-500/10 to-rose-500/10 border border-rose-300 rounded-xl p-2 text-center text-[11px] font-bold text-rose-900">
+                    🎉 레벨업으로 스탯 포인트 획득! 원하는 능력치의 <strong className="text-rose-700 font-black">[+]</strong> 버튼을 눌러 강화하세요!
+                  </div>
+                )}
+
+                {/* 4 Core Stat Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {(['dexterity', 'vitality', 'luck', 'charisma'] as (keyof CharacterStats)[]).map((statKey) => {
+                    const info = STAT_INFO[statKey];
+                    const val = stats[statKey] || 0;
+                    return (
+                      <div
+                        key={statKey}
+                        className={`p-2.5 rounded-xl border flex flex-col justify-between ${info.bgColor} transition-all`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-base">{info.icon}</span>
+                            <span className="text-xs font-black text-stone-800">{info.name}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-black text-stone-900">+{val}</span>
+                            <button
+                              onClick={() => allocateStatPoint(statKey)}
+                              disabled={statPoints <= 0}
+                              className={`w-7 h-7 rounded-lg font-black text-xs flex items-center justify-center transition-all ${
+                                statPoints > 0
+                                  ? 'bg-amber-500 hover:bg-amber-600 active:scale-90 text-white shadow-md shadow-amber-500/30 cursor-pointer'
+                                  : 'bg-stone-200 text-stone-400 cursor-not-allowed opacity-60'
+                              }`}
+                              title={statPoints > 0 ? `${info.name} +1 투자` : '스탯 포인트 부족'}
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                        <div className="text-[10px] text-stone-600 font-semibold leading-tight">
+                          {info.effectText(val)}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 3. Level Milestones Roadmap */}
+              <div className="bg-white rounded-2xl p-3 sm:p-3.5 border border-stone-200 shadow-xs">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-1.5">
+                    <Award className="w-4 h-4 text-amber-600" />
+                    <span className="text-xs font-black text-stone-900">레벨 마일스톤 특전</span>
+                  </div>
+                  <span className="text-[10px] text-stone-400 font-medium">주요 성장 혜택</span>
+                </div>
+
+                <div className="space-y-1.5 max-h-48 overflow-y-auto no-scrollbar pr-0.5">
+                  {LEVEL_MILESTONES.map((m) => {
+                    const isReached = level >= m.level;
+                    return (
+                      <div
+                        key={m.level}
+                        className={`p-2 rounded-xl border flex items-center justify-between text-left transition-all ${
+                          isReached
+                            ? 'bg-emerald-50/70 border-emerald-300 text-stone-900'
+                            : 'bg-stone-50 border-stone-200 text-stone-500 opacity-80'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">{m.icon}</span>
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <span className={`text-[10px] font-black px-1.5 py-0.2 rounded-md ${
+                                isReached ? 'bg-emerald-600 text-white' : 'bg-stone-200 text-stone-600'
+                              }`}>
+                                Lv.{m.level}
+                              </span>
+                              <span className="text-xs font-black">{m.title}</span>
+                            </div>
+                            <div className="text-[10px] font-medium text-stone-600 mt-0.5">
+                              ✨ {m.bonusPerk}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex-shrink-0 text-right">
+                          {isReached ? (
+                            <span className="text-[10px] font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
+                              달성 완료 ✓
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-bold text-stone-400 bg-stone-100 px-2 py-0.5 rounded-full border border-stone-200 flex items-center gap-0.5">
+                              <Lock className="w-2.5 h-2.5" />
+                              잠김
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 4. Title Selector */}
+              <div className="bg-white rounded-2xl p-3 sm:p-3.5 border border-stone-200 shadow-xs">
                 <div className="text-xs font-extrabold text-stone-800 mb-2 flex items-center gap-1.5">
                   <Award className="w-4 h-4 text-amber-600" />
                   <span>셰프 칭호 선택</span>
@@ -414,8 +558,8 @@ export const MyPageModal: React.FC<MyPageModalProps> = ({
                 </div>
               </div>
 
-              {/* Avatar Selection Grid */}
-              <div className="bg-white rounded-2xl p-3.5 border border-stone-200 shadow-xs">
+              {/* 5. Avatar Selection Grid */}
+              <div className="bg-white rounded-2xl p-3 sm:p-3.5 border border-stone-200 shadow-xs">
                 <div className="text-xs font-extrabold text-stone-800 mb-2 flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <Sparkles className="w-4 h-4 text-amber-500" />

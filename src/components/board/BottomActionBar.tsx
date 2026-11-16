@@ -29,7 +29,9 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
     stars,
     restorations,
     chefAvatar,
-    relicsInventory
+    relicsInventory,
+    level,
+    statPoints
   } = useGameStore();
 
   const [isBackpackDrawerOpen, setIsBackpackDrawerOpen] = useState(false);
@@ -234,12 +236,18 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
           </div>
           {/* Level Star Badge */}
           <div className="absolute -bottom-1 -left-1 bg-gradient-to-br from-amber-400 to-amber-600 text-white font-black text-[9px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-md">
-            49
+            {level}
           </div>
-          {/* Settings Gear Badge */}
-          <div className="absolute -top-1 -right-1 bg-stone-800 text-white p-0.5 rounded-full border border-white shadow flex items-center justify-center">
-            <Settings className="w-2.5 h-2.5 text-amber-300" />
-          </div>
+          {/* Settings Gear Badge or Unspent Stat Points Notification */}
+          {statPoints > 0 ? (
+            <div className="absolute -top-1 -right-1 bg-rose-600 text-white font-black text-[8px] px-1 py-0.2 rounded-full border border-white shadow animate-bounce">
+              +{statPoints}
+            </div>
+          ) : (
+            <div className="absolute -top-1 -right-1 bg-stone-800 text-white p-0.5 rounded-full border border-white shadow flex items-center justify-center">
+              <Settings className="w-2.5 h-2.5 text-amber-300" />
+            </div>
+          )}
         </button>
 
       </div>

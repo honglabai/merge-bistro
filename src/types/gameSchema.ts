@@ -175,3 +175,47 @@ export interface ContinentRegion {
   relicReward: ContinentRelic;
 }
 
+// ==========================================
+// Character RPG Progression Types
+// ==========================================
+export interface CharacterStats {
+  dexterity: number; // 🍳 손놀림: 머지 추가 코인 & 추가 EXP 획득 확률
+  vitality: number;  // ⚡ 활력: 최대 에너지 상한선 및 충전 속도 증가
+  luck: number;      // 🍀 행운: 럭키 버블 출현율 및 아이템 복제 확률 증가
+  charisma: number;  // 👑 카리스마: 주문 서빙 보상(코인/별) 배수 및 VIP 손님 호감도
+}
+
+export interface CharacterEvolutionTier {
+  tierId: number; // 1..5
+  name: string;
+  title: string;
+  badge: string;
+  frameColor: string;
+  minLevel: number;
+  maxLevel: number;
+  description: string;
+  passiveBonus: string;
+}
+
+export interface LevelMilestone {
+  level: number;
+  title: string;
+  icon: string;
+  description: string;
+  rewardCoins: number;
+  rewardGems: number;
+  bonusPerk: string;
+}
+
+export interface LevelUpEvent {
+  oldLevel: number;
+  newLevel: number;
+  statPointsGained: number;
+  rewardCoins: number;
+  rewardGems: number;
+  energyRefilled: number;
+  newTier?: CharacterEvolutionTier;
+  milestone?: LevelMilestone;
+}
+
+
