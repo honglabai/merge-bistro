@@ -49,7 +49,8 @@ export interface CustomerOrder {
   rewardCoins: number;
   rewardStars: number;
   isVIP?: boolean;
-  timeLeft?: number; // VIP countdown seconds
+  timeLeft?: number; // Order countdown seconds remaining
+  totalTime?: number; // Total order initial time in seconds
   rewardGems?: number; // VIP bonus gems
 }
 

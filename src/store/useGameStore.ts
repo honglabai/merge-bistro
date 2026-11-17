@@ -17,7 +17,7 @@ import {
   LevelUpEvent
 } from '../types/gameSchema';
 import { createInitialBoard } from '../data/initialBoardData';
-import { INITIAL_ORDERS, ORDER_POOL, RESTORATION_NODES, generateDynamicOrder, generateInitialOrders } from '../data/ordersAndMetaData';
+import { INITIAL_ORDERS, ORDER_POOL, RESTORATION_NODES, CUSTOMER_ROSTER, generateDynamicOrder, generateInitialOrders, calculateOrderDurationMinutes } from '../data/ordersAndMetaData';
 import { COOKSTAGRAM_POSTS } from '../data/storyAndCookstagramData';
 import { CONTINENT_REGIONS } from '../data/adventureMissionsData';
 import { calculateExpForLevel, getTierForLevel, LEVEL_MILESTONES, STAT_INFO } from '../data/characterProgressionData';
@@ -281,6 +281,26 @@ export const useGameStore = create<GameState>((set, get) => ({
           });
         }
 
+        // Sanitize orders to ensure 5-minute stepped time limit and active countdowns
+        const sanitizedOrders = activeOrders.map((ord: CustomerOrder, idx: number) => {
+          if (typeof ord.timeLeft !== 'number' || ord.timeLeft <= 0 || !ord.totalTime) {
+            const customer = CUSTOMER_ROSTER.find(c => c.id === ord.customerId);
+            const durationMin = calculateOrderDurationMinutes({
+              playerLevel: storedLevel,
+              customerPatience: customer?.patienceMinutes || 0,
+              slotIndex: idx,
+              isVIP: !!ord.isVIP
+            });
+            const total = durationMin * 60;
+            return {
+              ...ord,
+              totalTime: total,
+              timeLeft: total
+            };
+          }
+          return ord;
+        });
+
         set({
           board: sanitizedBoard,
           energy: Math.min(maxE, storedEnergy + recoveredOfflineEnergy),
@@ -297,7 +317,7 @@ export const useGameStore = create<GameState>((set, get) => ({
           chefName: typeof parsed.chefName === 'string' && parsed.chefName.trim() ? parsed.chefName : '바닷마을 총괄 셰프',
           chefAvatar: typeof parsed.chefAvatar === 'string' && parsed.chefAvatar ? parsed.chefAvatar : 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=160&q=80',
           chefTitle: typeof parsed.chefTitle === 'string' && parsed.chefTitle ? parsed.chefTitle : '미슐랭 3스타 수석 셰프',
-          orders: activeOrders,
+          orders: sanitizedOrders,
           restorations: parsed.restorations || RESTORATION_NODES,
           posts: parsed.posts || COOKSTAGRAM_POSTS,
           inventoryPocket: parsed.inventoryPocket || [null, null, null, null],
@@ -1478,21 +1498,22 @@ export const useGameStore = create<GameState>((set, get) => ({
     const state = get();
     if (state.vipRushOrder) return;
 
-    // Generate a high-stake, level-appropriate VIP order
+    // Generate a high-stake, level-appropriate VIP order with 5-minute stepped urgency
     const vipOrder = generateDynamicOrder({
       playerLevel: state.level,
       existingOrders: state.orders,
       slotIndex: 3,
       isVIP: true
     });
-    vipOrder.timeLeft = 120;
+    const vipSec = vipOrder.timeLeft || 600;
 
     set({
       vipRushOrder: vipOrder,
-      vipCountdown: 120
+      vipCountdown: vipSec
     });
     sounds.playRestorationFanfare();
-    state.showToast(`🚨 [돌발 VIP 주문!] ${vipOrder.customerName} 도착! (제한시간 2분)`);
+    const vipMinutes = Math.round(vipSec / 60);
+    state.showToast(`🚨 [돌발 VIP 주문!] ${vipOrder.customerName} 도착! (제한시간 ${vipMinutes}분)`);
   },
 
   tickGameLoop: () => {
@@ -1520,7 +1541,34 @@ export const useGameStore = create<GameState>((set, get) => ({
     // 3. Clean up expired lucky bubbles
     const validBubbles = state.luckyBubbles.filter(b => b.expiresAt > now);
 
-    // 4. VIP timer & spawn
+    // 4. Tick down normal customer orders & refresh on expiration
+    let expiredNotice = '';
+    const updatedOrders = state.orders.map((ord, idx) => {
+      const curTime = typeof ord.timeLeft === 'number' ? ord.timeLeft : (ord.totalTime || 1800);
+      const nextTime = curTime - 1;
+      if (nextTime <= 0) {
+        // Expired! Seamlessly refresh order for this slot
+        const refreshed = generateDynamicOrder({
+          playerLevel: state.level,
+          existingOrders: state.orders.filter(o => o.id !== ord.id),
+          slotIndex: idx
+        });
+        if (!expiredNotice) {
+          expiredNotice = `⏰ [${ord.customerName}] 주문 시간이 만료되어 새로운 손님이 방문했습니다!`;
+        }
+        return refreshed;
+      }
+      return {
+        ...ord,
+        timeLeft: nextTime
+      };
+    });
+
+    if (expiredNotice) {
+      state.showToast(expiredNotice);
+    }
+
+    // 5. VIP timer & spawn
     let vipOrder = state.vipRushOrder;
     let vipCountdown = state.vipCountdown;
     if (vipOrder && vipOrder.timeLeft !== undefined) {
@@ -1528,7 +1576,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       if (nextTime <= 0) {
         vipOrder = null;
         vipCountdown = 90;
-        state.showToast('🚨 VIP 손님이 시간이 지나 자리를 떴습니다.');
+        state.showToast('🚨 VIP 손님이 주문 시간 초과로 자리를 떴습니다.');
       } else {
         vipOrder = { ...vipOrder, timeLeft: nextTime };
       }
@@ -1545,6 +1593,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       isFeverActive: newFeverActive,
       feverTimeLeft: newFeverTime,
       luckyBubbles: validBubbles,
+      orders: updatedOrders,
       vipRushOrder: vipOrder,
       vipCountdown
     });

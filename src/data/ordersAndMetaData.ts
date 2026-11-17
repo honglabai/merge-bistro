@@ -7,6 +7,7 @@ export interface CustomerProfile {
   avatar: string;
   role: string;
   preferredChains: ItemChainId[];
+  patienceMinutes: number; // Patience offset in multiples of 5 (-10, -5, 0, +5, +10)
   quoteTemplates: string[];
 }
 
@@ -17,6 +18,7 @@ export const CUSTOMER_ROSTER: CustomerProfile[] = [
     avatar: '🐻',
     role: '명예 제빵 마스터',
     preferredChains: ['bakery', 'seafood', 'ruins'],
+    patienceMinutes: 0,
     quoteTemplates: [
       '화덕의 열기가 최고조다곰! 황금빛 [ITEM]을 완성할 차례라곰!',
       '버터의 결이 살아 숨쉬는 완벽한 [ITEM]을 부탁한다곰!',
@@ -29,6 +31,7 @@ export const CUSTOMER_ROSTER: CustomerProfile[] = [
     avatar: '🐱',
     role: '비스트로 수석 바리스타',
     preferredChains: ['cafe', 'seafood', 'ruins'],
+    patienceMinutes: -5,
     quoteTemplates: [
       '부드러운 크레마와 깊은 풍미! [ITEM]을 주문받았냥!',
       '골골송이 절로 나오는 환상적인 [ITEM] 부탁한다냥!',
@@ -41,6 +44,7 @@ export const CUSTOMER_ROSTER: CustomerProfile[] = [
     avatar: '🦉',
     role: '바닷마을 자치위원장',
     preferredChains: ['cafe', 'bakery', 'ruins'],
+    patienceMinutes: 10,
     quoteTemplates: [
       '마을 주민 회의 전에 따끈한 [ITEM]이 큰 활력이 되겠구려.',
       '오랜 세월을 살았지만 비스트로의 [ITEM]은 언제나 명품일세.',
@@ -53,6 +57,7 @@ export const CUSTOMER_ROSTER: CustomerProfile[] = [
     avatar: '🐧',
     role: '달콤 디저트 미식가',
     preferredChains: ['seafood', 'cafe', 'garden'],
+    patienceMinutes: 0,
     quoteTemplates: [
       '끄아악! 거친 바다 항해를 마치고 즐기는 달콤한 [ITEM]은 천상의 맛이지!',
       '디저트 쇼케이스에서 가장 빛나는 [ITEM]을 부탁하네!',
@@ -65,6 +70,7 @@ export const CUSTOMER_ROSTER: CustomerProfile[] = [
     avatar: '🦊',
     role: '고대 유적 탐사원',
     preferredChains: ['garden', 'ruins', 'bakery'],
+    patienceMinutes: 5,
     quoteTemplates: [
       '고문서 해독 중 집중력을 높여줄 [ITEM]이 꼭 필요해요!',
       '대륙 유적 발굴 현장에서 팀원들과 함께 나눌 [ITEM]을 부탁해요!',
@@ -77,6 +83,7 @@ export const CUSTOMER_ROSTER: CustomerProfile[] = [
     avatar: '🐶',
     role: '비스트로 전속 배달원',
     preferredChains: ['bakery', 'cafe', 'garden'],
+    patienceMinutes: -10,
     quoteTemplates: [
       '멍멍! 바닷마을 골목길 배달을 돌기 전에 든든한 [ITEM]이 꼭 필요해요!',
       '꼬리가 절로 흔들리는 환상의 [ITEM]! 얼른 맛보고 싶어요!',
@@ -89,6 +96,7 @@ export const CUSTOMER_ROSTER: CustomerProfile[] = [
     avatar: '🐿️',
     role: '비스트로 플랜테리어',
     preferredChains: ['garden', 'bakery', 'cafe'],
+    patienceMinutes: -5,
     quoteTemplates: [
       '온실 텃밭 식물들도 반해버린 싱그러운 [ITEM]을 부탁드려요!',
       '테이블을 예쁘게 꾸미며 향긋한 [ITEM]도 곁들이고 싶어요!',
@@ -101,6 +109,7 @@ export const CUSTOMER_ROSTER: CustomerProfile[] = [
     avatar: '🦁',
     role: '황실 수석 미식 평론가',
     preferredChains: ['seafood', 'bakery', 'ruins'],
+    patienceMinutes: 0,
     quoteTemplates: [
       '황실의 이름으로 명하노라! 최고급 [ITEM]의 품격을 보여주게!',
       '왕립 미식 평론지에 실릴 세기의 명작, 바로 [ITEM]일세!',
@@ -113,6 +122,7 @@ export const CUSTOMER_ROSTER: CustomerProfile[] = [
     avatar: '👑',
     role: '바닷마을 왕국 통치자',
     preferredChains: ['bakery', 'cafe', 'seafood', 'ruins'],
+    patienceMinutes: 0,
     quoteTemplates: [
       '짐의 입맛을 사로잡을 궁극의 명작, [ITEM]을 대령하라!',
       '왕국의 번영을 축하하는 성대한 축제에 [ITEM]이 빠질 수 없지!',
@@ -125,6 +135,7 @@ export const CUSTOMER_ROSTER: CustomerProfile[] = [
     avatar: '🐰',
     role: '허브 & 티 마스터',
     preferredChains: ['garden', 'cafe', 'seafood'],
+    patienceMinutes: 0,
     quoteTemplates: [
       '은은한 티 아로마와 완벽한 조화를 이루는 [ITEM]을 페어링할 시간이에요!',
       '달콤하고 싱그러운 [ITEM] 향에 귀가 쫑긋해져요!',
@@ -137,6 +148,7 @@ export const CUSTOMER_ROSTER: CustomerProfile[] = [
     avatar: '🦭',
     role: '대양 향신료 무역상',
     preferredChains: ['seafood', 'garden', 'ruins'],
+    patienceMinutes: 5,
     quoteTemplates: [
       '남쪽 대양 군도에서 무역선을 타고 왔소! 소문난 [ITEM]을 맛보러 왔지!',
       '진귀한 향신료 자루를 풀기 전에 최고급 [ITEM] 한 상 부탁하오!',
@@ -149,6 +161,7 @@ export const CUSTOMER_ROSTER: CustomerProfile[] = [
     avatar: '🦌',
     role: '숲속의 궁정 악사',
     preferredChains: ['cafe', 'bakery', 'garden'],
+    patienceMinutes: 5,
     quoteTemplates: [
       '선율에 영감을 불어넣어 줄 감미로운 [ITEM]을 노래하고 싶어요.',
       '숲의 정령들도 춤추게 만드는 매혹적인 [ITEM]의 향기예요.',
@@ -247,6 +260,16 @@ export function generateDynamicOrder({
   else if (finalLevel >= 9) rewardGems = 2;
   else if (finalLevel >= 7) rewardGems = 1;
 
+  // 5. Calculate 5-Minute Stepped Order Expiration Limit
+  const durationMinutes = calculateOrderDurationMinutes({
+    playerLevel: safeLvl,
+    customerPatience: customer.patienceMinutes || 0,
+    slotIndex,
+    isVIP
+  });
+  const totalTime = durationMinutes * 60;
+  const timeLeft = totalTime;
+
   return {
     id: `ord-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     customerId: customer.id,
@@ -259,8 +282,52 @@ export function generateDynamicOrder({
     rewardCoins,
     rewardStars,
     isVIP,
-    rewardGems
+    rewardGems,
+    totalTime,
+    timeLeft
   };
+}
+
+export function calculateOrderDurationMinutes({
+  playerLevel = 1,
+  customerPatience = 0,
+  slotIndex = 0,
+  isVIP = false
+}: {
+  playerLevel: number;
+  customerPatience?: number;
+  slotIndex?: number;
+  isVIP?: boolean;
+}): number {
+  const safeLvl = Math.max(1, playerLevel);
+  // Base duration starts at 60 minutes for Level 1, decreasing in 5-minute increments as player levels up
+  let baseMinutes = 60;
+  if (safeLvl <= 1) baseMinutes = 60;
+  else if (safeLvl === 2) baseMinutes = 55;
+  else if (safeLvl === 3) baseMinutes = 50;
+  else if (safeLvl === 4) baseMinutes = 45;
+  else if (safeLvl === 5) baseMinutes = 40;
+  else if (safeLvl <= 7) baseMinutes = 35;
+  else if (safeLvl <= 10) baseMinutes = 30;
+  else if (safeLvl <= 14) baseMinutes = 25;
+  else if (safeLvl <= 19) baseMinutes = 20;
+  else if (safeLvl <= 24) baseMinutes = 15;
+  else baseMinutes = 10;
+
+  const slotModifier = slotIndex === 0 ? -5 : slotIndex === 3 ? 5 : 0;
+
+  let durationMinutes: number;
+  if (isVIP) {
+    // VIP orders represent high-pressure rush orders: 40-50% duration (stepping into higher tier pace)
+    const vipCalculated = Math.floor((baseMinutes * 0.4) / 5) * 5;
+    durationMinutes = Math.max(5, Math.min(25, vipCalculated));
+  } else {
+    durationMinutes = baseMinutes + customerPatience + slotModifier;
+    durationMinutes = Math.round(durationMinutes / 5) * 5;
+    durationMinutes = Math.max(5, Math.min(60, durationMinutes));
+  }
+
+  return durationMinutes;
 }
 
 export function generateInitialOrders(playerLevel = 1): CustomerOrder[] {
