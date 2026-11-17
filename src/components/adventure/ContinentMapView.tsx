@@ -21,6 +21,14 @@ interface ContinentMapViewProps {
   onGoToRestoration?: () => void;
 }
 
+const REGION_SHORT_NAMES: Record<string, string> = {
+  'region-1': '바람의 항구',
+  'region-2': '에메랄드 숲',
+  'region-3': '타오르는 협곡',
+  'region-4': '별빛 빙하',
+  'region-5': '천공의 신전'
+};
+
 export const ContinentMapView: React.FC<ContinentMapViewProps> = ({
   onBackToBoard,
   onGoToRestoration
@@ -98,143 +106,212 @@ export const ContinentMapView: React.FC<ContinentMapViewProps> = ({
         </div>
       </div>
 
-      {/* 2. Interactive Fantasy Continent Map Canvas */}
-      <div className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden border-2 border-[#8C6239] shadow-xl bg-slate-900 group">
+      {/* 2. Interactive Fantasy Continent Map with Attached 5-Region Adventure Track */}
+      <div className="w-full rounded-2xl overflow-hidden border-2 border-[#8C6239] shadow-xl bg-[#1e130c] flex flex-col select-none">
         
-        {/* Background Fantasy Map Illustration */}
-        <img
-          src="/adventure-continent-map.jpg"
-          alt="Continent of Asteria Adventure Map"
-          className="w-full h-full object-cover filter brightness-[1.03] transition-transform duration-700 group-hover:scale-[1.02]"
-        />
-
-        {/* Atmospheric Sunlight Vignette */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />
-
-        {/* SVG Quest Pathways Connecting Biomes */}
-        <svg
-          className="absolute inset-0 w-full h-full pointer-events-none z-10"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-        >
-          {/* Animated Glowing Connection Line */}
-          <path
-            d={`M ${stageCoords[0].x} ${stageCoords[0].y} 
-               Q 18 60, ${stageCoords[1].x} ${stageCoords[1].y} 
-               Q 45 50, ${stageCoords[2].x} ${stageCoords[2].y} 
-               Q 45 35, ${stageCoords[3].x} ${stageCoords[3].y} 
-               Q 50 15, ${stageCoords[4].x} ${stageCoords[4].y}`}
-            fill="none"
-            stroke="#fbbf24"
-            strokeWidth="1.2"
-            strokeDasharray="2, 2"
-            className="animate-pulse"
+        {/* Background Map Viewport */}
+        <div className="relative w-full aspect-[16/9] bg-slate-900 overflow-hidden group">
+          <img
+            src="/adventure-continent-map.jpg"
+            alt="Continent of Asteria Adventure Map"
+            className="w-full h-full object-cover filter brightness-[1.03] transition-transform duration-700 group-hover:scale-[1.02]"
           />
-        </svg>
 
-        {/* Interactive Region Pins on Map */}
-        {continentRegions.map(region => {
-          const isSelected = region.id === selectedRegionId;
-          const isUnlocked = region.isUnlocked;
-          const isDone = region.isCompleted;
+          {/* Atmospheric Sunlight Vignette */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />
 
-          return (
-            <motion.div
-              key={region.id}
-              onClick={() => {
-                setSelectedRegionId(region.id);
-                selectAdventureRegion(region.id);
-              }}
-              whileHover={{ scale: 1.15 }}
-              whileTap={{ scale: 0.9 }}
-              style={{
-                left: `${region.mapCoords.x}%`,
-                top: `${region.mapCoords.y}%`
-              }}
-              className={`absolute -translate-x-1/2 -translate-y-1/2 z-20 cursor-pointer flex flex-col items-center ${
-                !isUnlocked ? 'opacity-70' : 'opacity-100'
-              }`}
-            >
-              {/* Pin Marker Badge */}
-              <div
-                className={`relative w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center border-2 shadow-lg transition-all ${
-                  isDone
-                    ? 'bg-gradient-to-tr from-amber-400 to-yellow-300 border-white ring-2 ring-amber-400 text-amber-950'
-                    : isUnlocked
-                    ? isSelected
-                      ? 'bg-gradient-to-tr from-emerald-500 to-teal-400 border-white ring-4 ring-emerald-300 text-white animate-bounce'
-                      : 'bg-gradient-to-tr from-sky-500 to-indigo-600 border-white text-white'
-                    : 'bg-slate-700/90 border-slate-400 text-slate-300'
+          {/* SVG Quest Pathways Connecting Biomes */}
+          <svg
+            className="absolute inset-0 w-full h-full pointer-events-none z-10"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+          >
+            {/* Animated Glowing Connection Line */}
+            <path
+              d={`M ${stageCoords[0].x} ${stageCoords[0].y} 
+                 Q 18 60, ${stageCoords[1].x} ${stageCoords[1].y} 
+                 Q 45 50, ${stageCoords[2].x} ${stageCoords[2].y} 
+                 Q 45 35, ${stageCoords[3].x} ${stageCoords[3].y} 
+                 Q 50 15, ${stageCoords[4].x} ${stageCoords[4].y}`}
+              fill="none"
+              stroke="#fbbf24"
+              strokeWidth="1.2"
+              strokeDasharray="2, 2"
+              className="animate-pulse"
+            />
+          </svg>
+
+          {/* Clean Landmark Pins on Map (No overlapping text boxes) */}
+          {continentRegions.map(region => {
+            const isSelected = region.id === selectedRegionId;
+            const isUnlocked = region.isUnlocked;
+            const isDone = region.isCompleted;
+
+            return (
+              <motion.div
+                key={region.id}
+                onClick={() => {
+                  setSelectedRegionId(region.id);
+                  selectAdventureRegion(region.id);
+                }}
+                whileHover={{ scale: 1.15 }}
+                whileTap={{ scale: 0.9 }}
+                style={{
+                  left: `${region.mapCoords.x}%`,
+                  top: `${region.mapCoords.y}%`
+                }}
+                className={`absolute -translate-x-1/2 -translate-y-1/2 z-20 cursor-pointer flex flex-col items-center ${
+                  !isUnlocked ? 'opacity-70' : 'opacity-100'
                 }`}
               >
-                {isDone ? (
-                  <Check className="w-4 h-4 stroke-[3]" />
-                ) : isUnlocked ? (
-                  <span className="text-xs font-black">{region.stageNumber}</span>
-                ) : (
-                  <Lock className="w-3.5 h-3.5" />
-                )}
+                {/* Pin Marker Badge */}
+                <div
+                  className={`relative w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border-2 shadow-lg transition-all ${
+                    isDone
+                      ? 'bg-gradient-to-tr from-amber-400 to-yellow-300 border-white ring-2 ring-amber-400 text-amber-950'
+                      : isUnlocked
+                      ? isSelected
+                        ? 'bg-gradient-to-tr from-emerald-500 to-teal-400 border-white ring-3 ring-emerald-300 text-white animate-bounce'
+                        : 'bg-gradient-to-tr from-sky-500 to-indigo-600 border-white text-white'
+                      : 'bg-slate-700/90 border-slate-400 text-slate-300'
+                  }`}
+                >
+                  {isDone ? (
+                    <Check className="w-3.5 h-3.5 stroke-[3]" />
+                  ) : isUnlocked ? (
+                    <span className="text-[11px] font-black">{region.stageNumber}</span>
+                  ) : (
+                    <Lock className="w-3 h-3" />
+                  )}
 
-                {/* Floating Character Pin if Current Unlocked Stage */}
-                {isUnlocked && !isDone && (
-                  <div className="absolute -top-3 -right-2 w-5 h-5 rounded-full overflow-hidden border border-white shadow-md bg-amber-400">
-                    <img
-                      src={chefAvatar || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80'}
-                      alt="Player"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
-              </div>
+                  {/* Floating Character Pin if Current Unlocked Stage */}
+                  {isUnlocked && !isDone && (
+                    <div className="absolute -top-2.5 -right-1.5 w-4 h-4 rounded-full overflow-hidden border border-white shadow-md bg-amber-400">
+                      <img
+                        src={chefAvatar || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80'}
+                        alt="Player"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            );
+          })}
 
-              {/* Pin Label Tooltip */}
-              <div
-                className={`mt-1 px-1.5 py-0.2 rounded-full text-[8.5px] sm:text-[9.5px] font-black whitespace-nowrap shadow-md border ${
-                  isSelected
-                    ? 'bg-amber-400 text-amber-950 border-white'
-                    : isUnlocked
-                    ? 'bg-slate-900/90 text-white border-white/40'
-                    : 'bg-black/80 text-slate-400 border-transparent'
-                }`}
-              >
-                {region.name.split('&')[0].trim()}
-              </div>
-            </motion.div>
-          );
-        })}
-
-        {/* Map Header Overlay Banner */}
-        <div className="absolute top-2 left-2 z-20 bg-slate-950/80 backdrop-blur-xs text-white px-2.5 py-1 rounded-xl border border-white/20 shadow-md pointer-events-none">
-          <div className="flex items-center gap-1.5">
-            <Compass className="w-3.5 h-3.5 text-amber-400 animate-spin" />
-            <span className="text-[10px] font-black tracking-tight text-amber-200">
-              아스테리아 대륙 모험 지도
-            </span>
+          {/* Map Header Overlay Banner */}
+          <div className="absolute top-2 left-2 z-20 bg-slate-950/80 backdrop-blur-xs text-white px-2.5 py-1 rounded-xl border border-white/20 shadow-md pointer-events-none">
+            <div className="flex items-center gap-1.5">
+              <Compass className="w-3.5 h-3.5 text-amber-400 animate-spin" />
+              <span className="text-[10px] font-black tracking-tight text-amber-200">
+                아스테리아 대륙 모험 지도
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Bottom Quick Stage Selector Pills */}
-        <div className="absolute bottom-2 inset-x-2 z-20 flex items-center justify-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-          {continentRegions.map(reg => (
-            <button
-              key={reg.id}
-              onClick={() => {
-                setSelectedRegionId(reg.id);
-                selectAdventureRegion(reg.id);
-              }}
-              className={`px-2 py-0.5 rounded-full text-[9px] font-black transition-all flex items-center gap-1 backdrop-blur-xs shadow-sm border ${
-                reg.id === selectedRegionId
-                  ? 'bg-amber-400 text-amber-950 border-white scale-105'
-                  : reg.isUnlocked
-                  ? 'bg-black/60 text-white border-white/30 hover:bg-black/80'
-                  : 'bg-black/40 text-slate-400 border-transparent'
-              }`}
-            >
-              <span>{reg.icon}</span>
-              <span>{reg.stageNumber}구역</span>
-            </button>
-          ))}
+        {/* Attached 5-Region Connected Box Row directly attached below map */}
+        <div className="w-full bg-[#24170e] border-t-2 border-[#8C6239] p-1.5 sm:p-2">
+          {/* Track Header Label */}
+          <div className="flex items-center justify-between px-1 mb-1 text-[9.5px] font-black text-amber-200/90">
+            <span className="flex items-center gap-1">
+              <MapPin className="w-3 h-3 text-amber-400" />
+              <span>대륙 탐험 5개 구역 트랙</span>
+            </span>
+            <span className="text-[8.5px] text-amber-300/70 font-medium">
+              구역 터치 시 퀘스트 전환
+            </span>
+          </div>
+
+          {/* 5 Distinct Connected Region Boxes in a Single Row */}
+          <div className="grid grid-cols-5 gap-1 relative">
+            {continentRegions.map((reg, idx) => {
+              const isSelected = reg.id === selectedRegionId;
+              const isUnlocked = reg.isUnlocked;
+              const isDone = reg.isCompleted;
+              const shortName = REGION_SHORT_NAMES[reg.id] || reg.name.split('&')[0].trim();
+
+              return (
+                <div key={reg.id} className="relative flex items-center">
+                  <motion.button
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => {
+                      setSelectedRegionId(reg.id);
+                      selectAdventureRegion(reg.id);
+                    }}
+                    className={`relative w-full py-1.5 px-0.5 rounded-xl border flex flex-col items-center justify-between text-center transition-all ${
+                      isSelected
+                        ? 'bg-gradient-to-b from-amber-300 to-amber-500 border-white text-amber-950 shadow-md ring-2 ring-amber-400/80 scale-[1.02] z-10'
+                        : isDone
+                        ? 'bg-[#1e3a2f] border-emerald-500/60 text-emerald-200 hover:bg-[#25493b]'
+                        : isUnlocked
+                        ? 'bg-[#1b263b] border-sky-400/60 text-sky-100 hover:bg-[#23324d]'
+                        : 'bg-[#18110b] border-amber-900/40 text-stone-500 opacity-60 hover:opacity-80'
+                    }`}
+                  >
+                    {/* Top: Icon + Stage */}
+                    <div className="flex items-center gap-0.5 leading-none">
+                      <span className="text-[10px] sm:text-[11px]">{reg.icon}</span>
+                      <span
+                        className={`text-[8.5px] sm:text-[9.5px] font-black ${
+                          isSelected ? 'text-amber-950' : isUnlocked ? 'text-white' : 'text-stone-400'
+                        }`}
+                      >
+                        {reg.stageNumber}구역
+                      </span>
+                    </div>
+
+                    {/* Middle: Short Region Name */}
+                    <span
+                      className={`text-[8px] sm:text-[9px] font-extrabold truncate w-full px-0.5 mt-0.5 leading-tight ${
+                        isSelected ? 'text-amber-950' : isUnlocked ? 'text-white/95' : 'text-stone-400'
+                      }`}
+                    >
+                      {shortName}
+                    </span>
+
+                    {/* Bottom: Status Pill */}
+                    <div className="mt-1">
+                      {isDone ? (
+                        <span
+                          className={`text-[7px] sm:text-[7.5px] font-black px-1 py-0.2 rounded-full leading-none flex items-center gap-0.5 ${
+                            isSelected
+                              ? 'bg-amber-950 text-amber-200'
+                              : 'bg-emerald-500/30 text-emerald-300 border border-emerald-400/50'
+                          }`}
+                        >
+                          <Check className="w-2 h-2" /> 완료
+                        </span>
+                      ) : isUnlocked ? (
+                        <span
+                          className={`text-[7px] sm:text-[7.5px] font-black px-1 py-0.2 rounded-full leading-none flex items-center gap-0.5 ${
+                            isSelected
+                              ? 'bg-amber-950 text-amber-200'
+                              : 'bg-sky-500/30 text-sky-200 border border-sky-400/50'
+                          }`}
+                        >
+                          <Flame className="w-2 h-2 text-amber-400" /> 탐험
+                        </span>
+                      ) : (
+                        <span className="text-[7px] sm:text-[7.5px] font-bold text-stone-500 px-0.5 py-0.2 rounded leading-none flex items-center gap-0.5">
+                          <Lock className="w-1.5 h-1.5" /> Lv.{reg.recommendedLevel}
+                        </span>
+                      )}
+                    </div>
+                  </motion.button>
+
+                  {/* Connecting Arrow to next box */}
+                  {idx < continentRegions.length - 1 && (
+                    <div className="absolute -right-[3px] top-1/2 -translate-y-1/2 z-20 pointer-events-none opacity-50">
+                      <ChevronRight className="w-2.5 h-2.5 text-amber-400/80" />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
+
       </div>
 
       {/* 3. Selected Region Detail & Active Missions Panel */}
