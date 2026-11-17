@@ -141,11 +141,33 @@ export const ContinentMapView: React.FC<ContinentMapViewProps> = ({
             />
           </svg>
 
-          {/* Clean Landmark Pins on Map (No overlapping text boxes) */}
+          {/* Clean Landmark Pins & Quest Progress Text on Map */}
           {continentRegions.map(region => {
             const isSelected = region.id === selectedRegionId;
             const isUnlocked = region.isUnlocked;
             const isDone = region.isCompleted;
+
+            // Formulate concise regional quest progress text
+            let questLabel = '';
+            let questStatusType: 'done' | 'active' | 'claimable' | 'locked' = 'locked';
+
+            if (isDone) {
+              questStatusType = 'done';
+              questLabel = '✔ 탐험 완료 (3/3)';
+            } else if (!isUnlocked) {
+              questStatusType = 'locked';
+              questLabel = `🔒 Lv.${region.recommendedLevel} 해금`;
+            } else {
+              const activeIdx = region.missions.findIndex(m => !m.isCompleted);
+              if (activeIdx === -1) {
+                questStatusType = 'claimable';
+                questLabel = '🎁 보상 수령 가능!';
+              } else {
+                questStatusType = 'active';
+                const activeMission = region.missions[activeIdx];
+                questLabel = `Q${activeIdx + 1}. ${activeMission.title} (${activeMission.currentCount}/${activeMission.targetCount})`;
+              }
+            }
 
             return (
               <motion.div
@@ -154,14 +176,14 @@ export const ContinentMapView: React.FC<ContinentMapViewProps> = ({
                   setSelectedRegionId(region.id);
                   selectAdventureRegion(region.id);
                 }}
-                whileHover={{ scale: 1.15 }}
-                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.12 }}
+                whileTap={{ scale: 0.95 }}
                 style={{
                   left: `${region.mapCoords.x}%`,
                   top: `${region.mapCoords.y}%`
                 }}
                 className={`absolute -translate-x-1/2 -translate-y-1/2 z-20 cursor-pointer flex flex-col items-center ${
-                  !isUnlocked ? 'opacity-70' : 'opacity-100'
+                  !isUnlocked ? 'opacity-75' : 'opacity-100'
                 }`}
               >
                 {/* Pin Marker Badge */}
@@ -194,6 +216,28 @@ export const ContinentMapView: React.FC<ContinentMapViewProps> = ({
                       />
                     </div>
                   )}
+                </div>
+
+                {/* Simple Quest Progress Text Badge on Map */}
+                <div
+                  className={`mt-1 px-1.5 py-0.5 rounded-full text-[8px] sm:text-[9px] font-black whitespace-nowrap shadow-md border backdrop-blur-xs flex items-center gap-1 transition-all select-none ${
+                    questStatusType === 'done'
+                      ? 'bg-emerald-950/90 text-emerald-300 border-emerald-500/50'
+                      : questStatusType === 'claimable'
+                      ? 'bg-gradient-to-r from-amber-500 to-emerald-500 text-white border-white animate-pulse'
+                      : questStatusType === 'active'
+                      ? isSelected
+                        ? 'bg-amber-400 text-amber-950 border-white ring-2 ring-amber-300 shadow-lg scale-105'
+                        : 'bg-slate-950/90 text-amber-200 border-amber-400/50'
+                      : 'bg-black/75 text-slate-400 border-white/10 opacity-75'
+                  }`}
+                >
+                  {questStatusType === 'active' && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping inline-block flex-shrink-0" />
+                  )}
+                  <span className="truncate max-w-[110px] sm:max-w-[140px] leading-tight">
+                    {questLabel}
+                  </span>
                 </div>
               </motion.div>
             );
