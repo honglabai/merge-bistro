@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Clock, Flame } from 'lucide-react';
+import { Check, Clock, Flame, X, Info, ChevronRight, Sparkles, ChefHat } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 import { ItemGraphic } from '../ui/ItemGraphic';
+import { ITEM_CHAINS, getItemDef } from '../../data/itemsData';
+import { CustomerOrder } from '../../types/gameSchema';
 
 export const OrderQueueBar: React.FC = () => {
-  const { orders, board, fulfillOrder, vipRushOrder } = useGameStore();
+  const { orders, board, fulfillOrder, vipRushOrder, showToast } = useGameStore();
+  const [inspectingOrder, setInspectingOrder] = useState<CustomerOrder | null>(null);
 
   const cardBorderColors = [
     'border-amber-400 bg-amber-50/90',
@@ -92,6 +95,9 @@ export const OrderQueueBar: React.FC = () => {
         <div className="w-full grid grid-cols-4 gap-1 sm:gap-1.5 items-end">
           <AnimatePresence mode="popLayout">
             {displayOrders.map((order, idx) => {
+              const chainDef = ITEM_CHAINS[order.targetChainId];
+              const itemDef = getItemDef(order.targetChainId, order.targetLevel);
+
               const hasItem = board.some(
                 cell =>
                   cell.state === 'OPEN' &&
@@ -124,11 +130,12 @@ export const OrderQueueBar: React.FC = () => {
                   whileHover={{ scale: 1.03, y: -1 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => {
-                    if (hasItem) {
-                      fulfillOrder(order.id);
+                    setInspectingOrder(order);
+                    if (chainDef && itemDef) {
+                      showToast(`📦 [${itemDef.name}] - '${chainDef.name}' 제품군 (Lv.${order.targetLevel})`);
                     }
                   }}
-                  title={`${order.customerName} (${order.customerRole}): ${order.customerQuote}\n제한시간: ${formatOrderTime(order.timeLeft)}`}
+                  title={`${order.customerName}: ${itemDef?.name || '요리'} (제품군: ${chainDef?.name || ''})\n클릭하여 제품군 및 제작 레시피 확인`}
                   className={`relative w-full h-[62px] sm:h-[66px] rounded-lg border-[1.5px] flex flex-col justify-between items-center p-0.5 shadow-md cursor-pointer transition-all backdrop-blur-xs select-none ${borderTheme} ${
                     hasItem
                       ? 'ring-2 ring-emerald-400 animate-pulse bg-emerald-50/95'
@@ -164,6 +171,12 @@ export const OrderQueueBar: React.FC = () => {
                       {isUrgent && !isVIP && (
                         <span className="absolute -top-1.5 -right-1 text-[7.5px]">🔥</span>
                       )}
+                    </div>
+
+                    {/* Mini Product Family Badge */}
+                    <div className="absolute bottom-0.5 left-0.5 z-10 px-1 py-0.2 rounded text-[6.5px] sm:text-[7px] font-black bg-black/65 text-amber-200 border border-white/20 backdrop-blur-xs flex items-center gap-0.5 pointer-events-none">
+                      <span>{chainDef?.generatorIcon}</span>
+                      <span>Lv.{order.targetLevel}</span>
                     </div>
 
                     {/* Ready Checkmark Overlay if item is ready */}
@@ -205,10 +218,18 @@ export const OrderQueueBar: React.FC = () => {
                     {/* Right: Timer or Deliver Button */}
                     <div className="flex items-center gap-0.5 text-[7px] sm:text-[7.5px] font-black text-white leading-none whitespace-nowrap flex-shrink-0">
                       {hasItem ? (
-                        <>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            fulfillOrder(order.id);
+                          }}
+                          className="flex items-center gap-0.5 text-[7px] sm:text-[7.5px] font-black text-white bg-emerald-500 hover:bg-emerald-400 active:scale-95 px-1.5 py-0.5 rounded shadow-xs"
+                          title="즉시 납품하기"
+                        >
                           <Check className="w-2 h-2 stroke-[3]" />
                           <span>납품</span>
-                        </>
+                        </button>
                       ) : isVIP ? (
                         <>
                           <Clock className="w-1.5 h-1.5 text-amber-200 animate-spin" />
@@ -255,6 +276,251 @@ export const OrderQueueBar: React.FC = () => {
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Product Family & Order Recipe Detail Modal */}
+      <AnimatePresence>
+        {inspectingOrder && (() => {
+          const order = inspectingOrder;
+          const chainDef = ITEM_CHAINS[order.targetChainId];
+          const itemDef = getItemDef(order.targetChainId, order.targetLevel);
+          const isVIP = !!order.isVIP;
+          const hasItem = board.some(
+            cell =>
+              cell.state === 'OPEN' &&
+              cell.item &&
+              cell.item.chainId === order.targetChainId &&
+              cell.item.level === order.targetLevel &&
+              !cell.item.isGenerator
+          );
+
+          // Recipe steps from Level 1 up to order.targetLevel
+          const recipeSteps = chainDef ? chainDef.items.filter(i => i.level <= order.targetLevel) : [];
+          const generatorFirstItem = chainDef?.items[0];
+
+          return (
+            <div
+              className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 select-none"
+              onClick={() => setInspectingOrder(null)}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 15 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 15 }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white rounded-3xl max-w-sm w-full p-4 sm:p-5 shadow-2xl border-4 border-[#8C6239] relative overflow-hidden max-h-[88vh] flex flex-col text-slate-800"
+              >
+                {/* Modal Top Header */}
+                <div className="flex justify-between items-start pb-2.5 border-b border-cream-200">
+                  <div className="flex items-center gap-2">
+                    <div className="relative w-9 h-9 rounded-full bg-amber-100 border-2 border-amber-400 flex items-center justify-center text-lg shadow-sm">
+                      {order.customerAvatar}
+                      {isVIP && <span className="absolute -top-1.5 -right-1 text-[11px]">👑</span>}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <h3 className="text-sm font-black text-slate-900 leading-tight">
+                          {order.customerName}
+                        </h3>
+                        {isVIP && (
+                          <span className="text-[8.5px] font-black bg-rose-500 text-white px-1.5 py-0.2 rounded-full animate-pulse">
+                            VIP 주문
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-slate-500 font-medium">
+                        {order.customerRole}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setInspectingOrder(null)}
+                    className="p-1 rounded-full text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Modal Scrollable Content */}
+                <div className="overflow-y-auto py-2.5 space-y-2.5 no-scrollbar text-xs">
+                  
+                  {/* Customer Speech Quote */}
+                  <div className="bg-amber-50/80 p-2.5 rounded-xl border border-amber-200/80 text-[11px] text-amber-950 font-medium leading-relaxed italic flex items-start gap-1.5">
+                    <span className="text-sm flex-shrink-0">💬</span>
+                    <span>"{order.customerQuote}"</span>
+                  </div>
+
+                  {/* 1. Target Item & Product Family (Category) Card */}
+                  <div className="bg-gradient-to-br from-[#FAF7F2] via-white to-amber-50/40 p-3 rounded-2xl border-2 border-[#D4A373]/60 shadow-xs space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-black text-amber-900 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
+                        <span>{chainDef?.generatorIcon}</span>
+                        <span>제품군: {chainDef?.name || order.targetChainId}</span>
+                      </span>
+                      <span className="text-[10px] font-bold text-slate-500">
+                        목표: Lv.{order.targetLevel}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-3 pt-1">
+                      <div className="w-16 h-16 sm:w-18 sm:h-18 flex-shrink-0 bg-white rounded-2xl border-2 border-amber-200/80 p-1 shadow-inner flex items-center justify-center">
+                        <ItemGraphic
+                          chainId={order.targetChainId}
+                          level={order.targetLevel}
+                          className="w-full h-full object-contain filter drop-shadow-sm"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm sm:text-base font-black text-slate-900 truncate">
+                          {itemDef?.name || '특제 비스트로 요리'}
+                        </div>
+                        <div className="text-[10px] text-amber-800 font-bold mt-0.5">
+                          분류: {chainDef?.categoryName}
+                        </div>
+                        <p className="text-[10px] text-slate-600 mt-1 leading-snug line-clamp-2">
+                          {itemDef?.description || '손님이 간절히 기다리는 특별한 비스트로 메뉴입니다.'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 2. Production Source & Generator Info */}
+                  <div className="bg-emerald-50/80 p-2.5 rounded-xl border border-emerald-200 space-y-1">
+                    <div className="flex items-center gap-1.5 text-[10.5px] font-black text-emerald-950">
+                      <ChefHat className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>생산처 (어떤 생성기에서 만드나요?)</span>
+                    </div>
+                    <p className="text-[10.5px] text-emerald-900 leading-relaxed font-medium">
+                      보드의 <strong>[{chainDef?.generatorIcon} {chainDef?.generatorName}]</strong>을(를) 탭하여 기본 재료<strong>({generatorFirstItem?.name || '기본 재료'})</strong>를 소환한 뒤, 2개씩 합성하여 <strong>Lv.{order.targetLevel}</strong>까지 완성하세요!
+                    </p>
+                  </div>
+
+                  {/* 3. Step-by-Step Merge Recipe Tree */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-[10px] font-black text-slate-700 px-0.5">
+                      <span className="flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-amber-500" />
+                        <span>합성 레시피 단계 (Lv.1 ➔ Lv.{order.targetLevel})</span>
+                      </span>
+                      <span className="text-[9px] text-amber-800 font-bold">
+                        총 {order.targetLevel}단계 합성
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-1 px-1 bg-slate-50 rounded-xl border border-slate-200">
+                      {recipeSteps.map((step, idx) => {
+                        const isTarget = step.level === order.targetLevel;
+                        return (
+                          <React.Fragment key={step.level}>
+                            <div
+                              className={`flex-shrink-0 flex flex-col items-center p-1.5 rounded-lg border text-center transition-all ${
+                                isTarget
+                                  ? 'bg-amber-100 border-amber-400 ring-2 ring-amber-300 shadow-xs'
+                                  : 'bg-white border-slate-200'
+                              }`}
+                              style={{ minWidth: '60px' }}
+                            >
+                              <span className="text-[8px] font-black text-slate-500">
+                                Lv.{step.level}
+                              </span>
+                              <div className="w-7 h-7 flex items-center justify-center my-0.5">
+                                <ItemGraphic
+                                  chainId={order.targetChainId}
+                                  level={step.level}
+                                  className="w-full h-full object-contain"
+                                />
+                              </div>
+                              <span
+                                className={`text-[8px] font-bold truncate max-w-[55px] ${
+                                  isTarget ? 'text-amber-950 font-black' : 'text-slate-700'
+                                }`}
+                              >
+                                {step.name}
+                              </span>
+                              {isTarget && (
+                                <span className="text-[6.5px] font-black bg-amber-500 text-white px-1 rounded-full mt-0.5">
+                                  목표!
+                                </span>
+                              )}
+                            </div>
+                            {idx < recipeSteps.length - 1 && (
+                              <ChevronRight className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                            )}
+                          </React.Fragment>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 4. Reward & Countdown Timer */}
+                  <div className="grid grid-cols-2 gap-2 text-center">
+                    <div className="bg-amber-50 p-2 rounded-xl border border-amber-200 flex flex-col items-center justify-center">
+                      <span className="text-[9px] font-bold text-amber-800">납품 완료 보상</span>
+                      <div className="text-xs font-black text-amber-950 flex items-center gap-1 mt-0.5">
+                        <span>+{order.rewardCoins}🪙</span>
+                        <span>+{order.rewardStars}⭐</span>
+                        {isVIP && order.rewardGems && (
+                          <span className="text-purple-600">+{order.rewardGems}💎</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="bg-sky-50 p-2 rounded-xl border border-sky-200 flex flex-col items-center justify-center">
+                      <span className="text-[9px] font-bold text-sky-800">남은 시간</span>
+                      <div className="text-xs font-black text-sky-950 flex items-center gap-1 mt-0.5">
+                        <Clock className="w-3 h-3 text-sky-600" />
+                        <span>{formatOrderTime(order.timeLeft)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Board Preparation Status */}
+                  <div
+                    className={`p-2 rounded-xl border text-[10.5px] font-bold flex items-center justify-center gap-1.5 ${
+                      hasItem
+                        ? 'bg-emerald-100 text-emerald-900 border-emerald-300 shadow-2xs'
+                        : 'bg-slate-100 text-slate-600 border-slate-200'
+                    }`}
+                  >
+                    {hasItem ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-600 stroke-[3]" />
+                        <span>보드에 완성된 아이템이 준비되어 있습니다!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Info className="w-3.5 h-3.5 text-slate-400" />
+                        <span>아직 보드에 해당 아이템이 없습니다.</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Modal Bottom Actions */}
+                <div className="pt-2 border-t border-cream-200">
+                  {hasItem ? (
+                    <button
+                      onClick={() => {
+                        fulfillOrder(order.id);
+                        setInspectingOrder(null);
+                      }}
+                      className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-xs sm:text-sm shadow-md hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-1 animate-pulse"
+                    >
+                      <Check className="w-4 h-4 stroke-[3]" />
+                      <span>지금 바로 납품하기 (+{order.rewardCoins}🪙 +{order.rewardStars}⭐)</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setInspectingOrder(null)}
+                      className="w-full py-2.5 rounded-xl bg-[#2A9D8F] hover:bg-[#1f7369] text-white font-black text-xs sm:text-sm shadow-md active:scale-95 transition-all"
+                    >
+                      확인 (보드에서 머지하여 제작)
+                    </button>
+                  )}
+                </div>
+              </motion.div>
+            </div>
+          );
+        })()}
+      </AnimatePresence>
 
     </div>
   );
