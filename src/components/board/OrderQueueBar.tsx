@@ -7,8 +7,92 @@ import { ITEM_CHAINS, getItemDef } from '../../data/itemsData';
 import { CustomerOrder } from '../../types/gameSchema';
 
 export const OrderQueueBar: React.FC = () => {
-  const { orders, board, fulfillOrder, vipRushOrder, showToast } = useGameStore();
+  const { orders, board, fulfillOrder, vipRushOrder, showToast, selectTile } = useGameStore();
   const [inspectingOrder, setInspectingOrder] = useState<CustomerOrder | null>(null);
+
+  // Multi-click tracking ref (1 click: deliver, 2 clicks: text recipe, 3 clicks: detail modal)
+  const clickTrackerRef = React.useRef<{
+    orderId: string;
+    count: number;
+    timer: NodeJS.Timeout | null;
+  }>({
+    orderId: '',
+    count: 0,
+    timer: null
+  });
+
+  React.useEffect(() => {
+    return () => {
+      if (clickTrackerRef.current.timer) {
+        clearTimeout(clickTrackerRef.current.timer);
+      }
+    };
+  }, []);
+
+  const handleCardClick = (order: CustomerOrder) => {
+    const tracker = clickTrackerRef.current;
+
+    // Reset tracker if clicking a different order card
+    if (tracker.orderId !== order.id) {
+      if (tracker.timer) clearTimeout(tracker.timer);
+      tracker.orderId = order.id;
+      tracker.count = 0;
+    }
+
+    tracker.count += 1;
+    if (tracker.timer) clearTimeout(tracker.timer);
+
+    if (tracker.count >= 3) {
+      // 3번 연속 클릭: 현재 클릭하면 나오는 세부내용 팝업 열기
+      tracker.count = 0;
+      tracker.timer = null;
+      setInspectingOrder(order);
+      return;
+    }
+
+    // 1번 또는 2번 클릭 판별 타이머 (320ms)
+    tracker.timer = setTimeout(() => {
+      const finalCount = tracker.count;
+      tracker.count = 0;
+      tracker.timer = null;
+
+      const chainDef = ITEM_CHAINS[order.targetChainId];
+      const itemDef = getItemDef(order.targetChainId, order.targetLevel);
+
+      if (finalCount === 1) {
+        // 1번 클릭: 해당 제품을 찾아서 제공 (있으면 납품, 없으면 안내 및 생성기 선택)
+        const hasItem = board.some(
+          cell =>
+            cell.state === 'OPEN' &&
+            cell.item &&
+            cell.item.chainId === order.targetChainId &&
+            cell.item.level === order.targetLevel &&
+            !cell.item.isGenerator
+        );
+
+        if (hasItem) {
+          fulfillOrder(order.id);
+        } else {
+          // Find generator on board to guide player
+          const genCell = board.find(
+            c => c.state === 'OPEN' && c.item && c.item.chainId === order.targetChainId && c.item.isGenerator
+          );
+          if (genCell) {
+            selectTile(genCell.index);
+            showToast(`🔍 보드에 [${itemDef?.name || '요리'}]이(가) 없습니다. 선택된 [${chainDef?.generatorName}]에서 제작하세요!`);
+          } else {
+            showToast(`🔍 보드에 [${itemDef?.name || '요리'}]이(가) 아직 없습니다! (Lv.${order.targetLevel})`);
+          }
+        }
+      } else if (finalCount === 2) {
+        // 2번 연속 클릭: 어떻게 만드는지 간단히 글자로만 표현
+        const firstItem = chainDef?.items[0];
+        showToast(
+          `💡 [${itemDef?.name || '요리'}] 제작법: [${chainDef?.generatorIcon} ${chainDef?.generatorName}] 탭 ➜ Lv.1 ${firstItem?.name || '재료'} ➜ Lv.${order.targetLevel}까지 합성!`
+        );
+      }
+    }, 320);
+  };
 
   const cardBorderColors = [
     'border-amber-400 bg-amber-50/90',
@@ -129,13 +213,8 @@ export const OrderQueueBar: React.FC = () => {
                   exit={{ opacity: 0, scale: 0.8, y: -10 }}
                   whileHover={{ scale: 1.03, y: -1 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => {
-                    setInspectingOrder(order);
-                    if (chainDef && itemDef) {
-                      showToast(`📦 [${itemDef.name}] - '${chainDef.name}' 제품군 (Lv.${order.targetLevel})`);
-                    }
-                  }}
-                  title={`${order.customerName}: ${itemDef?.name || '요리'} (제품군: ${chainDef?.name || ''})\n클릭하여 제품군 및 제작 레시피 확인`}
+                  onClick={() => handleCardClick(order)}
+                  title={`${order.customerName}: ${itemDef?.name || '요리'}\n• 1회 클릭: 보드 제품 찾아 납품 제공\n• 2회 연속: 제작법 텍스트 안내\n• 3회 연속: 상세 레시피 팝업`}
                   className={`relative w-full h-[62px] sm:h-[66px] rounded-lg border-[1.5px] flex flex-col justify-between items-center p-0.5 shadow-md cursor-pointer transition-all backdrop-blur-xs select-none ${borderTheme} ${
                     hasItem
                       ? 'ring-2 ring-emerald-400 animate-pulse bg-emerald-50/95'
@@ -222,6 +301,10 @@ export const OrderQueueBar: React.FC = () => {
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
+                            if (clickTrackerRef.current.timer) {
+                              clearTimeout(clickTrackerRef.current.timer);
+                              clickTrackerRef.current.count = 0;
+                            }
                             fulfillOrder(order.id);
                           }}
                           className="flex items-center gap-0.5 text-[7px] sm:text-[7.5px] font-black text-white bg-emerald-500 hover:bg-emerald-400 active:scale-95 px-1.5 py-0.5 rounded shadow-xs"
