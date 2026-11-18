@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   X,
   User,
@@ -21,12 +21,15 @@ import {
   ChefHat,
   Heart,
   TrendingUp,
-  Package
+  Package,
+  Camera,
+  Upload
 } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 import { sounds } from '../../utils/soundSynthesizer';
 import { getTierForLevel, LEVEL_MILESTONES, STAT_INFO } from '../../data/characterProgressionData';
 import { CharacterStats } from '../../types/gameSchema';
+import { AvatarCropModal } from './AvatarCropModal';
 
 interface MyPageModalProps {
   isOpen: boolean;
@@ -156,6 +159,21 @@ export const MyPageModal: React.FC<MyPageModalProps> = ({
   const [nameInput, setNameInput] = useState(chefName || '바닷마을 총괄 셰프');
   const [selectedTitle, setSelectedTitle] = useState(chefTitle || '미슐랭 3스타 수석 셰프');
 
+  // Custom Avatar Crop & Upload State
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [savedCustomAvatar, setSavedCustomAvatar] = useState<string | null>(() => {
+    try {
+      const stored = localStorage.getItem('merge_bistro_custom_avatar');
+      if (stored) return stored;
+      if (chefAvatar && chefAvatar.startsWith('data:image/')) return chefAvatar;
+      return null;
+    } catch {
+      return null;
+    }
+  });
+
   // Settings State
   const [soundOn, setSoundOn] = useState(sounds.enabled);
   const [bgmOn, setBgmOn] = useState(() => {
@@ -182,6 +200,40 @@ export const MyPageModal: React.FC<MyPageModalProps> = ({
   const handleSelectTitle = (title: string) => {
     setSelectedTitle(title);
     setChefProfile(chefName, chefAvatar, title);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('이미지 파일(JPG, PNG, WebP 등)만 선택할 수 있습니다.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target?.result as string;
+      if (result) {
+        setCropImageSrc(result);
+        setIsCropModalOpen(true);
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const handleCropComplete = (croppedDataUrl: string) => {
+    try {
+      localStorage.setItem('merge_bistro_custom_avatar', croppedDataUrl);
+    } catch (err) {
+      console.warn('Failed to save custom avatar to localStorage:', err);
+    }
+    setSavedCustomAvatar(croppedDataUrl);
+    setChefProfile(chefName, croppedDataUrl, selectedTitle);
+    setIsCropModalOpen(false);
+    setCropImageSrc(null);
+    sounds.playOrderComplete();
   };
 
   const handleToggleSound = () => {
@@ -319,8 +371,8 @@ export const MyPageModal: React.FC<MyPageModalProps> = ({
               {/* 1. Hero Character Tier & Growth Card */}
               <div className="bg-gradient-to-br from-[#fffdfa] via-amber-50/70 to-orange-50/50 border-2 border-amber-300/80 rounded-2xl p-3 sm:p-3.5 shadow-sm">
                 <div className="flex flex-col sm:flex-row items-center gap-3">
-                  {/* Avatar with Tier Ring & Level Badge */}
-                  <div className="relative flex-shrink-0">
+                  {/* Avatar with Tier Ring, Level Badge & Camera Upload Button */}
+                  <div className="relative flex-shrink-0 group">
                     <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-full bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 p-1 shadow-md overflow-hidden border-2 border-white">
                       <img
                         src={chefAvatar}
@@ -331,6 +383,14 @@ export const MyPageModal: React.FC<MyPageModalProps> = ({
                     <div className="absolute -bottom-1 -right-1 bg-gradient-to-br from-amber-600 to-amber-800 text-white font-black text-[11px] px-1.5 py-0.5 rounded-full border-2 border-white shadow flex items-center justify-center">
                       Lv.{level}
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-amber-600 hover:bg-amber-700 active:scale-90 text-white flex items-center justify-center border-2 border-white shadow-md cursor-pointer transition-all"
+                      title="내 사진으로 아바타 등록/크롭"
+                    >
+                      <Camera className="w-3 h-3" />
+                    </button>
                   </div>
 
                   {/* Profile Details & Tier Name */}
@@ -558,17 +618,94 @@ export const MyPageModal: React.FC<MyPageModalProps> = ({
                 </div>
               </div>
 
+              {/* Hidden file input for custom photo upload */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileSelect}
+              />
+
               {/* 5. Avatar Selection Grid */}
               <div className="bg-white rounded-2xl p-3 sm:p-3.5 border border-stone-200 shadow-xs">
                 <div className="text-xs font-extrabold text-stone-800 mb-2 flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <Sparkles className="w-4 h-4 text-amber-500" />
-                    <span>아바타 캐릭터 변경 (8종)</span>
+                    <span>아바타 캐릭터 & 내 사진</span>
                   </div>
-                  <span className="text-[10px] text-stone-400 font-semibold">클릭 시 즉시 적용</span>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="text-[10px] font-black bg-gradient-to-r from-amber-500 to-orange-500 text-white px-2.5 py-1 rounded-full shadow-xs hover:brightness-105 active:scale-95 flex items-center gap-1 cursor-pointer transition-all"
+                  >
+                    <Camera className="w-3 h-3" />
+                    <span>내 사진 등록/크롭</span>
+                  </button>
+                </div>
+
+                {/* Direct Upload Banner Card */}
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="mb-2.5 p-2.5 rounded-xl border-2 border-dashed border-amber-300 bg-amber-50/50 hover:bg-amber-100/60 cursor-pointer flex items-center justify-between transition-all group"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform flex-shrink-0">
+                      <Camera className="w-5 h-5" />
+                    </div>
+                    <div className="text-left">
+                      <div className="text-xs font-black text-amber-950 flex items-center gap-1">
+                        <span>내 얼굴 / 반려동물 사진 직접 등록</span>
+                        <span className="text-[9px] bg-amber-200 text-amber-900 font-extrabold px-1.5 py-0.2 rounded-full">
+                          크롭 & 모바일 최적화
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-amber-800/80 font-medium">
+                        카메라 촬영 또는 갤러리 사진을 원하는 영역으로 잘라 아바타로 사용하세요
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-6 h-6 rounded-full bg-amber-200/80 flex items-center justify-center text-amber-800 text-xs font-black flex-shrink-0 ml-2">
+                    +
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {/* Saved Custom Avatar Card if available */}
+                  {savedCustomAvatar && (
+                    <div
+                      onClick={() => handleSelectAvatar(savedCustomAvatar)}
+                      className={`p-2 rounded-2xl border-2 flex flex-col items-center text-center cursor-pointer transition-all active:scale-95 relative ${
+                        chefAvatar === savedCustomAvatar
+                          ? 'bg-amber-50 border-amber-500 ring-2 ring-amber-300/60 shadow-sm'
+                          : 'bg-stone-50/70 border-stone-200 hover:border-amber-300 hover:bg-amber-50/40'
+                      }`}
+                    >
+                      <div className="relative mb-1.5">
+                        <img
+                          src={savedCustomAvatar}
+                          alt="내 커스텀 사진"
+                          className="w-12 h-12 rounded-full object-cover border border-white shadow-xs"
+                        />
+                        <span className="absolute -bottom-1 -right-1 text-xs bg-white rounded-full p-0.5 shadow-xs border">
+                          📷
+                        </span>
+                        {chefAvatar === savedCustomAvatar && (
+                          <div className="absolute inset-0 bg-amber-600/30 rounded-full flex items-center justify-center">
+                            <Check className="w-5 h-5 text-white drop-shadow stroke-[3]" />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="text-[11px] font-black text-stone-800 leading-tight">
+                        내 사진 아바타
+                      </div>
+                      <div className="text-[9px] font-bold text-amber-700 leading-tight mt-0.5">
+                        직접 등록 완료
+                      </div>
+                    </div>
+                  )}
+
                   {AVATAR_OPTIONS.map((av) => {
                     const isSelected = chefAvatar === av.url;
                     return (
@@ -920,6 +1057,17 @@ export const MyPageModal: React.FC<MyPageModalProps> = ({
         </div>
 
       </div>
+
+      {/* Interactive Avatar Cropper Modal (Mobile Optimized) */}
+      <AvatarCropModal
+        isOpen={isCropModalOpen}
+        imageSrc={cropImageSrc}
+        onClose={() => {
+          setIsCropModalOpen(false);
+          setCropImageSrc(null);
+        }}
+        onCropComplete={handleCropComplete}
+      />
     </div>
   );
 };
