@@ -108,11 +108,16 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({
         >
           {currentTab === 'game' ? (
             <>
-              <img
-                src="/extracted/btn_jewelbox_clean.png"
-                alt="Jewel Box"
-                className="w-full h-full object-contain filter drop-shadow-sm"
-              />
+              <picture>
+                <source srcSet="/extracted/btn_jewelbox_clean.webp" type="image/webp" />
+                <img
+                  src="/extracted/btn_jewelbox_clean.png"
+                  alt="Jewel Box"
+                  width={44}
+                  height={44}
+                  className="w-full h-full object-contain filter drop-shadow-sm"
+                />
+              </picture>
               {/* Badge */}
               {occupiedBackpackCount > 0 && (
                 <div className="absolute -top-1 -right-1 bg-amber-400 text-amber-950 font-black text-[8px] w-4 h-4 rounded-full flex items-center justify-center border border-white shadow">

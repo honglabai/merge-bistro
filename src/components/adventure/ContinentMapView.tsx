@@ -111,11 +111,18 @@ export const ContinentMapView: React.FC<ContinentMapViewProps> = ({
         
         {/* Background Map Viewport */}
         <div className="relative w-full aspect-[16/9] bg-slate-900 overflow-hidden group">
-          <img
-            src="/adventure-continent-map.jpg"
-            alt="Continent of Asteria Adventure Map"
-            className="w-full h-full object-cover filter brightness-[1.03] transition-transform duration-700 group-hover:scale-[1.02]"
-          />
+          <picture>
+            <source srcSet="/adventure-continent-map.webp" type="image/webp" />
+            <img
+              src="/adventure-continent-map.jpg"
+              alt="Continent of Asteria Adventure Map"
+              width={1200}
+              height={675}
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover filter brightness-[1.03] transition-transform duration-700 group-hover:scale-[1.02]"
+            />
+          </picture>
 
           {/* Atmospheric Sunlight Vignette */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />

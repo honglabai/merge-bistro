@@ -130,11 +130,18 @@ export const OrderQueueBar: React.FC = () => {
       
       {/* Bistro Bakery Hero Background with Cat Barista (Cat face centered above cards) */}
       <div className="relative w-full h-[14.5dvh] min-h-[120px] max-h-[140px] bg-[#3e2723] overflow-hidden">
-        <img
-          src="/bistro-window-cat.png"
-          alt="Bistro Bakery with Cat Barista"
-          className="w-full h-full object-cover object-[center_50%] filter brightness-105"
-        />
+        <picture>
+          <source srcSet="/bistro-window-cat.webp" type="image/webp" />
+          <img
+            src="/bistro-window-cat.png"
+            alt="Bistro Bakery with Cat Barista"
+            width={960}
+            height={465}
+            fetchPriority="high"
+            decoding="async"
+            className="w-full h-full object-cover object-[center_50%] filter brightness-105"
+          />
+        </picture>
 
         {/* Soft atmospheric gradient to provide depth while keeping cat & shop vivid */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/45 pointer-events-none" />
@@ -195,7 +202,7 @@ export const OrderQueueBar: React.FC = () => {
               const isUrgent = !hasItem && (order.timeLeft ?? 999) <= 300; // 5 minutes or less
 
               const borderTheme = isVIP
-                ? 'border-amber-400 bg-gradient-to-b from-amber-100/95 to-orange-100/95 ring-2 ring-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.9)] animate-pulse'
+                ? 'border-amber-400 bg-gradient-to-b from-amber-100/95 to-orange-100/95 ring-2 ring-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.9)]'
                 : isUrgent
                 ? 'border-rose-400 bg-rose-50/95 ring-1 ring-rose-400/90 shadow-md'
                 : cardBorderColors[idx % cardBorderColors.length];
@@ -280,17 +287,17 @@ export const OrderQueueBar: React.FC = () => {
                     className={`w-full flex items-center justify-between px-1 py-0.5 rounded-b-[4px] text-white leading-none ${
                       isVIP
                         ? hasItem
-                          ? 'bg-gradient-to-r from-amber-600 to-emerald-600 animate-pulse'
-                          : 'bg-gradient-to-r from-amber-600 to-rose-600'
+                          ? 'bg-gradient-to-r from-amber-700 to-emerald-700'
+                          : 'bg-gradient-to-r from-amber-700 to-rose-700'
                         : hasItem
-                        ? 'bg-emerald-600 shadow-xs'
+                        ? 'bg-emerald-700 shadow-xs'
                         : isUrgent
-                        ? 'bg-gradient-to-r from-rose-600 to-amber-700 animate-pulse'
-                        : 'bg-[#1b7367]'
+                        ? 'bg-gradient-to-r from-rose-700 to-amber-800'
+                        : 'bg-[#0c4038]'
                     }`}
                   >
-                    {/* Left: Reward Coins */}
-                    <span className="text-[7.5px] sm:text-[8px] font-black text-amber-300 tracking-tight flex items-center gap-0.5 leading-none whitespace-nowrap flex-shrink-0">
+                    {/* Left: Reward Coins (High contrast text on dark teal/amber) */}
+                    <span className="text-[7.5px] sm:text-[8px] font-black text-amber-200 tracking-tight flex items-center gap-0.5 leading-none whitespace-nowrap flex-shrink-0">
                       +{order.rewardCoins}🪙
                     </span>
 
@@ -307,7 +314,7 @@ export const OrderQueueBar: React.FC = () => {
                             }
                             fulfillOrder(order.id);
                           }}
-                          className="flex items-center gap-0.5 text-[7px] sm:text-[7.5px] font-black text-white bg-emerald-500 hover:bg-emerald-400 active:scale-95 px-1.5 py-0.5 rounded shadow-xs"
+                          className="flex items-center gap-0.5 text-[7px] sm:text-[7.5px] font-black text-white bg-emerald-800 hover:bg-emerald-700 active:scale-95 px-1.5 py-0.5 rounded shadow-xs border border-emerald-500/50"
                           title="즉시 납품하기"
                         >
                           <Check className="w-2 h-2 stroke-[3]" />
@@ -329,8 +336,8 @@ export const OrderQueueBar: React.FC = () => {
                         </>
                       ) : (
                         <>
-                          <Clock className="w-1.5 h-1.5 text-white/80" />
-                          <span className="text-white/95 font-bold tracking-tight">
+                          <Clock className="w-1.5 h-1.5 text-white/90" />
+                          <span className="text-white font-bold tracking-tight">
                             {formatOrderTime(order.timeLeft)}
                           </span>
                         </>
@@ -338,10 +345,10 @@ export const OrderQueueBar: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Micro Expiration Progress Bar at the very bottom edge of card */}
-                  <div className="w-full h-[2px] bg-black/25 overflow-hidden rounded-b-[4px]">
+                  {/* Micro Expiration Progress Bar at the very bottom edge of card (GPU Composited) */}
+                  <div className="w-full h-[2px] bg-black/40 overflow-hidden rounded-b-[4px]">
                     <div
-                      className={`h-full transition-all duration-1000 ${
+                      className={`h-full w-full origin-left transition-transform duration-1000 will-change-transform ${
                         isVIP
                           ? 'bg-amber-300'
                           : isUrgent
@@ -349,7 +356,7 @@ export const OrderQueueBar: React.FC = () => {
                           : 'bg-emerald-400'
                       }`}
                       style={{
-                        width: `${progressPercent}%`
+                        transform: `scaleX(${progressPercent / 100})`
                       }}
                     />
                   </div>

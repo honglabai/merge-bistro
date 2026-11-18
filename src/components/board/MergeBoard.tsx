@@ -124,7 +124,7 @@ export const MergeBoard: React.FC = () => {
 
         {/* 7x9 = 63 Exact Mathematical 1:1 Square Checkerboard Grid */}
         <div
-          className={`box-content rounded-2xl overflow-hidden shadow-2xl mx-auto flex-shrink-0 border-2 transition-all duration-300 ${
+          className={`box-content rounded-2xl overflow-hidden shadow-2xl mx-auto flex-shrink-0 border-2 transition-[border-color,box-shadow] duration-300 ${
             isFeverActive
               ? 'border-amber-400 ring-4 ring-amber-300 shadow-[0_0_25px_rgba(245,158,11,0.9)] animate-pulse'
               : 'border-[#166d62]/80 ring-1 ring-black/15'
@@ -229,7 +229,7 @@ export const MergeBoard: React.FC = () => {
                       />
                     </div>
                   ) : (
-                    <span className="text-[8px] text-white/80 z-10 font-bold">거미줄</span>
+                    <span className="text-[8px] bg-black/75 text-white font-black px-1.5 py-0.5 rounded shadow-xs z-10">거미줄</span>
                   )}
                 </div>
               )}

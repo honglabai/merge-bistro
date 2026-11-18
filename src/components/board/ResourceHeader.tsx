@@ -88,18 +88,23 @@ export const ResourceHeader: React.FC<ResourceHeaderProps> = ({
             </div>
           ) : (
             <>
-              <img
-                src="/extracted/btn_map_clean.png"
-                alt="Map"
-                className="w-full h-full object-contain filter drop-shadow-sm"
-              />
+              <picture>
+                <source srcSet="/extracted/btn_map_clean.webp" type="image/webp" />
+                <img
+                  src="/extracted/btn_map_clean.png"
+                  alt="대륙 모험 지도 열기"
+                  width={44}
+                  height={44}
+                  className="w-full h-full object-contain filter drop-shadow-sm"
+                />
+              </picture>
               {/* Notification badge if quest claimable or restoration ready */}
               {hasClaimableQuest ? (
                 <div className="absolute -top-1 -right-1 bg-amber-400 text-amber-950 font-black text-[8px] px-1 py-0.2 rounded-full flex items-center justify-center border border-white shadow animate-bounce">
                   🎯UP!
                 </div>
               ) : canRestore ? (
-                <div className="absolute -top-1 -right-1 bg-rose-500 text-white font-black text-[8px] px-1 py-0.2 rounded-full flex items-center justify-center border border-white shadow animate-bounce">
+                <div className="absolute -top-1 -right-1 bg-rose-700 text-white font-black text-[8px] px-1 py-0.2 rounded-full flex items-center justify-center border border-white shadow animate-bounce">
                   ⭐UP!
                 </div>
               ) : null}
@@ -159,7 +164,7 @@ export const ResourceHeader: React.FC<ResourceHeaderProps> = ({
             className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-tr from-amber-400 via-amber-500 to-orange-500 border-2 border-white text-white flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-transform flex-shrink-0 cursor-pointer drop-shadow-md"
           >
             <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow" />
-            <span className="absolute -top-1 -right-1 bg-rose-500 text-white font-black text-[8px] px-1 py-0.2 rounded-full border border-white shadow">
+            <span className="absolute -top-1 -right-1 bg-rose-700 text-white font-black text-[8px] px-1 py-0.2 rounded-full border border-white shadow">
               장터
             </span>
           </button>

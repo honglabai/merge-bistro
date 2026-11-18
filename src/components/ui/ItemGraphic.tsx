@@ -7,30 +7,36 @@ interface ItemGraphicProps {
   level: number;
   isGenerator?: boolean;
   className?: string;
+  priority?: boolean;
 }
 
 export const ItemGraphic: React.FC<ItemGraphicProps> = ({
   chainId,
   level,
   isGenerator = false,
-  className = 'w-full h-full'
+  className = 'w-full h-full',
+  priority = false
 }) => {
   const baseKey = isGenerator ? `${chainId}_gen` : `${chainId}_${level}`;
-  const [imgSrc, setImgSrc] = useState(`/items/${baseKey}.png`);
+  // Prioritize high-performance lightweight WebP
+  const [imgSrc, setImgSrc] = useState(`/items/${baseKey}.webp`);
   const [hasError, setHasError] = useState(false);
   const itemDef = getItemDef(chainId, level);
 
   useEffect(() => {
-    setImgSrc(`/items/${baseKey}.png`);
+    setImgSrc(`/items/${baseKey}.webp`);
     setHasError(false);
   }, [baseKey]);
 
   const handleError = () => {
-    if (imgSrc.endsWith('.png')) {
-      // Fallback to SVG if PNG is missing
+    if (imgSrc.endsWith('.webp')) {
+      // Fallback to optimized PNG
+      setImgSrc(`/items/${baseKey}.png`);
+    } else if (imgSrc.endsWith('.png')) {
+      // Fallback to SVG vector
       setImgSrc(`/items/${baseKey}.svg`);
     } else {
-      // If both fail, fallback to emoji
+      // If all formats fail, fallback to emoji
       setHasError(true);
     }
   };
@@ -48,7 +54,9 @@ export const ItemGraphic: React.FC<ItemGraphicProps> = ({
       key={imgSrc}
       src={imgSrc}
       alt={itemDef?.name || 'Item'}
-      loading="eager"
+      width={72}
+      height={72}
+      loading={priority ? 'eager' : 'lazy'}
       decoding="async"
       onError={handleError}
       className={`object-contain select-none pointer-events-none filter drop-shadow-[0_4px_6px_rgba(0,0,0,0.32)] transition-transform ${className}`}
