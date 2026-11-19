@@ -6,6 +6,7 @@ import { MergeBoard } from './components/board/MergeBoard';
 import { BottomActionBar } from './components/board/BottomActionBar';
 import { Toast } from './components/ui/Toast';
 import { ParticleCanvas } from './components/ui/ParticleCanvas';
+import { GameTitleLandingScreen } from './components/modals/GameTitleLandingScreen';
 
 // Code-split heavy views and secondary modals to reduce initial JS payload
 const TownRestorationView = lazy(() => import('./components/meta/TownRestorationView').then(m => ({ default: m.TownRestorationView })));
@@ -28,6 +29,7 @@ export const App: React.FC = () => {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isResetOpen, setIsResetOpen] = useState(false);
   const [isHomeMenuOpen, setIsHomeMenuOpen] = useState(false);
+  const [isTitleLandingOpen, setIsTitleLandingOpen] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
 
   const init = useGameStore(s => s.init);
@@ -215,6 +217,7 @@ export const App: React.FC = () => {
             onOpenMyPage={() => setIsMyPageOpen(true)}
             onOpenHelp={() => setIsHelpOpen(true)}
             onOpenResetConfirm={() => setIsResetOpen(true)}
+            onOpenLanding={() => setIsTitleLandingOpen(true)}
           />
         )}
         <DialogueModal />
@@ -231,6 +234,12 @@ export const App: React.FC = () => {
         {isShopOpen && <ShopMarketModal isOpen={isShopOpen} onClose={() => setIsShopOpen(false)} />}
       </Suspense>
       <Toast />
+
+      {/* Game Title & Story Landing Screen (Mobile-Optimized) */}
+      <GameTitleLandingScreen
+        isOpen={isTitleLandingOpen}
+        onStart={() => setIsTitleLandingOpen(false)}
+      />
 
     </div>
   );

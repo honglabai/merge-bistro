@@ -13,6 +13,7 @@ interface HomeMenuModalProps {
   onOpenMyPage: () => void;
   onOpenHelp: () => void;
   onOpenResetConfirm: () => void;
+  onOpenLanding?: () => void;
 }
 
 export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
@@ -22,7 +23,8 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
   onSelectTab,
   onOpenMyPage,
   onOpenHelp,
-  onOpenResetConfirm
+  onOpenResetConfirm,
+  onOpenLanding
 }) => {
   const {
     energy,
@@ -393,6 +395,23 @@ export const HomeMenuModal: React.FC<HomeMenuModalProps> = ({
               <HelpCircle className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
               <span className="whitespace-nowrap">플레이 가이드</span>
             </button>
+
+            {/* View Title & Landing Screen */}
+            {onOpenLanding && (
+              <button
+                onClick={() => {
+                  onClose();
+                  onOpenLanding();
+                }}
+                className="col-span-2 py-2 px-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border-2 border-amber-400 text-amber-950 text-[11px] font-black flex items-center justify-between shadow-xs active:scale-95 transition-all cursor-pointer"
+              >
+                <div className="flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                  <span>게임 타이틀 & 랜딩 화면 보기</span>
+                </div>
+                <ChevronRight className="w-3.5 h-3.5 text-amber-600" />
+              </button>
+            )}
 
             {/* Reset Game */}
             <button
