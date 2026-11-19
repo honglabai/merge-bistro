@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, Lock, Sparkles, Flame } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 import { ItemGraphic } from '../ui/ItemGraphic';
+import { CobwebGraphic } from './CobwebGraphic';
 
 export const MergeBoard: React.FC = () => {
   const {
@@ -215,22 +216,21 @@ export const MergeBoard: React.FC = () => {
               )}
 
               {cell.state === 'COBWEB' && (
-                <div className="w-full h-full flex flex-col items-center justify-center relative p-0">
-                  <span className="absolute text-white/40 text-2xl sm:text-3xl select-none pointer-events-none z-10 drop-shadow-sm">
-                    🕸️
-                  </span>
-                  {cell.item ? (
-                    <div className="w-[96%] h-[96%] flex items-center justify-center z-0 relative opacity-85">
+                <div className="w-full h-full flex items-center justify-center relative p-0 overflow-hidden">
+                  {/* Trapped Item (if any) beneath the web */}
+                  {cell.item && (
+                    <div className="w-[96%] h-[96%] flex items-center justify-center z-0 relative opacity-85 filter brightness-90">
                       <ItemGraphic
                         chainId={cell.item.chainId}
                         level={cell.item.level}
                         isGenerator={cell.item.isGenerator}
-                        className="w-full h-full filter brightness-95"
+                        className="w-full h-full"
                       />
                     </div>
-                  ) : (
-                    <span className="text-[8px] bg-black/75 text-white font-black px-1.5 py-0.5 rounded shadow-xs z-10">거미줄</span>
                   )}
+
+                  {/* Bright Gray Realistic Cobweb Overlay (No text, no black box) */}
+                  <CobwebGraphic className="absolute inset-0 w-full h-full pointer-events-none z-10" />
                 </div>
               )}
 
